@@ -1,6 +1,11 @@
 import SwiftUI
 import CoreData
 
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
+import UIKit
+#endif
 
 struct DetailsView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -160,8 +165,8 @@ struct DetailsView: View {
     
     // Call this function whenever you make a change that you want to save
     private func updateProject() {
-        saveContext()
-    }
+            saveContext()
+        }
 }
 
 extension Optional where Wrapped == String {
@@ -171,6 +176,7 @@ extension Optional where Wrapped == String {
     }
 }
 
+#if os(macOS)
 extension Data {
     var pngData: Data? {
         guard let imageRep = NSBitmapImageRep(data: self),
@@ -180,6 +186,7 @@ extension Data {
         return pngData
     }
 }
+#endif
 
 
 
@@ -295,6 +302,22 @@ struct ContactModalView: View {
     }
 }
 
-
-
-
+struct ImagePickerButton: View {
+    var body: some View {
+        Button(action: {
+            #if os(macOS)
+            let panel = NSOpenPanel()
+            panel.begin { response in
+                if response == .OK, let url = panel.url {
+                    let image = NSImage(contentsOf: url)
+                    // Use the image
+                }
+            }
+            #elseif os(iOS)
+            // On iOS, you would present a UIImagePickerController from a UIViewController
+            #endif
+        }) {
+            Text("Open Image Picker")
+        }
+    }
+}

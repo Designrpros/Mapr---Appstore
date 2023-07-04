@@ -1,5 +1,12 @@
 import SwiftUI
 import MapKit
+import CoreData
+
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
+import UIKit
+#endif
 
 struct MapListView: View {
     @State private var searchText = ""
