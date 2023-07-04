@@ -293,8 +293,9 @@ struct PreviewView: View {
                 for pageIndex in 0..<pageCount {
                     // Create a new view for each page
                     let pageView = pdfView
-                        .frame(width: pdfWidth, height: pdfHeight)
-                        .offset(y: -CGFloat(pageIndex) * pdfHeight)
+                        .frame(width: contentRect.width, height: contentRect.height)
+                        .offset(y: -CGFloat(pageIndex) * contentRect.height)
+
                     let renderer = ImageRenderer(content: pageView)
                     guard let cgImage = renderer.cgImage else { continue }
 

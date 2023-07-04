@@ -278,7 +278,7 @@ struct ContactModalView: View {
                             }
                         }
                     }
-                }.frame(width: 300, height: 400)
+                }.frame(width: 300, height: 250)
                 
                 Button(action: {
                     isPresented = false
