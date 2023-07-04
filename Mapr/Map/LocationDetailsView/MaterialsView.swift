@@ -49,11 +49,11 @@ struct MaterialsView: View {
         VStack(alignment: .leading) {
             HStack(spacing: 0) {
                 Text("Number")
-                    .frame(width: 70)
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                 Text("Amount")
-                    .frame(width: 70)
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                 Text("Description")
@@ -61,11 +61,11 @@ struct MaterialsView: View {
                     .padding()
                     .background(Color.gray.opacity(0.2))
                 Text("Price")
-                    .frame(width: 70)
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                 Text("Actions")
-                    .frame(width: 100)
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
             }
@@ -79,7 +79,7 @@ struct MaterialsView: View {
                         material.number = Int64($0)
                         saveContext()
                     }), formatter: NumberFormatter())
-                        .frame(width: 70)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .cornerRadius(5)
                         .textFieldStyle(PlainTextFieldStyle())
@@ -90,7 +90,7 @@ struct MaterialsView: View {
                         material.amount = Int16($0)
                         saveContext()
                     }), formatter: NumberFormatter())
-                        .frame(width: 70)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .cornerRadius(5)
                         .textFieldStyle(PlainTextFieldStyle())
@@ -112,7 +112,7 @@ struct MaterialsView: View {
                         material.price = $0
                         saveContext()
                     }), formatter: NumberFormatter())
-                        .frame(width: 70)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .cornerRadius(5)
                         .textFieldStyle(PlainTextFieldStyle())
@@ -130,7 +130,7 @@ struct MaterialsView: View {
                     }
                     .padding()
                     .cornerRadius(5)
-                    .frame(width: 100)
+                    .frame(maxWidth: .infinity)
                 }
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(5)
