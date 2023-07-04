@@ -98,6 +98,7 @@ struct DetailsView: View {
                         
                         Spacer()
                         
+                        #if os(macOS)
                         Button(action: {
                             let panel = NSOpenPanel()
                             panel.allowsMultipleSelection = true
@@ -120,10 +121,12 @@ struct DetailsView: View {
                             Image(systemName: "plus")
                         }
                         .buttonStyle(BorderlessButtonStyle())
+                        #endif
 
                     }
                     .padding(.bottom)
                     
+                    #if os(macOS)
                     if let imagesSet = project.galleryImage as? Set<GalleryImage>, !imagesSet.isEmpty {
                         let imagesArray = Array(imagesSet)
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
@@ -147,6 +150,7 @@ struct DetailsView: View {
                     } else {
                         Text("Select images")
                     }
+                    #endif
                     
                     Spacer()
                 }
