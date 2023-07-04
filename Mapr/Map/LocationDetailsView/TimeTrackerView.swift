@@ -2,6 +2,7 @@ import SwiftUI
 import CoreData
 
 class TimeTrackerViewModel: ObservableObject {
+    
     @Published var timeEntries: [TimeTracker] = []
     private var viewContext: NSManagedObjectContext?
     private var project: Project?
@@ -43,7 +44,7 @@ class TimeTrackerViewModel: ObservableObject {
 struct TimeTrackerView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var project: Project
-    @StateObject private var viewModel = TimeTrackerViewModel()
+    @ObservedObject var viewModel: TimeTrackerViewModel
     
     var body: some View {
             VStack(alignment: .leading) {

@@ -43,8 +43,8 @@ class MaterialsViewModel: ObservableObject {
 struct MaterialsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var project: Project
-    @StateObject private var viewModel = MaterialsViewModel()
-
+    @ObservedObject var viewModel: MaterialsViewModel
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack(spacing: 0) {

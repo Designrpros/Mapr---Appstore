@@ -59,6 +59,11 @@ struct LocationDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedContact: Contact?
+    
+    
+    @StateObject private var timeTrackerViewModel = TimeTrackerViewModel()
+    @StateObject private var materialsViewModel = MaterialsViewModel()
+    @StateObject private var checklistViewModel = ChecklistViewModel()
 
     
     var body: some View {
@@ -163,13 +168,13 @@ struct LocationDetailView: View {
                             DetailsView(project: project)
                                 .onAppear(perform: saveContext)
                         case 1:
-                            TimeTrackerView(project: project)
+                            TimeTrackerView(project: project, viewModel: timeTrackerViewModel)
                         case 2:
-                            MaterialsView(project: project)
+                            MaterialsView(project: project, viewModel: materialsViewModel)
                         case 3:
-                            ChecklistView(project: project)
+                            ChecklistView(project: project, viewModel: checklistViewModel)
                         case 4:
-                            PreviewView(project: project)
+                            PreviewView(project: project, timeTrackerViewModel: timeTrackerViewModel, materialsViewModel: materialsViewModel, checklistViewModel: checklistViewModel)
                         default:
                             EmptyView()
                         }

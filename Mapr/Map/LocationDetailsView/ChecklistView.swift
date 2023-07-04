@@ -62,8 +62,8 @@ class ChecklistViewModel: ObservableObject {
 struct ChecklistView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var project: Project
-    @StateObject private var viewModel = ChecklistViewModel()
-
+    @ObservedObject var viewModel: ChecklistViewModel
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack(spacing: 0) {
