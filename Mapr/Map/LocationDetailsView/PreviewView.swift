@@ -211,7 +211,7 @@ struct PreviewView: View {
         .background(Color.gray.opacity(0.1))
         .cornerRadius(5)
     }
-    
+
     private func saveAsPDF(pdfView: some View) {
         // Estimate the height of your content
         let itemHeight = CGFloat(50) // Estimate of the height of each item in your lists
@@ -279,10 +279,15 @@ struct PreviewView: View {
                 let coverRenderer = ImageRenderer(content: coverPage)
                 guard let coverCGImage = coverRenderer.cgImage else { return }
 
+                let margin = CGFloat(20) // Adjust this to change the margin size
+                let contentRect = CGRect(x: margin, y: margin, width: pdfWidth - 2 * margin, height: pdfHeight - 2 * margin)
+
+                // Draw the cover page
                 pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
-                pdfContext.draw(coverCGImage, in: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight)))
+                pdfContext.draw(coverCGImage, in: contentRect)
                 pdfContext.endPDFPage()
-                // Render the rest of the content
+
+                // Draw the rest of the pages
                 for pageIndex in 0..<pageCount {
                     // Create a new view for each page
                     let pageView = pdfView
@@ -292,7 +297,7 @@ struct PreviewView: View {
                     guard let cgImage = renderer.cgImage else { continue }
 
                     pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
-                    pdfContext.draw(cgImage, in: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight)))
+                    pdfContext.draw(cgImage, in: contentRect)
                     pdfContext.endPDFPage()
                 }
 
@@ -304,7 +309,6 @@ struct PreviewView: View {
             }
         }
     }
-
 
 
 
