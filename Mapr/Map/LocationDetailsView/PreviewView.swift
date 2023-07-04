@@ -1,8 +1,7 @@
 import SwiftUI
 import CoreData
-#if os(iOS)
-import UIKit
-#endif
+
+#if os(macOS)
 
 struct PreviewView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -36,7 +35,7 @@ struct PreviewView: View {
         }
         
         ScrollView {
-            previewContent
+                previewContent
         }
         
     }
@@ -50,26 +49,26 @@ struct PreviewView: View {
                     Text(project.location?.name ?? "No Address Title")
                         .font(.title)
                         .frame(maxWidth: .infinity, alignment: .leading) // Add this line
-                    
+
                     Text("\(project.location?.postalCode ?? ""), \(project.location?.city ?? ""), \(project.location?.country ?? "")")
                         .font(.subheadline)
                         .frame(maxWidth: .infinity, alignment: .leading) // Add this line
-                    
+
                     // Project Description
                     Text(project.projectDescription.bound)
                         .padding(.top)
                         .frame(maxWidth: .infinity, alignment: .leading) // Add this line
                 }
-                
+
                 Spacer()
-                
+
                 // Contact Information
                 VStack(alignment: .leading) {
                     Text("Contact Information")
                         .font(.headline)
                         .padding(.top)
                         .frame(maxWidth: .infinity, alignment: .leading) // Add this line
-                    
+
                     if let contact = project.contact {
                         VStack(alignment: .leading){
                             HStack {
@@ -89,11 +88,11 @@ struct PreviewView: View {
                                 Text(" \(contact.address ?? "Unknown")")
                             }
                         }.padding(.bottom)
-                            .frame(maxWidth: .infinity, alignment: .leading) // Add this line
+                          .frame(maxWidth: .infinity, alignment: .leading) // Add this line
                     }
                 }
             }
-            
+
             
             // Gallery
             VStack(alignment: .leading) {
@@ -105,22 +104,11 @@ struct PreviewView: View {
                     let imagesArray = Array(imagesSet)
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
                         ForEach(imagesArray, id: \.id) { galleryImage in
-                            if let imageData = galleryImage.imageData {
-#if os(iOS)
-                                if let uiImage = UIImage(data: imageData) {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                }
-#elseif os(macOS)
-                                if let nsImage = NSImage(data: imageData) {
-                                    Image(nsImage: nsImage)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                }
-#endif
+                            if let imageData = galleryImage.imageData, let nsImage = NSImage(data: imageData) {
+                                Image(nsImage: nsImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
                             }
-                            
                         }
                     }
                 } else {
@@ -225,28 +213,22 @@ struct PreviewView: View {
         .background(Color.gray.opacity(0.1))
         .cornerRadius(5)
     }
-    
+
     private func saveAsPDF(pdfView: some View) {
         // Estimate the height of your content
         let itemHeight = CGFloat(50) // Estimate of the height of each item in your lists
         let otherContentHeight = CGFloat(500) // Estimate of the height of the other content
-        
+
         let timeEntriesHeight = itemHeight * CGFloat(timeTrackerViewModel.timeEntries.count)
         let materialsHeight = itemHeight * CGFloat(materialsViewModel.materials.count)
         let checklistItemsHeight = itemHeight * CGFloat(checklistViewModel.checklistItems.count)
-        
+
         let contentHeight = timeEntriesHeight + materialsHeight + checklistItemsHeight + otherContentHeight
-        
+
         let pdfWidth = CGFloat(595) // Width of a standard A4 page
         let pdfHeight = CGFloat(842) // Height of a standard A4 page
         let pageCount = Int(ceil(contentHeight / pdfHeight)) // Calculate the number of pages
-        
-#if os(iOS)
-        // Generate PDF data
-        let pdfData = generatePDFData(pdfView: pdfView, pdfWidth: pdfWidth, pdfHeight: pdfHeight, pageCount: pageCount)
-        let activityVC = UIActivityViewController(activityItems: [pdfData], applicationActivities: nil)
-        UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
-#elseif os(macOS)
+
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
@@ -254,12 +236,12 @@ struct PreviewView: View {
         panel.begin { response in
             if response == .OK, let directoryURL = panel.url {
                 let pdfURL = directoryURL.appendingPathComponent("preview.pdf")
-                
+
                 guard let consumer = CGDataConsumer(url: pdfURL as CFURL),
                       let pdfContext = CGContext(consumer: consumer, mediaBox: nil, nil) else {
                     return
                 }
-                
+
                 // Create a cover page
                 let coverPage = VStack {
                     Spacer()
@@ -291,22 +273,22 @@ struct PreviewView: View {
                                 Text(" \(contact.address ?? "Unknown")")
                             }
                         }.padding(.bottom)
-                            .frame(maxWidth: .infinity, alignment: .center)
+                         .frame(maxWidth: .infinity, alignment: .center)
                         Spacer()
                     }
                 }
-                    .frame(width: pdfWidth, height: pdfHeight)
+                .frame(width: pdfWidth, height: pdfHeight)
                 let coverRenderer = ImageRenderer(content: coverPage)
                 guard let coverCGImage = coverRenderer.cgImage else { return }
-                
+
                 let margin = CGFloat(20) // Adjust this to change the margin size
                 let contentRect = CGRect(x: margin, y: margin, width: pdfWidth - 2 * margin, height: pdfHeight - 2 * margin)
-                
+
                 // Draw the cover page
                 pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
                 pdfContext.draw(coverCGImage, in: contentRect)
                 pdfContext.endPDFPage()
-                
+
                 // Draw the rest of the pages
                 for pageIndex in 0..<pageCount {
                     // Create a new view for each page
@@ -315,58 +297,19 @@ struct PreviewView: View {
                         .offset(y: -CGFloat(pageIndex) * pdfHeight)
                     let renderer = ImageRenderer(content: pageView)
                     guard let cgImage = renderer.cgImage else { continue }
-                    
+
                     pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
                     pdfContext.draw(cgImage, in: contentRect)
                     pdfContext.endPDFPage()
                 }
-                
+
                 pdfContext.closePDF()
-                
+
                 DispatchQueue.main.async {
                     isPDFSaved = true
                 }
             }
         }
-#endif
     }
-}
-
-#if os(iOS)
-struct PDFView: UIViewRepresentable {
-    var pageView: some View
-    
-    func makeUIView(context: Context) -> UIView {
-        let controller = UIHostingController(rootView: pageView)
-        return controller.view
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {
-    }
-}
-
-func generatePDFData(pdfView: some View, pdfWidth: CGFloat, pdfHeight: CGFloat) -> Data {
-    let pdfMetaData = [
-        kCGPDFContextCreator: "Your App",
-        kCGPDFContextAuthor: "Your Name",
-        kCGPDFContextTitle: "Your Document Title"
-    ]
-    let format = UIGraphicsPDFRendererFormat()
-    format.documentInfo = pdfMetaData as [String: Any]
-    let pageDimensions = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
-    let renderer = UIGraphicsPDFRenderer(bounds: pageDimensions, format: format)
-    
-    let pdfData = renderer.pdfData { context in
-        context.beginPage()
-        let pdfView = PDFView(pageView: pdfView)
-            .frame(width: pdfWidth, height: pdfHeight)
-        let controller = UIHostingController(rootView: pdfView)
-        let view = controller.view
-        view?.frame = pageDimensions
-        view?.backgroundColor = .white
-        view?.layer.render(in: context.cgContext)
-    }
-    
-    return pdfData
 }
 #endif
