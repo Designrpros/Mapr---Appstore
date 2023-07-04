@@ -6,6 +6,7 @@ struct Mapr: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.dark)
                 .environment(\.managedObjectContext, persistentContainer.viewContext)
         }
         #if os(macOS)
