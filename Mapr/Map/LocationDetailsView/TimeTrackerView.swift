@@ -80,17 +80,23 @@ struct TimeTrackerView: View {
                         .padding()
                         .cornerRadius(5)
                         
-                        Stepper(value: Binding(get: {
-                            timeEntry.hours
+                        Picker(selection: Binding(get: {
+                            Int(timeEntry.hours * 2)
                         }, set: {
-                            timeEntry.hours = $0
+                            timeEntry.hours = Double($0) / 2
                             saveContext()
-                        }), in: 0...24, step: 0.5) {
-                            Text("\(timeEntry.hours, specifier: "%.1f")")
+                        }), label: Text("")) {
+                            ForEach(0...48, id: \.self) { halfHour in
+                                Text("\(Double(halfHour) / 2, specifier: "%.1f")").tag(halfHour)
+                            }
                         }
-                        .frame(width: 100)
+                        .labelsHidden() // Hide the label
+                        .frame(width: 100, alignment: .center) // Set the frame width
+                        .clipped() // Clip the view to its bounding frame
                         .padding()
                         .cornerRadius(5)
+
+
                     
                     TextField("Description", text: Binding(get: {
                         timeEntry.notes ?? ""

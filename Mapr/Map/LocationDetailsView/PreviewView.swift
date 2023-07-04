@@ -26,7 +26,7 @@ struct PreviewView: View {
     
     var body: some View {
         ScrollView {
-            VStack {
+            VStack (alignment: .leading)  {
                 HStack{
                     VStack(alignment: .leading){
                         Text(project.location?.name ?? "No Address Title")
