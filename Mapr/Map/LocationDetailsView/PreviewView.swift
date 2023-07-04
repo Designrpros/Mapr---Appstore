@@ -224,7 +224,7 @@ struct PreviewView: View {
         let contentHeight = timeEntriesHeight + materialsHeight + checklistItemsHeight + otherContentHeight
 
         let pdfWidth = CGFloat(595) // Width of a standard A4 page
-        let pdfHeight = CGFloat(820) // Height of a standard A4 page
+        let pdfHeight = CGFloat(842) // Height of a standard A4 page
         let pageCount = Int(ceil(contentHeight / pdfHeight)) // Calculate the number of pages
 
         let panel = NSOpenPanel()
@@ -240,6 +240,22 @@ struct PreviewView: View {
                     return
                 }
 
+                // Create a cover page
+                let coverPage = VStack {
+                    Text(project.location?.name ?? "No Address Title")
+                        .font(.title)
+                    Text("\(project.location?.postalCode ?? ""), \(project.location?.city ?? ""), \(project.location?.country ?? "")")
+                        .font(.subheadline)
+                }
+                .frame(width: pdfWidth, height: pdfHeight)
+                let coverRenderer = ImageRenderer(content: coverPage)
+                guard let coverCGImage = coverRenderer.cgImage else { return }
+
+                pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
+                pdfContext.draw(coverCGImage, in: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight)))
+                pdfContext.endPDFPage()
+
+                // Render the rest of the content
                 for pageIndex in 0..<pageCount {
                     // Create a new view for each page
                     let pageView = pdfView
@@ -261,6 +277,7 @@ struct PreviewView: View {
             }
         }
     }
+
 
 
 
