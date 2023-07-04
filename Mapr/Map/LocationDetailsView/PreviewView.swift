@@ -242,10 +242,38 @@ struct PreviewView: View {
 
                 // Create a cover page
                 let coverPage = VStack {
+                    Spacer()
                     Text(project.location?.name ?? "No Address Title")
                         .font(.title)
                     Text("\(project.location?.postalCode ?? ""), \(project.location?.city ?? ""), \(project.location?.country ?? "")")
                         .font(.subheadline)
+                    // Project Description
+                    Text(project.projectDescription.bound)
+                        .padding(.top)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    Spacer()
+                    if let contact = project.contact {
+                        VStack(alignment: .leading){
+                            HStack {
+                                Image(systemName: "person.fill")
+                                Text("\(contact.name ?? "Unknown")")
+                            }
+                            HStack {
+                                Image(systemName: "envelope.fill")
+                                Text("\(contact.email ?? "Unknown")")
+                            }
+                            HStack {
+                                Image(systemName: "phone.fill")
+                                Text(" \(contact.phone ?? "Unknown")")
+                            }
+                            HStack {
+                                Image(systemName: "location.fill")
+                                Text(" \(contact.address ?? "Unknown")")
+                            }
+                        }.padding(.bottom)
+                         .frame(maxWidth: .infinity, alignment: .center)
+                        Spacer()
+                    }
                 }
                 .frame(width: pdfWidth, height: pdfHeight)
                 let coverRenderer = ImageRenderer(content: coverPage)
@@ -254,7 +282,6 @@ struct PreviewView: View {
                 pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
                 pdfContext.draw(coverCGImage, in: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight)))
                 pdfContext.endPDFPage()
-
                 // Render the rest of the content
                 for pageIndex in 0..<pageCount {
                     // Create a new view for each page
@@ -277,6 +304,7 @@ struct PreviewView: View {
             }
         }
     }
+
 
 
 
