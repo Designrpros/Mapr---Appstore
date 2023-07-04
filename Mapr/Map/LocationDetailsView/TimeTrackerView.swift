@@ -42,19 +42,19 @@ class TimeTrackerViewModel: ObservableObject {
 
 
 struct TimeTrackerView: View {
+    
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var project: Project
     @ObservedObject var viewModel: TimeTrackerViewModel
-    
     var body: some View {
             VStack(alignment: .leading) {
                 HStack(spacing: 0) {
                     Text("Date")
-                        .frame(width: 100)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.2))
                     Text("Hours")
-                        .frame(width: 100)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.2))
                     Text("Description")
@@ -62,7 +62,7 @@ struct TimeTrackerView: View {
                         .padding()
                         .background(Color.gray.opacity(0.2))
                     Text("Actions")
-                        .frame(width: 100)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.2))
                 }
@@ -77,7 +77,7 @@ struct TimeTrackerView: View {
                             saveContext()
                         }), displayedComponents: .date)
                         .datePickerStyle(CompactDatePickerStyle())
-                        .frame(width: 100)
+                        //.frame(width: 100)
                         .padding()
                         .cornerRadius(5)
                         
