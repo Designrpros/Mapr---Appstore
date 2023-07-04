@@ -1,90 +1,65 @@
-//
-//  ContentView.swift
-//  Mapr
-//
-//  Created by Vegar Berentsen on 04/07/2023.
-//
-
 import SwiftUI
-import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
+    @State private var selectedTab = 0
+    @State private var isShowing = false
+    @AppStorage("isDarkMode") private var isDarkMode = false
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
-                    }
+            VStack {
+                switch selectedTab {
+                case 0:
+                    MapListView()
+                        .navigationTitle("Map Locations")
+                case 1:
+                    ContactListView()
+                        .navigationTitle("Contacts")
+                default:
+                    Text("Invalid selection")
                 }
-                .onDelete(perform: deleteItems)
+                Spacer()
+                TabBar(selectedTab: $selectedTab)
+                    .frame(width: 235)
             }
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            Text("Select an item")
-        }
-    }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
+        }.frame(minHeight: 600)
+        .preferredColorScheme(isDarkMode ? .dark : .light)
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
+
+struct TabBar: View {
+    @Binding var selectedTab: Int
+    
+    var body: some View {
+        HStack {
+            TabButton(icon: "mappin.and.ellipse", tabNumber: 0, selectedTab: $selectedTab)
+            TabButton(icon: "person.2.fill", tabNumber: 1, selectedTab: $selectedTab)
+        }
+        .frame(height: 60)
+        .background(Color.accentColor)
+    }
+}
+
+struct TabButton: View {
+    let icon: String
+    let tabNumber: Int
+    @Binding var selectedTab: Int
+    
+    var body: some View {
+        Button(action: { selectedTab = tabNumber }) {
+            Image(systemName: icon)
+                .font(.system(size: 24))
+                .foregroundColor(selectedTab == tabNumber ? Color("CostumGray") : Color.primary)
+                .frame(maxWidth: .infinity, maxHeight: 60)
+        }
+        .buttonStyle(BorderlessButtonStyle())
+    }
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        ContentView()
     }
 }

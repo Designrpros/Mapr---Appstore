@@ -1,9 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="true" userDefinedModelVersionIdentifier="">
-    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
-        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22D68" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="ChecklistItem" representedClassName="ChecklistItem" syncable="YES" codeGenerationType="class">
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="item" optional="YES" attributeType="String"/>
+        <relationship name="children" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ChecklistItem" inverseName="parent" inverseEntity="ChecklistItem"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChecklistItem" inverseName="children" inverseEntity="ChecklistItem"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="checklistItem" inverseEntity="Project"/>
     </entity>
-    <elements>
-        <element name="Item" positionX="-63" positionY="-18" width="128" height="44"/>
-    </elements>
+    <entity name="Contact" representedClassName="Contact" syncable="YES" codeGenerationType="class">
+        <attribute name="address" optional="YES" attributeType="String"/>
+        <attribute name="email" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="phone" optional="YES" attributeType="String"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="contact" inverseEntity="Project"/>
+    </entity>
+    <entity name="GalleryImage" representedClassName="GalleryImage" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="galleryImage" inverseEntity="Project"/>
+    </entity>
+    <entity name="Location" representedClassName="Location" syncable="YES" codeGenerationType="class">
+        <attribute name="city" optional="YES" attributeType="String"/>
+        <attribute name="country" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="postalCode" optional="YES" attributeType="String"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="location" inverseEntity="Project"/>
+    </entity>
+    <entity name="Material" representedClassName="Material" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="materialDescription" optional="YES" attributeType="String"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="material" inverseEntity="Project"/>
+    </entity>
+    <entity name="Project" representedClassName="Project" syncable="YES" codeGenerationType="class">
+        <attribute name="addressDescription" optional="YES" attributeType="String"/>
+        <attribute name="addressSubtitle" optional="YES" attributeType="String"/>
+        <attribute name="addressTitle" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="projectDescription" optional="YES" attributeType="String"/>
+        <attribute name="projectName" optional="YES" attributeType="String"/>
+        <relationship name="checklistItem" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChecklistItem" inverseName="project" inverseEntity="ChecklistItem"/>
+        <relationship name="contact" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Contact" inverseName="project" inverseEntity="Contact"/>
+        <relationship name="galleryImage" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GalleryImage" inverseName="project" inverseEntity="GalleryImage"/>
+        <relationship name="location" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Location" inverseName="project" inverseEntity="Location"/>
+        <relationship name="material" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Material" inverseName="project" inverseEntity="Material"/>
+        <relationship name="timeTracker" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TimeTracker" inverseName="project" inverseEntity="TimeTracker"/>
+    </entity>
+    <entity name="TimeTracker" representedClassName="TimeTracker" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="hours" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="timeTracker" inverseEntity="Project"/>
+    </entity>
 </model>
