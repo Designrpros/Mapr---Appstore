@@ -102,11 +102,11 @@ struct PreviewView: View {
                     let imagesArray = Array(imagesSet)
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
                         ForEach(imagesArray, id: \.id) { galleryImage in
-                            if let imageData = galleryImage.imageData, let nsImage = NSImage(data: imageData) {
-                                Image(nsImage: nsImage)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                            }
+                            if let imageData = galleryImage.imageData, let uiImage = UIImage(data: imageData) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                    }
                         }
                     }
                 } else {
@@ -227,6 +227,12 @@ struct PreviewView: View {
         let pdfHeight = CGFloat(842) // Height of a standard A4 page
         let pageCount = Int(ceil(contentHeight / pdfHeight)) // Calculate the number of pages
 
+        #if os(iOS)
+        // Generate PDF data
+        let pdfData = generatePDFData(pdfView: pdfView, pdfWidth: pdfWidth, pdfHeight: pdfHeight, pageCount: pageCount)
+        let activityVC = UIActivityViewController(activityItems: [pdfData], applicationActivities: nil)
+        UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
+        #elseif os(macOS)
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
@@ -308,11 +314,42 @@ struct PreviewView: View {
                 }
             }
         }
+#endif
     }
+    
+    private func generatePDFData(pdfView: some View, pdfWidth: CGFloat, pdfHeight: CGFloat, pageCount: Int) -> Data {
+           let pdfMetaData = [
+               kCGPDFContextCreator: "Your App",
+               kCGPDFContextAuthor: "Your Name",
+               kCGPDFContextTitle: "Your Document Title"
+           ]
+           let pdfData = NSMutableData()
+           UIGraphicsBeginPDFContextToData(pdfData, .zero, pdfMetaData)
 
+           for pageIndex in 0..<pageCount {
+               UIGraphicsBeginPDFPageWithInfo(CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight), nil)
 
+               let pdfContext = UIGraphicsGetCurrentContext()
 
+               let pageView = pdfView
+                   .frame(width: pdfWidth, height: pdfHeight)
+                   .offset(y: -CGFloat(pageIndex) * pdfHeight)
+               let controller = UIHostingController(rootView: pageView)
+               let view = controller.view
 
+               let targetFrame = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
+               view?.frame = targetFrame
+               view?.backgroundColor = .white
 
+               guard let currentContext = UIGraphicsGetCurrentContext() else {
+                   break
+               }
 
+               view?.layer.render(in: currentContext)
+           }
+
+           UIGraphicsEndPDFContext()
+
+           return pdfData as Data
+       }
 }

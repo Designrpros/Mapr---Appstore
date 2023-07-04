@@ -8,9 +8,11 @@ struct Mapr: App {
             ContentView()
                 .environment(\.managedObjectContext, persistentContainer.viewContext)
         }
+        #if os(macOS)
         Settings {
             SettingsView()
         }
+        #endif
     }
     
     var persistentContainer: NSPersistentContainer = {
