@@ -173,8 +173,8 @@ struct LocationDetailView: View {
                             MaterialsView(project: project, viewModel: materialsViewModel)
                         case 3:
                             ChecklistView(project: project, viewModel: checklistViewModel)
-                        case 4:
                         #if os(macOS)
+                        case 4:
                             PreviewView(project: project, timeTrackerViewModel: timeTrackerViewModel, materialsViewModel: materialsViewModel, checklistViewModel: checklistViewModel)
                         #endif
                         default:
