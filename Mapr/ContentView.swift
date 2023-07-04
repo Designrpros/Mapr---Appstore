@@ -3,7 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var isShowing = false
-    @AppStorage("isDarkMode") private var isDarkMode = false
+    // @AppStorage("isDarkMode") private var isDarkMode = false
 
     var body: some View {
         NavigationView {
@@ -23,8 +23,8 @@ struct ContentView: View {
                     .frame(width: 235)
             }
 
-        }.frame(minHeight: 600)
-        .preferredColorScheme(isDarkMode ? .dark : .light)
+        }.frame(idealWidth: 600, minHeight: 600)
+        //.preferredColorScheme(isDarkMode ? .dark : .light)
     }
 }
 
