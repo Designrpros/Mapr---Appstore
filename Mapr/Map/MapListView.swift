@@ -172,8 +172,12 @@ struct MapListView: View {
             searchResults.remove(at: index)
         }
 
+        // Clear the search text
+        searchText = ""
+
         return project
     }
+
 
 
     
