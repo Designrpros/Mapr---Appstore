@@ -164,11 +164,14 @@ struct MapListView: View {
         // Set the other properties of the project
         project.projectName = mapItem.name
 
+        print("Saving project...")
         do {
             try viewContext.save()
+            print("Project saved successfully.")
         } catch {
             print("Failed to save project: \(error)")
         }
+
 
         // Update the search results to remove the newly saved location
         if let index = searchResults.firstIndex(where: { $0.name == mapItem.name }) {

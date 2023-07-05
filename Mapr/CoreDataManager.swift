@@ -6,7 +6,7 @@ struct PersistenceController {
     let container: NSPersistentCloudKitContainer
 
     init(inMemory: Bool = false) {
-        container = NSPersistentCloudKitContainer(name: "Mapr")
+        container = NSPersistentCloudKitContainer(name: "iCloud.Mapr")
         if inMemory {
             container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
         } else {
@@ -18,8 +18,11 @@ struct PersistenceController {
             storeDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.Mapr")
         }
         load()
+
+        // Add observer for NSPersistentStoreRemoteChange events
+        NotificationCenter.default.addObserver(CoreDataManager.shared, selector: #selector(CoreDataManager.shared.handleRemoteChangeNotification(_:)), name: .NSPersistentStoreRemoteChange, object: nil)
     }
-    
+
     private func load() {
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -29,15 +32,14 @@ struct PersistenceController {
         container.viewContext.automaticallyMergesChangesFromParent = true
 
         // Initialize CloudKit schema (update this, when making changes to coredata)
-        //do {
-        //    try container.initializeCloudKitSchema(options: [.printSchema])
-        //} catch {
-        //    print("Failed to initialize CloudKit schema: \(error)")
-        //}
+        do {
+            try container.initializeCloudKitSchema(options: [.printSchema])
+        } catch {
+            print("Failed to initialize CloudKit schema: \(error.localizedDescription)")
+        }
+
     }
-
 }
-
 
 class CoreDataManager: ObservableObject {
     static let shared = CoreDataManager()
@@ -84,6 +86,12 @@ class CoreDataManager: ObservableObject {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
+        }
+    }
+
+    @objc func handleRemoteChangeNotification(_ notification: Notification) {
+        if let error = notification.userInfo?[NSPersistentStoreSaveError] as? NSError {
+            print("CloudKit sync error: \(error), \(error.userInfo)")
         }
     }
 }

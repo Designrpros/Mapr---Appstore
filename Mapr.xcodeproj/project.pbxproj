@@ -52,6 +52,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		ADB555BB2A55E61F004D089E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ADF428392A53A7470096D87D /* Mapr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mapr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADF4283C2A53A7470096D87D /* MaprApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaprApp.swift; sourceTree = "<group>"; };
 		ADF4283E2A53A7470096D87D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -131,6 +132,7 @@
 		ADF4283B2A53A7470096D87D /* Mapr */ = {
 			isa = PBXGroup;
 			children = (
+				ADB555BB2A55E61F004D089E /* Info.plist */,
 				ADF4283C2A53A7470096D87D /* MaprApp.swift */,
 				ADF4283E2A53A7470096D87D /* AppDelegate.swift */,
 				ADF428432A53A7470096D87D /* ContentView.swift */,
@@ -515,6 +517,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mapr/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -554,6 +557,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mapr/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
