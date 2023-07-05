@@ -12,6 +12,7 @@ struct Mapr: App {
         #if os(macOS)
         Settings {
             SettingsView()
+                .environment(\.managedObjectContext, persistentContainer.viewContext)
         }
         #endif
     }

@@ -18,6 +18,7 @@ struct MapListView: View {
     @State private var searchResults: [MKMapItem] = []
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedProject: Project? = nil
+    @State private var isLinkActive = false
     
     var body: some View {
             VStack {
@@ -60,16 +61,18 @@ struct MapListView: View {
                                 
                                 Button(action: {
                                     selectedProject = createProject(from: mapItem)
+                                    isLinkActive = true
                                 }){
                                     Image(systemName: "mappin")
                                         .font(.system(size: 15))
                                         .foregroundColor(.white)
                                 }.buttonStyle(BorderlessButtonStyle())
+
                             }
                             .background(
                                 Group {
                                     if let selectedProject = selectedProject {
-                                        NavigationLink(destination: LocationDetailView(project: selectedProject, locations: $locations), isActive: .constant(selectedProject != nil)) {
+                                        NavigationLink(destination: LocationDetailView(project: selectedProject, locations: $locations), isActive: $isLinkActive) {
                                             EmptyView()
                                         }
                                     }

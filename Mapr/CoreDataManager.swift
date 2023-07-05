@@ -3,41 +3,55 @@ import CoreData
 struct PersistenceController {
     static let shared = PersistenceController()
 
-    let container1: NSPersistentContainer
-    let container2: NSPersistentContainer
-    //let container3: NSPersistentContainer
+    let container: NSPersistentCloudKitContainer
 
     init(inMemory: Bool = false) {
-        container1 = NSPersistentContainer(name: "Location")
-        container2 = NSPersistentContainer(name: "Contact")
-        //container3 = NSPersistentContainer(name: "NoteItem")
+        container = NSPersistentCloudKitContainer(name: "Mapr")
         if inMemory {
-            container1.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
-            container2.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
+            container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
+        } else {
+            guard let storeDescription = container.persistentStoreDescriptions.first else {
+                fatalError("No Descriptions found.")
+            }
+            storeDescription.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+            storeDescription.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+            storeDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.Mapr")
         }
-        load(container: container1)
-        load(container: container2)
-        //load(container: container3)
+        load()
     }
     
-    private func load(container: NSPersistentContainer) {
+    private func load() {
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+        container.viewContext.automaticallyMergesChangesFromParent = true
+
+        // Initialize CloudKit schema (update this, when making changes to coredata)
+        //do {
+        //    try container.initializeCloudKitSchema(options: [.printSchema])
+        //} catch {
+        //    print("Failed to initialize CloudKit schema: \(error)")
+        //}
     }
+
 }
 
-class CoreDataManager {
+
+class CoreDataManager: ObservableObject {
     static let shared = CoreDataManager()
     let persistenceController = PersistenceController.shared
+
+    var context: NSManagedObjectContext {
+        return persistenceController.container.viewContext
+    }
 
     // Your CRUD operations go here
     func fetchContacts() -> [Contact] {
         let request: NSFetchRequest<Contact> = Contact.fetchRequest()
         do {
-            return try persistenceController.container2.viewContext.fetch(request)
+            return try context.fetch(request)
         } catch {
             print("Failed to fetch contacts: \(error)")
             return []
@@ -45,7 +59,7 @@ class CoreDataManager {
     }
 
     func addContact(id: UUID, name: String, email: String, phone: String, address: String) {
-        let contact = Contact(context: persistenceController.container2.viewContext)
+        let contact = Contact(context: context)
         contact.name = name
         contact.email = email
         contact.phone = phone
@@ -54,7 +68,7 @@ class CoreDataManager {
     }
 
     func deleteContact(_ contact: Contact) {
-        persistenceController.container2.viewContext.delete(contact)
+        context.delete(contact)
         saveContext()
     }
 
@@ -63,7 +77,6 @@ class CoreDataManager {
     }
 
     func saveContext() {
-        let context = persistenceController.container2.viewContext
         if context.hasChanges {
             do {
                 try context.save()
