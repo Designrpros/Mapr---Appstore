@@ -72,11 +72,11 @@ struct ChecklistView: View {
                     .padding()
                     .background(Color.gray.opacity(0.2))
                 Text("Checked")
-                    .frame(width: 100)
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                 Text("Actions")
-                    .frame(width: 100)
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
             }
@@ -141,7 +141,7 @@ struct ChecklistView: View {
                 checklistItem.isChecked = $0
                 viewModel.saveContext()
             }))
-            .frame(width: 100)
+            .frame(maxWidth: .infinity)
             .padding()
             .cornerRadius(5)
 
@@ -186,7 +186,8 @@ struct ChecklistView: View {
             }
             .padding()
             .cornerRadius(5)
-            .frame(width: 100)
+            .frame(maxWidth: .infinity)
+            
         }
         .background(Color.gray.opacity(0.1))
         .cornerRadius(5)

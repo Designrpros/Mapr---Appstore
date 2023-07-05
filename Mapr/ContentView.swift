@@ -20,10 +20,10 @@ struct ContentView: View {
                 }
                 Spacer()
                 TabBar(selectedTab: $selectedTab)
-                    .frame(width: 235)
+                    .frame(minWidth: 235, maxWidth: .infinity)
             }
 
-        }.frame(idealWidth: 600, minHeight: 600)
+        }.frame(idealWidth: 600, idealHeight: 600)
         //.preferredColorScheme(isDarkMode ? .dark : .light)
     }
 }
