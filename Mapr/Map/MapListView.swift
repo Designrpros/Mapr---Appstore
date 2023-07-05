@@ -167,8 +167,14 @@ struct MapListView: View {
             print("Failed to save project: \(error)")
         }
 
+        // Update the search results to remove the newly saved location
+        if let index = searchResults.firstIndex(where: { $0.name == mapItem.name }) {
+            searchResults.remove(at: index)
+        }
+
         return project
     }
+
 
     
     private func searchLocations() {
@@ -184,11 +190,16 @@ struct MapListView: View {
                 }
                 
                 DispatchQueue.main.async {
-                    self.searchResults = response.mapItems
+                    let savedLocationNames = Set(self.savedLocations.map { $0.name ?? "" })
+                    self.searchResults = response.mapItems.filter { mapItem in
+                        guard let name = mapItem.name else { return false }
+                        return !savedLocationNames.contains(name)
+                    }
                 }
             }
         }
     }
+
     
     private func deleteAllProjects() {
         let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = Project.fetchRequest()
