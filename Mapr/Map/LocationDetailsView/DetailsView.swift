@@ -12,7 +12,6 @@ struct DetailsView: View {
     @State private var showingModal = false
     @State private var isEditingDescription = false
     @ObservedObject var project: Project // Fetch the project from CoreData
-    @State private var selectedImage: UIImage?
     @State private var isShowingImagePicker = false
 
     var body: some View {
