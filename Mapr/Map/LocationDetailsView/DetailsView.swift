@@ -13,7 +13,12 @@ struct DetailsView: View {
     @State private var isEditingDescription = false
     @ObservedObject var project: Project // Fetch the project from CoreData
     @State private var isShowingImagePicker = false
-
+#if os(iOS)
+    @State private var selectedImage: UIImage?
+    @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+#endif
+    @State private var showingActionSheet = false
+    
     var body: some View {
             VStack(alignment: .leading) {
                 HStack(spacing: 0) {
@@ -125,30 +130,43 @@ Button(action: {
 #endif
 
 #if os(iOS)
-Button(action: {
-    isShowingImagePicker = true
-}) {
-    Image(systemName: "plus")
-}.foregroundColor(.white)
-.sheet(isPresented: $isShowingImagePicker) {
-    ImagePicker(selectedImage: $selectedImage)
-        .onChange(of: selectedImage) { newImage in
-            if let newImage = newImage {
-                let newGalleryImage = GalleryImage(context: viewContext)
-                newGalleryImage.id = UUID()
-                newGalleryImage.imageData = newImage.pngData() // Convert the UIImage to Data
-                newGalleryImage.project = project
-                saveContext()
-            }
-        }
-}
+                        Button(action: {
+                                    showingActionSheet = true
+                                }) {
+                                    Image(systemName: "plus")
+                                }.foregroundColor(.white)
+                                .actionSheet(isPresented: $showingActionSheet) {
+                                    ActionSheet(title: Text("Select Photo"), buttons: [
+                                        .default(Text("Photo Library")) {
+                                            sourceType = .photoLibrary
+                                            isShowingImagePicker = true
+                                        },
+                                        .default(Text("Camera")) {
+                                            sourceType = .camera
+                                            isShowingImagePicker = true
+                                        },
+                                        .cancel()
+                                    ])
+                                }
+                                .sheet(isPresented: $isShowingImagePicker) {
+                                    ImagePicker(selectedImage: $selectedImage, sourceType: sourceType, viewContext: viewContext, project: project)
+                                        .onChange(of: selectedImage) { newImage in
+                                            if let newImage = newImage {
+                                                let newGalleryImage = GalleryImage(context: viewContext)
+                                                newGalleryImage.id = UUID()
+                                                newGalleryImage.imageData = newImage.pngData() // Convert the UIImage to Data
+                                                newGalleryImage.project = project
+                                                saveContext()
+                                            }
+                                        }
+                                }
 #endif
 
 
                     }
                     .padding(.bottom)
                     
-                    #if os(macOS)
+#if os(macOS)
                     if let imagesSet = project.galleryImage as? Set<GalleryImage>, !imagesSet.isEmpty {
                         let imagesArray = Array(imagesSet)
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
@@ -172,7 +190,36 @@ Button(action: {
                     } else {
                         Text("Select images")
                     }
-                    #endif
+#endif
+                    
+#if os(iOS)
+                    if let imagesSet = project.galleryImage as? Set<GalleryImage>, !imagesSet.isEmpty {
+                        let imagesArray = Array(imagesSet)
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
+                            ForEach(imagesArray, id: \.id) { galleryImage in
+                                if let imageData = galleryImage.imageData, let uiImage = UIImage(data: imageData) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .contextMenu {
+                                            Button(action: {
+                                                viewContext.delete(galleryImage)
+                                                saveContext()
+                                            }) {
+                                                Text("Delete")
+                                                Image(systemName: "trash")
+                                            }
+                                        }
+                                }
+                            }
+                        }
+                    } else {
+                        Text("Select images")
+                    }
+#endif
+
+                    
+                    
                     
                     Spacer()
                 }
@@ -329,44 +376,17 @@ struct ContactModalView: View {
     }
 }
 
-struct ImagePickerButton: View {
-    #if os(iOS)
-    @State private var isShowingImagePicker = false
-    @State private var selectedImage: UIImage?
-    #endif
-
-    var body: some View {
-        Button(action: {
-            #if os(macOS)
-            let panel = NSOpenPanel()
-            panel.begin { response in
-                if response == .OK, let url = panel.url {
-                    let image = NSImage(contentsOf: url)
-                    // Use the image
-                }
-            }
-            #elseif os(iOS)
-            isShowingImagePicker = true
-            #endif
-        }) {
-            Text("Open Image Picker")
-        }
-        #if os(iOS)
-        .sheet(isPresented: $isShowingImagePicker) {
-            ImagePicker(selectedImage: $selectedImage)
-        }
-        #endif
-    }
-}
-
 
 #if os(iOS)
-
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var selectedImage: UIImage?
+    var sourceType: UIImagePickerController.SourceType
+    var viewContext: NSManagedObjectContext
+    var project: Project
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let picker = UIImagePickerController()
+        picker.sourceType = sourceType
         picker.delegate = context.coordinator
         return picker
     }
@@ -389,6 +409,17 @@ struct ImagePicker: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
                 parent.selectedImage = uiImage
+                
+                // Save the image
+                let newGalleryImage = GalleryImage(context: parent.viewContext)
+                newGalleryImage.id = UUID()
+                newGalleryImage.imageData = uiImage.pngData() // Convert the UIImage to Data
+                newGalleryImage.project = parent.project
+                do {
+                    try parent.viewContext.save()
+                } catch {
+                    print("Failed to save image: \(error)")
+                }
             }
             picker.dismiss(animated: true)
         }
@@ -399,5 +430,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
 }
-
 #endif
+
+
+

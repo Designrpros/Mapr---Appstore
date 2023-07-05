@@ -97,7 +97,6 @@ struct TimeTrackerView: View {
                         .padding()
                         .cornerRadius(5)
 
-
                     
                     TextField("Description", text: Binding(get: {
                         timeEntry.notes ?? ""
