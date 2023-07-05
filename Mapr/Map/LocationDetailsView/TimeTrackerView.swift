@@ -92,7 +92,7 @@ struct TimeTrackerView: View {
                             }
                         }
                         .labelsHidden() // Hide the label
-                        .frame(width: 100, alignment: .center) // Set the frame width
+                        .frame(maxWidth: .infinity)
                         .clipped() // Clip the view to its bounding frame
                         .padding()
                         .cornerRadius(5)
@@ -126,7 +126,8 @@ struct TimeTrackerView: View {
                     }
                     .padding()
                     .cornerRadius(5)
-                    .frame(width: 100)
+                    .frame(maxWidth: .infinity)
+                        
                 }
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(5)

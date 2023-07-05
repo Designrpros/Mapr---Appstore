@@ -23,7 +23,9 @@ struct CustomSegmentedControl: View {
                 
                     VStack {
                         Image(systemName: getImageName(for: index))
+#if os(macOS)
                         Text(getText(for: index))
+#endif
                     }
                     .padding()
                     .foregroundColor(selectedTab == index ? .blue : .gray)
@@ -50,7 +52,7 @@ struct CustomSegmentedControl: View {
         default: return ""
         }
     }
-
+#if os(macOS)
     func getText(for index: Int) -> String {
         switch index {
         case 0: return "Details"
@@ -61,4 +63,6 @@ struct CustomSegmentedControl: View {
         default: return ""
         }
     }
+#endif
 }
+

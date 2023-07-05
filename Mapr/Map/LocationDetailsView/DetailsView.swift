@@ -12,8 +12,9 @@ struct DetailsView: View {
     @State private var showingModal = false
     @State private var isEditingDescription = false
     @ObservedObject var project: Project // Fetch the project from CoreData
-    
-    
+    @State private var selectedImage: UIImage?
+    @State private var isShowingImagePicker = false
+
     var body: some View {
             VStack(alignment: .leading) {
                 HStack(spacing: 0) {
@@ -29,6 +30,7 @@ struct DetailsView: View {
                             }) {
                                 Image(systemName: "plus")
                             }
+                            .foregroundColor(.white)
                             .buttonStyle(BorderlessButtonStyle())
                             .sheet(isPresented: $showingModal) {
                                 ContactModalView(selectedContact: $project.contact, isPresented: $showingModal, dismiss: {
@@ -98,30 +100,51 @@ struct DetailsView: View {
                         
                         Spacer()
                         
-                        #if os(macOS)
-                        Button(action: {
-                            let panel = NSOpenPanel()
-                            panel.allowsMultipleSelection = true
-                            panel.canChooseDirectories = false
-                            panel.canCreateDirectories = false
-                            panel.canChooseFiles = true
-                            panel.allowedFileTypes = ["png", "jpg", "jpeg"]
-                            if panel.runModal() == .OK {
-                                for url in panel.urls {
-                                    if let image = NSImage(contentsOf: url) {
-                                        let newImage = GalleryImage(context: viewContext)
-                                        newImage.id = UUID()
-                                        newImage.imageData = image.tiffRepresentation // Save the original NSImage data
-                                        newImage.project = project
-                                    }
-                                }
-                                saveContext()
-                            }
-                        }) {
-                            Image(systemName: "plus")
-                        }
-                        .buttonStyle(BorderlessButtonStyle())
-                        #endif
+#if os(macOS)
+Button(action: {
+    let panel = NSOpenPanel()
+    panel.allowsMultipleSelection = true
+    panel.canChooseDirectories = false
+    panel.canCreateDirectories = false
+    panel.canChooseFiles = true
+    panel.allowedFileTypes = ["png", "jpg", "jpeg"]
+    if panel.runModal() == .OK {
+        for url in panel.urls {
+            if let image = NSImage(contentsOf: url) {
+                let newImage = GalleryImage(context: viewContext)
+                newImage.id = UUID()
+                newImage.imageData = image.tiffRepresentation // Save the original NSImage data
+                newImage.project = project
+            }
+        }
+        saveContext()
+    }
+}) {
+    Image(systemName: "plus")
+}
+.buttonStyle(BorderlessButtonStyle())
+#endif
+
+#if os(iOS)
+Button(action: {
+    isShowingImagePicker = true
+}) {
+    Image(systemName: "plus")
+}.foregroundColor(.white)
+.sheet(isPresented: $isShowingImagePicker) {
+    ImagePicker(selectedImage: $selectedImage)
+        .onChange(of: selectedImage) { newImage in
+            if let newImage = newImage {
+                let newGalleryImage = GalleryImage(context: viewContext)
+                newGalleryImage.id = UUID()
+                newGalleryImage.imageData = newImage.pngData() // Convert the UIImage to Data
+                newGalleryImage.project = project
+                saveContext()
+            }
+        }
+}
+#endif
+
 
                     }
                     .padding(.bottom)
@@ -278,7 +301,8 @@ struct ContactModalView: View {
                             }
                         }
                     }
-                }.frame(width: 300, height: 250)
+                }.frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
+
                 
                 Button(action: {
                     isPresented = false
@@ -307,6 +331,11 @@ struct ContactModalView: View {
 }
 
 struct ImagePickerButton: View {
+    #if os(iOS)
+    @State private var isShowingImagePicker = false
+    @State private var selectedImage: UIImage?
+    #endif
+
     var body: some View {
         Button(action: {
             #if os(macOS)
@@ -318,10 +347,58 @@ struct ImagePickerButton: View {
                 }
             }
             #elseif os(iOS)
-            // On iOS, you would present a UIImagePickerController from a UIViewController
+            isShowingImagePicker = true
             #endif
         }) {
             Text("Open Image Picker")
         }
+        #if os(iOS)
+        .sheet(isPresented: $isShowingImagePicker) {
+            ImagePicker(selectedImage: $selectedImage)
+        }
+        #endif
     }
 }
+
+
+#if os(iOS)
+
+struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var selectedImage: UIImage?
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) {
+        // No update needed
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        var parent: ImagePicker
+
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let uiImage = info[.originalImage] as? UIImage {
+                parent.selectedImage = uiImage
+            }
+            picker.dismiss(animated: true)
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.selectedImage = nil
+            picker.dismiss(animated: true)
+        }
+    }
+}
+
+#endif
