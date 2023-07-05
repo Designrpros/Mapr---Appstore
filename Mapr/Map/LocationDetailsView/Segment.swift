@@ -54,7 +54,7 @@ struct CustomSegmentedControl: View {
     func getText(for index: Int) -> String {
         switch index {
         case 0: return "Details"
-        case 1: return "Time Tracker"
+        case 1: return "Time"
         case 2: return "Materials"
         case 3: return "Checklist"
         case 4: return "Preview"
