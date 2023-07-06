@@ -43,9 +43,8 @@ struct AllProjectsMapView: UIViewRepresentable {
         var maxLongitude = -180.0
         
         for location in locations {
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-            annotation.title = location.name
+            guard let project = location.project else { continue }
+            let annotation = ProjectAnnotation(project: project)
             uiView.addAnnotation(annotation)
             
             let latitude = location.latitude
@@ -74,33 +73,7 @@ struct AllProjectsMapView: UIViewRepresentable {
         }
     }
 }
-    
-class Coordinator: NSObject, MKMapViewDelegate {
-    var parent: AllProjectsMapView
 
-    init(_ parent: AllProjectsMapView) {
-        self.parent = parent
-    }
-
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        let identifier = "project"
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-
-        if annotationView == nil {
-            annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-            annotationView?.canShowCallout = true
-        } else {
-            annotationView?.annotation = annotation
-        }
-
-        if let projectAnnotation = annotation as? ProjectAnnotation {
-            let markerView = annotationView as! MKMarkerAnnotationView
-            markerView.markerTintColor = projectAnnotation.project.isFinished ? UIColor.yellow : UIColor.red
-        }
-
-        return annotationView
-    }
-}
 
 #elseif os(macOS)
 struct AllProjectsMapView: NSViewRepresentable {
@@ -130,9 +103,8 @@ struct AllProjectsMapView: NSViewRepresentable {
         var maxLongitude = -180.0
         
         for location in locations {
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-            annotation.title = location.name
+            guard let project = location.project else { continue }
+            let annotation = ProjectAnnotation(project: project)
             nsView.addAnnotation(annotation)
             
             let latitude = location.latitude
@@ -160,42 +132,62 @@ struct AllProjectsMapView: NSViewRepresentable {
             print("Invalid region")
         }
     }
-}
+    
+    class Coordinator: NSObject, MKMapViewDelegate {
+        var parent: AllProjectsMapView
 
-class Coordinator: NSObject, MKMapViewDelegate {
-   var parent: AllProjectsMapView
-
-   init(_ parent: AllProjectsMapView) {
-       self.parent = parent
-   }
-
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        guard let annotation = annotation as? ProjectAnnotation else { return nil }
-
-        let identifier = "project"
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
-
-        if annotationView == nil {
-            annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-        } else {
-            annotationView?.annotation = annotation
+        init(_ parent: AllProjectsMapView) {
+            self.parent = parent
         }
 
-        annotationView?.canShowCallout = true
-        annotationView?.markerTintColor = annotation.project.isFinished ? .yellow : .red
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            guard let annotation = annotation as? ProjectAnnotation else { return nil }
 
-        return annotationView
+            let identifier = "project"
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
+
+            if annotationView == nil {
+                annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            } else {
+                annotationView?.annotation = annotation
+            }
+
+            annotationView?.canShowCallout = true
+            annotationView?.markerTintColor = annotation.color
+
+            return annotationView
+        }
     }
 }
 #endif
 
-class ProjectAnnotation: MKPointAnnotation {
-    let project: Project
+
+class ProjectAnnotation: NSObject, MKAnnotation {
+    @ObservedObject var project: Project
+
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: project.location?.latitude ?? 0, longitude: project.location?.longitude ?? 0)
+    }
+
+    var title: String? {
+        project.location?.name
+    }
+
+    #if os(iOS)
+    var color: UIColor {
+        return project.isFinished ? .yellow : .red
+    }
+    #elseif os(macOS)
+    var color: NSColor {
+        return project.isFinished ? .yellow : .red
+    }
+    #endif
 
     init(project: Project) {
         self.project = project
-        super.init()
-        self.coordinate = CLLocationCoordinate2D(latitude: project.location?.latitude ?? 0, longitude: project.location?.longitude ?? 0)
-        self.title = project.location?.name
     }
 }
+
+
+
+

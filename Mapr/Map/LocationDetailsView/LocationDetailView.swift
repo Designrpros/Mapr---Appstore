@@ -84,7 +84,7 @@ struct LocationDetailView: View {
                     ZStack {
                         
                         
-                        MapView(mapItem: mapItem, addressTitle: addressTitle)
+                        MapView(project: project)
                             .frame(height: 300)
                             .cornerRadius(20)
                             .padding()

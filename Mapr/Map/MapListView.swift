@@ -8,8 +8,6 @@ import AppKit
 import UIKit
 #endif
 
-
-
 struct MapListView: View {
     @State private var searchText = ""
     @State private var locations: [MKMapItem] = []
