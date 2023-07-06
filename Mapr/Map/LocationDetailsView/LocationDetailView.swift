@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import CoreData
 
 class ContactState: ObservableObject {
     @Published var selectedContact: Contact?
@@ -12,11 +13,21 @@ struct LocationDetailView: View {
     @State private var showOptions = false
     @State private var selectedTab = 0
     @State private var isShowingNewView = false
+    @State private var refreshID = UUID()
+
 
     @FetchRequest(
         entity: Project.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Project.projectName, ascending: true)]
-    ) var projects: FetchedResults<Project>
+        sortDescriptors: [NSSortDescriptor(keyPath: \Project.projectName, ascending: true)],
+        predicate: NSPredicate(format: "isFinished == %@", NSNumber(value: false))
+    ) var unfinishedProjects: FetchedResults<Project>
+
+    @FetchRequest(
+        entity: Project.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Project.projectName, ascending: true)],
+        predicate: NSPredicate(format: "isFinished == %@", NSNumber(value: true))
+    ) var finishedProjects: FetchedResults<Project>
+
 
     @Environment(\.managedObjectContext) var managedObjectContext
 
@@ -30,7 +41,7 @@ struct LocationDetailView: View {
             _locations = locations
             _projectName = State(initialValue: "Unknown")
             _projectDescription = State(initialValue: "Unknown")
-            _project = State(initialValue: project) // Store the project in a @State variable
+            _project = ObservedObject(initialValue: project) // Store the project in a @State variable
             return
         }
         let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
@@ -39,12 +50,12 @@ struct LocationDetailView: View {
         _locations = locations
         _projectName = State(initialValue: project.projectName ?? "")
         _projectDescription = State(initialValue: project.projectDescription ?? "")
-        _project = State(initialValue: project) // Store the project in a @State variable
+        _project = ObservedObject(initialValue: project) // Store the project in a @State variable
     }
 
 
-    @State private var project: Project
-    
+    @ObservedObject var project: Project
+
     @State private var isEditingDescription = false
     @State private var isEditingName = false
     @State private var projectName: String
@@ -95,13 +106,11 @@ struct LocationDetailView: View {
                             if isEditingName {
                                 TextField("Address Title", text: $addressTitle, onCommit:  {
                                     isEditingName = false
-                                    if let project = projects.first {
-                                        project.addressTitle = addressTitle
-                                        do {
-                                            try managedObjectContext.save()
-                                        } catch {
-                                            print("Failed to save address title: \(error)")
-                                        }
+                                    project.addressTitle = addressTitle
+                                    do {
+                                        try managedObjectContext.save()
+                                    } catch {
+                                        print("Failed to save address title: \(error)")
                                     }
                                 })
                                 .font(.title)
@@ -117,13 +126,11 @@ struct LocationDetailView: View {
                             if isEditingDescription {
                                 TextField("Address Subtitle", text: $addressSubtitle, onCommit:  {
                                     isEditingDescription = false
-                                    if let project = projects.first {
-                                        project.addressSubtitle = addressSubtitle
-                                        do {
-                                            try managedObjectContext.save()
-                                        } catch {
-                                            print("Failed to save address subtitle: \(error)")
-                                        }
+                                    project.addressSubtitle = addressSubtitle
+                                    do {
+                                        try managedObjectContext.save()
+                                    } catch {
+                                        print("Failed to save address subtitle: \(error)")
                                     }
                                 })
                                 .font(.subheadline)
@@ -136,6 +143,7 @@ struct LocationDetailView: View {
                                     }
                             }
                         }.padding()
+
                         
                         Spacer()
                         
@@ -149,18 +157,18 @@ struct LocationDetailView: View {
                         //.padding()
                         //.buttonStyle(BorderlessButtonStyle())
                         
-                       // Button(action: {
-                         //   showOptions.toggle()
-                        //}) {
-                          //  Image(systemName: "ellipsis")
-                            //    .font(.system(size: 20))
-                              //  .foregroundColor(Color(.systemGray))
-                        //}
-                        //.padding()
-                        //.buttonStyle(BorderlessButtonStyle())
-                        //.popover(isPresented: $showOptions) {
-                        //    OptionsView(mapItem: mapItem, locations: $locations)
-                        //}
+                        Button(action: {
+                            showOptions.toggle()
+                        }) {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 20))
+                                .foregroundColor(Color(.systemGray))
+                        }
+                        .padding()
+                        .buttonStyle(BorderlessButtonStyle())
+                        .popover(isPresented: $showOptions) {
+                            OptionsView(refreshID: $refreshID, project: project)
+                        }
                     }
                     CustomSegmentedControl(selectedTab: $selectedTab)
                         switch selectedTab {
@@ -219,17 +227,15 @@ struct LocationDetailView: View {
     
     
     struct OptionsView: View {
-        let mapItem: MKMapItem
+        @Environment(\.managedObjectContext) private var viewContext
+        @Binding var refreshID: UUID
+        var project: Project
         @Environment(\.presentationMode) var presentationMode
-        @Binding var locations: [MKMapItem]
         
+
         var body: some View {
                 List {
                     Button(action: {
-                        if let index = locations.firstIndex(where: { $0 == mapItem }) {
-                            locations.remove(at: index)
-                        }
-                        presentationMode.wrappedValue.dismiss()
                     }) {
                         HStack {
                             Image(systemName: "trash")
@@ -247,19 +253,29 @@ struct LocationDetailView: View {
                         }
                     }
                     Button(action: {
-                        // mark the project as finished here
+                        // Toggle the isFinished property of the project
+                        project.isFinished.toggle()
+                        do {
+                            try viewContext.save()
+                            // Toggle the refreshID to force a refresh of the view
+                            refreshID = UUID()
+                        } catch {
+                            // Handle the error here
+                            print("Failed to update project status: \(error)")
+                        }
                     }) {
                         HStack {
                             Image(systemName: "checkmark")
-                            Text("Mark as finished")
+                            // Change the displayed text based on the isFinished property
+                            Text(project.isFinished ? "Mark as active" : "Mark as finished")
                         }
                     }
-                    
                 }
                 .navigationTitle("Options")
                 .background(Color.clear)
         }
     }
+
 
     
     

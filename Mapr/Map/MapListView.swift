@@ -8,6 +8,8 @@ import AppKit
 import UIKit
 #endif
 
+
+
 struct MapListView: View {
     @State private var searchText = ""
     @State private var locations: [MKMapItem] = []
@@ -104,7 +106,7 @@ struct MapListView: View {
                         
                         Spacer()
                         
-                        ForEach(savedLocations, id: \.self) { location in
+                        ForEach(savedLocations.filter { $0.project?.isFinished == false }, id: \.self) { location in
                             if let project = location.project {
                                 NavigationLink(destination: LocationDetailView(project: project, locations: $locations)) {
                                     HStack {
@@ -120,7 +122,7 @@ struct MapListView: View {
                                         }
                                     }
                                 }
-                                .contextMenu { // Add this modifier
+                                .contextMenu {
                                     Button(action: {
                                         // Delete the project associated with the location
                                         if let project = location.project {
@@ -136,6 +138,26 @@ struct MapListView: View {
                                     }) {
                                         Text("Delete Location")
                                         Image(systemName: "trash")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Section(header: Text("Finished Projects")) {
+                        ForEach(savedLocations.filter { $0.project?.isFinished == true }, id: \.self) { location in
+                            if let project = location.project {
+                                NavigationLink(destination: LocationDetailView(project: project, locations: $locations)) {
+                                    HStack {
+                                        Image(systemName: "house.fill")
+                                            .foregroundColor(.yellow)
+                                            .frame(width: 30, height: 30)
+                                        VStack(alignment: .leading) {
+                                            Text(location.name ?? "Unknown") // Use the name from your Location entity
+                                                .font(.headline)
+                                            Text("\(location.postalCode ?? ""), \(location.city ?? ""), \(location.country ?? "")") // Display the postal code, city, and country
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        }
                                     }
                                 }
                             }
