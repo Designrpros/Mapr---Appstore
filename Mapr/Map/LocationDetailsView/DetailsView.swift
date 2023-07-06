@@ -157,9 +157,12 @@ Button(action: {
                                                 newGalleryImage.imageData = newImage.pngData() // Convert the UIImage to Data
                                                 newGalleryImage.project = project
                                                 saveContext()
+                                                selectedImage = nil // Reset the selectedImage
                                             }
                                         }
                                 }
+
+
 #endif
 
 
@@ -379,6 +382,7 @@ struct ContactModalView: View {
 
 #if os(iOS)
 struct ImagePicker: UIViewControllerRepresentable {
+    @Environment(\.presentationMode) private var presentationMode
     @Binding var selectedImage: UIImage?
     var sourceType: UIImagePickerController.SourceType
     var viewContext: NSManagedObjectContext
@@ -386,20 +390,18 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = sourceType
+        picker.sourceType = self.sourceType
         picker.delegate = context.coordinator
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) {
-        // No update needed
-    }
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) {}
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
 
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         var parent: ImagePicker
 
         init(_ parent: ImagePicker) {
@@ -407,29 +409,31 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let uiImage = info[.originalImage] as? UIImage {
-                parent.selectedImage = uiImage
-                
-                // Save the image
+            if let image = info[.originalImage] as? UIImage {
+                parent.selectedImage = image
+
+                // Add the image directly here
                 let newGalleryImage = GalleryImage(context: parent.viewContext)
                 newGalleryImage.id = UUID()
-                newGalleryImage.imageData = uiImage.pngData() // Convert the UIImage to Data
+                newGalleryImage.imageData = image.pngData() // Convert the UIImage to Data
                 newGalleryImage.project = parent.project
+
                 do {
                     try parent.viewContext.save()
                 } catch {
                     print("Failed to save image: \(error)")
                 }
             }
-            picker.dismiss(animated: true)
+
+            parent.presentationMode.wrappedValue.dismiss()
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.selectedImage = nil
-            picker.dismiss(animated: true)
+            parent.presentationMode.wrappedValue.dismiss()
         }
     }
 }
+
 #endif
 
 
