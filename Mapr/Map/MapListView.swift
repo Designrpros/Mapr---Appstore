@@ -19,6 +19,7 @@ struct MapListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedProject: Project? = nil
     @State private var isLinkActive = false
+    @State private var showingSettings = false
     
     var body: some View {
             VStack {
@@ -143,6 +144,19 @@ struct MapListView: View {
                 }
             }.onAppear {
                 print(savedLocations)
+            }
+            .toolbar() {
+                ToolbarItem(placement: .automatic) {
+                            Button(action: {
+                                showingSettings = true
+                            }) {
+                                Image(systemName: "gear")
+                            }
+                        }
+                    }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
+                    .environment(\.managedObjectContext, viewContext)
             }
         }
     

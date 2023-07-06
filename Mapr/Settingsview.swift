@@ -11,6 +11,7 @@ struct SettingsView: View {
     @AppStorage("isDarkMode") private var isDarkMode = true
     @Environment(\.managedObjectContext) var managedObjectContext
     @State private var showRestartAlert = false
+    @Environment(\.presentationMode) var presentationMode  // Add this property
 
     var body: some View {
         VStack{
@@ -40,11 +41,17 @@ struct SettingsView: View {
             }
             .padding()
             .buttonStyle(BorderlessButtonStyle())
+            
+            Button("Cancel") {  // Add this button
+                presentationMode.wrappedValue.dismiss()
+            }
+            .padding()
         }
         .alert(isPresented: $showRestartAlert) {
             Alert(title: Text("Restart Required"), message: Text("Please close and reopen the app to see changes."), dismissButton: .default(Text("OK")))
         }
     }
+    
     
     private func deleteAll() {
         let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = Location.fetchRequest()
