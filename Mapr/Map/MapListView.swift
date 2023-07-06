@@ -14,9 +14,11 @@ struct MapListView: View {
     @State private var searchText = ""
     @State private var locations: [MKMapItem] = []
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Location.name, ascending: true)],
+        entity: Project.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Project.projectName, ascending: true)],
         animation: .default)
-    private var savedLocations: FetchedResults<Location>
+    private var projects: FetchedResults<Project>
+
     @State private var searchResults: [MKMapItem] = []
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedProject: Project? = nil
@@ -106,8 +108,8 @@ struct MapListView: View {
                         
                         Spacer()
                         
-                        ForEach(savedLocations.filter { $0.project?.isFinished == false }, id: \.self) { location in
-                            if let project = location.project {
+                        ForEach(projects.filter { !$0.isFinished }, id: \.self) { project in
+                            if let location = project.location {
                                 NavigationLink(destination: LocationDetailView(project: project, locations: $locations)) {
                                     HStack {
                                         Image(systemName: "house.fill")
@@ -144,8 +146,8 @@ struct MapListView: View {
                         }
                     }
                     Section(header: Text("Finished Projects")) {
-                        ForEach(savedLocations.filter { $0.project?.isFinished == true }, id: \.self) { location in
-                            if let project = location.project {
+                        ForEach(projects.filter { $0.isFinished }, id: \.self) { project in
+                            if let location = project.location {
                                 NavigationLink(destination: LocationDetailView(project: project, locations: $locations)) {
                                     HStack {
                                         Image(systemName: "house.fill")
@@ -165,7 +167,7 @@ struct MapListView: View {
                     }
                 }
             }.onAppear {
-                print(savedLocations)
+                print(projects)
             }
             .toolbar() {
                 ToolbarItem(placement: .automatic) {
@@ -236,7 +238,7 @@ struct MapListView: View {
                 }
                 
                 DispatchQueue.main.async {
-                    let savedLocationNames = Set(self.savedLocations.map { $0.name ?? "" })
+                    let savedLocationNames = Set(self.projects.map { $0.location?.name ?? "" })
                     self.searchResults = response.mapItems.filter { mapItem in
                         guard let name = mapItem.name else { return false }
                         return !savedLocationNames.contains(name)
@@ -245,6 +247,7 @@ struct MapListView: View {
             }
         }
     }
+
 
     
     private func deleteAllProjects() {

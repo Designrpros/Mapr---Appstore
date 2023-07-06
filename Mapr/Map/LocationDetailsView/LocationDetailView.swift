@@ -235,23 +235,23 @@ struct LocationDetailView: View {
 
         var body: some View {
                 List {
-                    Button(action: {
-                    }) {
-                        HStack {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                            Text("Delete Project")
-                                .foregroundColor(.red)
-                        }
-                    }
-                    Button(action: {
+                    //Button(action: {
+                    //}) {
+                       // HStack {
+                      //      Image(systemName: "trash")
+                     //           .foregroundColor(.red)
+                    //   Text("Delete Project")
+                    //         .foregroundColor(.red)
+                     //   }
+                    //}
+                    //Button(action: {
                         // Call your export function here
-                    }) {
-                        HStack {
-                            Image(systemName: "doc.text")
-                            Text("Export as PDF")
-                        }
-                    }
+                    //}) {
+                        //HStack {
+                       //     Image(systemName: "doc.text")
+                      //      Text("Export as PDF")
+                     //   }
+                    //}
                     Button(action: {
                         // Toggle the isFinished property of the project
                         project.isFinished.toggle()
