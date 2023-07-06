@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ADB555EE2A56A08D004D089E /* ChecklistItem+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E02A56A08D004D089E /* ChecklistItem+CoreDataClass.swift */; };
+		ADB555EF2A56A08D004D089E /* ChecklistItem+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E12A56A08D004D089E /* ChecklistItem+CoreDataProperties.swift */; };
+		ADB555F02A56A08D004D089E /* Project+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E22A56A08D004D089E /* Project+CoreDataClass.swift */; };
+		ADB555F12A56A08D004D089E /* Project+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E32A56A08D004D089E /* Project+CoreDataProperties.swift */; };
+		ADB555F22A56A08D004D089E /* TimeTracker+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E42A56A08D004D089E /* TimeTracker+CoreDataClass.swift */; };
+		ADB555F32A56A08D004D089E /* TimeTracker+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E52A56A08D004D089E /* TimeTracker+CoreDataProperties.swift */; };
+		ADB555F42A56A08D004D089E /* Material+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E62A56A08D004D089E /* Material+CoreDataClass.swift */; };
+		ADB555F52A56A08D004D089E /* Material+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E72A56A08D004D089E /* Material+CoreDataProperties.swift */; };
+		ADB555F62A56A08D004D089E /* Location+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E82A56A08D004D089E /* Location+CoreDataClass.swift */; };
+		ADB555F72A56A08D004D089E /* Location+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555E92A56A08D004D089E /* Location+CoreDataProperties.swift */; };
+		ADB555F82A56A08D004D089E /* Contact+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555EA2A56A08D004D089E /* Contact+CoreDataClass.swift */; };
+		ADB555F92A56A08D004D089E /* Contact+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555EB2A56A08D004D089E /* Contact+CoreDataProperties.swift */; };
+		ADB555FA2A56A08D004D089E /* GalleryImage+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555EC2A56A08D004D089E /* GalleryImage+CoreDataClass.swift */; };
+		ADB555FB2A56A08D004D089E /* GalleryImage+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB555ED2A56A08D004D089E /* GalleryImage+CoreDataProperties.swift */; };
 		ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283C2A53A7470096D87D /* MaprApp.swift */; };
 		ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283E2A53A7470096D87D /* AppDelegate.swift */; };
 		ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADF428402A53A7470096D87D /* Mapr.xcdatamodeld */; };
@@ -53,6 +67,20 @@
 
 /* Begin PBXFileReference section */
 		ADB555BB2A55E61F004D089E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		ADB555E02A56A08D004D089E /* ChecklistItem+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChecklistItem+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ADB555E12A56A08D004D089E /* ChecklistItem+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChecklistItem+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ADB555E22A56A08D004D089E /* Project+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ADB555E32A56A08D004D089E /* Project+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ADB555E42A56A08D004D089E /* TimeTracker+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeTracker+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ADB555E52A56A08D004D089E /* TimeTracker+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeTracker+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ADB555E62A56A08D004D089E /* Material+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Material+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ADB555E72A56A08D004D089E /* Material+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Material+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ADB555E82A56A08D004D089E /* Location+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ADB555E92A56A08D004D089E /* Location+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ADB555EA2A56A08D004D089E /* Contact+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Contact+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ADB555EB2A56A08D004D089E /* Contact+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Contact+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ADB555EC2A56A08D004D089E /* GalleryImage+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GalleryImage+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ADB555ED2A56A08D004D089E /* GalleryImage+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GalleryImage+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ADF428392A53A7470096D87D /* Mapr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mapr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADF4283C2A53A7470096D87D /* MaprApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaprApp.swift; sourceTree = "<group>"; };
 		ADF4283E2A53A7470096D87D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -109,9 +137,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		ADB555FC2A56A1E3004D089E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				ADB555E02A56A08D004D089E /* ChecklistItem+CoreDataClass.swift */,
+				ADB555E12A56A08D004D089E /* ChecklistItem+CoreDataProperties.swift */,
+				ADB555E22A56A08D004D089E /* Project+CoreDataClass.swift */,
+				ADB555E32A56A08D004D089E /* Project+CoreDataProperties.swift */,
+				ADB555E42A56A08D004D089E /* TimeTracker+CoreDataClass.swift */,
+				ADB555E52A56A08D004D089E /* TimeTracker+CoreDataProperties.swift */,
+				ADB555E62A56A08D004D089E /* Material+CoreDataClass.swift */,
+				ADB555E72A56A08D004D089E /* Material+CoreDataProperties.swift */,
+				ADB555E82A56A08D004D089E /* Location+CoreDataClass.swift */,
+				ADB555E92A56A08D004D089E /* Location+CoreDataProperties.swift */,
+				ADB555EA2A56A08D004D089E /* Contact+CoreDataClass.swift */,
+				ADB555EB2A56A08D004D089E /* Contact+CoreDataProperties.swift */,
+				ADB555EC2A56A08D004D089E /* GalleryImage+CoreDataClass.swift */,
+				ADB555ED2A56A08D004D089E /* GalleryImage+CoreDataProperties.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		ADF428302A53A7470096D87D = {
 			isa = PBXGroup;
 			children = (
+				ADB555FC2A56A1E3004D089E /* Model */,
 				ADF4283B2A53A7470096D87D /* Mapr */,
 				ADF428522A53A7490096D87D /* MaprTests */,
 				ADF4285C2A53A7490096D87D /* MaprUITests */,
@@ -340,25 +390,39 @@
 			buildActionMask = 2147483647;
 			files = (
 				ADF428832A53A88A0096D87D /* MaterialsView.swift in Sources */,
+				ADB555EF2A56A08D004D089E /* ChecklistItem+CoreDataProperties.swift in Sources */,
 				ADF428712A53A7B80096D87D /* Settingsview.swift in Sources */,
 				ADF428772A53A7EF0096D87D /* AllProjectMapView.swift in Sources */,
+				ADB555F92A56A08D004D089E /* Contact+CoreDataProperties.swift in Sources */,
+				ADB555F22A56A08D004D089E /* TimeTracker+CoreDataClass.swift in Sources */,
+				ADB555F42A56A08D004D089E /* Material+CoreDataClass.swift in Sources */,
+				ADB555F52A56A08D004D089E /* Material+CoreDataProperties.swift in Sources */,
 				ADF4288D2A53A8F70096D87D /* ContactView.swift in Sources */,
 				ADF428852A53A89F0096D87D /* ChecklistView.swift in Sources */,
 				ADF4287B2A53A82E0096D87D /* LocationDetailView.swift in Sources */,
+				ADB555F62A56A08D004D089E /* Location+CoreDataClass.swift in Sources */,
 				ADF428732A53A7C80096D87D /* MapListView.swift in Sources */,
+				ADB555F82A56A08D004D089E /* Contact+CoreDataClass.swift in Sources */,
 				ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */,
 				ADF4288B2A53A8E50096D87D /* ContactListView.swift in Sources */,
+				ADB555F72A56A08D004D089E /* Location+CoreDataProperties.swift in Sources */,
+				ADB555F12A56A08D004D089E /* Project+CoreDataProperties.swift in Sources */,
+				ADB555FA2A56A08D004D089E /* GalleryImage+CoreDataClass.swift in Sources */,
 				ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */,
 				ADF4287F2A53A8550096D87D /* DetailsView.swift in Sources */,
 				ADF428892A53A8C30096D87D /* StreetView.swift in Sources */,
+				ADB555F32A56A08D004D089E /* TimeTracker+CoreDataProperties.swift in Sources */,
 				ADF428442A53A7470096D87D /* ContentView.swift in Sources */,
 				ADF4287D2A53A8410096D87D /* Segment.swift in Sources */,
 				ADF4286D2A53A7950096D87D /* CoreDataManager.swift in Sources */,
 				ADF428872A53A8B10096D87D /* PreviewView.swift in Sources */,
+				ADB555F02A56A08D004D089E /* Project+CoreDataClass.swift in Sources */,
+				ADB555FB2A56A08D004D089E /* GalleryImage+CoreDataProperties.swift in Sources */,
 				ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */,
 				ADF428752A53A7D80096D87D /* MapView.swift in Sources */,
 				ADF428812A53A86B0096D87D /* TimeTrackerView.swift in Sources */,
 				ADF4286F2A53A7AA0096D87D /* Constants.swift in Sources */,
+				ADB555EE2A56A08D004D089E /* ChecklistItem+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,6 +579,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Mapr/Preview Content\"";
 				DEVELOPMENT_TEAM = 8MCGWNL2HK;
 				ENABLE_HARDENED_RUNTIME = YES;
+				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mapr/Info.plist;
@@ -555,6 +620,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Mapr/Preview Content\"";
 				DEVELOPMENT_TEAM = 8MCGWNL2HK;
 				ENABLE_HARDENED_RUNTIME = YES;
+				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mapr/Info.plist;

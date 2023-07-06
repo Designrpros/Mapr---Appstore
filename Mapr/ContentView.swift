@@ -33,9 +33,11 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var isShowing = false
-    // @AppStorage("isDarkMode") private var isDarkMode = false
     @ObservedObject var signInWithAppleManager = SignInWithAppleManager()
-
+    
+    // Add this line to observe your CoreDataManager
+    @ObservedObject var coreDataManager = CoreDataManager.shared
+    
     var body: some View {
         if !signInWithAppleManager.isSignedIn {
             Button(action: signInWithAppleManager.handleSignInWithApple) {
@@ -76,6 +78,10 @@ struct ContentView: View {
                 
             }.frame(idealWidth: 600, idealHeight: 600)
             //.preferredColorScheme(isDarkMode ? .dark : .light)
+                .alert(isPresented: $coreDataManager.showErrorAlert) {
+                    Alert(title: Text("Error"), message: Text(coreDataManager.errorAlertMessage), dismissButton: .default(Text("OK")))
+                    
+                }
         }
     }
 }
