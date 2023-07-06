@@ -21,9 +21,14 @@ struct AllProjectsMapView: UIViewRepresentable {
         sortDescriptors: [NSSortDescriptor(keyPath: \Location.name, ascending: true)],
         animation: .default)
     private var locations: FetchedResults<Location>
-
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
+        mapView.delegate = context.coordinator
         return mapView
     }
     
@@ -36,13 +41,13 @@ struct AllProjectsMapView: UIViewRepresentable {
         var maxLatitude = -90.0
         var minLongitude = 180.0
         var maxLongitude = -180.0
-
+        
         for location in locations {
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
             annotation.title = location.name
             uiView.addAnnotation(annotation)
-
+            
             let latitude = location.latitude
             let longitude = location.longitude
             
@@ -58,15 +63,42 @@ struct AllProjectsMapView: UIViewRepresentable {
         
         let latitudeDelta = maxLatitude - minLatitude + 0.05
         let longitudeDelta = maxLongitude - minLongitude + 0.05
-
+        
         let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
         let region = MKCoordinateRegion(center: centerCoordinate, span: span)
-
+        
         if isValid(region: region) {
             uiView.setRegion(region, animated: true)
         } else {
             print("Invalid region")
         }
+    }
+}
+    
+class Coordinator: NSObject, MKMapViewDelegate {
+    var parent: AllProjectsMapView
+
+    init(_ parent: AllProjectsMapView) {
+        self.parent = parent
+    }
+
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let identifier = "project"
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+
+        if annotationView == nil {
+            annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            annotationView?.canShowCallout = true
+        } else {
+            annotationView?.annotation = annotation
+        }
+
+        if let projectAnnotation = annotation as? ProjectAnnotation {
+            let pinView = annotationView as! MKPinAnnotationView
+            pinView.pinTintColor = projectAnnotation.project.isFinished ? UIColor.yellow : UIColor.red
+        }
+
+        return annotationView
     }
 }
 
@@ -76,12 +108,17 @@ struct AllProjectsMapView: NSViewRepresentable {
         sortDescriptors: [NSSortDescriptor(keyPath: \Location.name, ascending: true)],
         animation: .default)
     private var locations: FetchedResults<Location>
-
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
     func makeNSView(context: Context) -> MKMapView {
         let mapView = MKMapView()
+        mapView.delegate = context.coordinator
         return mapView
     }
-
+    
     func updateNSView(_ nsView: MKMapView, context: Context) {
         nsView.removeAnnotations(nsView.annotations)
         
@@ -91,13 +128,13 @@ struct AllProjectsMapView: NSViewRepresentable {
         var maxLatitude = -90.0
         var minLongitude = 180.0
         var maxLongitude = -180.0
-
+        
         for location in locations {
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
             annotation.title = location.name
             nsView.addAnnotation(annotation)
-
+            
             let latitude = location.latitude
             let longitude = location.longitude
             
@@ -113,10 +150,10 @@ struct AllProjectsMapView: NSViewRepresentable {
         
         let latitudeDelta = maxLatitude - minLatitude + 0.05
         let longitudeDelta = maxLongitude - minLongitude + 0.05
-
+        
         let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
         let region = MKCoordinateRegion(center: centerCoordinate, span: span)
-
+        
         if isValid(region: region) {
             nsView.setRegion(region, animated: true)
         } else {
@@ -124,4 +161,41 @@ struct AllProjectsMapView: NSViewRepresentable {
         }
     }
 }
+
+class Coordinator: NSObject, MKMapViewDelegate {
+   var parent: AllProjectsMapView
+
+   init(_ parent: AllProjectsMapView) {
+       self.parent = parent
+   }
+
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        guard let annotation = annotation as? ProjectAnnotation else { return nil }
+
+        let identifier = "project"
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
+
+        if annotationView == nil {
+            annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+        } else {
+            annotationView?.annotation = annotation
+        }
+
+        annotationView?.canShowCallout = true
+        annotationView?.markerTintColor = annotation.project.isFinished ? .yellow : .red
+
+        return annotationView
+    }
+}
 #endif
+
+class ProjectAnnotation: MKPointAnnotation {
+    let project: Project
+
+    init(project: Project) {
+        self.project = project
+        super.init()
+        self.coordinate = CLLocationCoordinate2D(latitude: project.location?.latitude ?? 0, longitude: project.location?.longitude ?? 0)
+        self.title = project.location?.name
+    }
+}
