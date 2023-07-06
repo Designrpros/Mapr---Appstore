@@ -87,15 +87,15 @@ class Coordinator: NSObject, MKMapViewDelegate {
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
 
         if annotationView == nil {
-            annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
             annotationView?.canShowCallout = true
         } else {
             annotationView?.annotation = annotation
         }
 
         if let projectAnnotation = annotation as? ProjectAnnotation {
-            let pinView = annotationView as! MKPinAnnotationView
-            pinView.pinTintColor = projectAnnotation.project.isFinished ? UIColor.yellow : UIColor.red
+            let markerView = annotationView as! MKMarkerAnnotationView
+            markerView.markerTintColor = projectAnnotation.project.isFinished ? UIColor.yellow : UIColor.red
         }
 
         return annotationView
