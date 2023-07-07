@@ -126,47 +126,66 @@ struct AddUserView: View {
     var onAddUser: ((CKRecord) -> Void)?
 
     var body: some View {
-        VStack {
-            TextField("Search...", text: $searchText)
-                .font(.title) // Increase font size
-                .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
-                .background(Color(.darkGray))
-                .cornerRadius(10)
-                .textFieldStyle(PlainTextFieldStyle())
-                .onChange(of: searchText) { newValue in
-                    fetchUsers(searchText: newValue)
-                }
-
-            List {
-                ForEach(users, id: \.self) { user in
-                    Button(action: {
-                        onAddUser?(user)
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        HStack {
-                            Text(user["username"] as? String ?? "Unknown")
-                                .font(.headline)
-                            Text(user["email"] as? String ?? "")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                }
-            }
-            Button(action: {
+        ZStack {
+            Color.clear
+            .contentShape(Rectangle())
+            .onTapGesture {
                 presentationMode.wrappedValue.dismiss()
-            }) {
-                Text("Cancel")
-                    .foregroundColor(.red)
             }
+            
+            VStack {
+                HStack {
+                    TextField("Search...", text: $searchText)
+                        .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+                        .background(Color(.darkGray))
+                        .cornerRadius(10)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .onChange(of: searchText) { newValue in
+                            fetchUsers(searchText: newValue)
+                        }
+                }
+                .padding([.horizontal, .top])
+                
+                List {
+                    ForEach(users, id: \.self) { user in
+                        Button(action: {
+                            onAddUser?(user)
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            HStack {
+                                Image(systemName: "person.crop.circle")
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                VStack(alignment: .leading) {
+                                    Text(user["username"] as? String ?? "Unknown")
+                                        .font(.headline)
+                                    Text(user["email"] as? String ?? "")
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                        }
+                        .buttonStyle(BorderlessButtonStyle())
+                    }
+                }.frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
+
+                
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Cancel")
+                        .font(.headline)
+                        
+                }.padding()
+            }
+            .navigationTitle("Add User")
         }
-        .navigationTitle("Add User")
     }
 
     func fetchUsers(searchText: String) {
         let predicate = NSPredicate(format: "username CONTAINS[c] %@ OR email CONTAINS[c] %@", searchText, searchText)
         let query = CKQuery(recordType: "User", predicate: predicate)
-        CloudKitManager.shared.container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+        CKContainer.default().publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
                     users = records
@@ -176,7 +195,6 @@ struct AddUserView: View {
             }
         }
     }
-
 }
 
 
