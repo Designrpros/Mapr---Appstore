@@ -1,43 +1,14 @@
 import SwiftUI
 import AuthenticationServices
 
-class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate {
-    @Published var isSignedIn = false
-
-    func handleSignInWithApple() {
-        let appleIDProvider = ASAuthorizationAppleIDProvider()
-        let request = appleIDProvider.createRequest()
-        request.requestedScopes = [.fullName, .email]
-
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        authorizationController.delegate = self
-        authorizationController.performRequests()
-    }
-
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-            let userIdentifier = appleIDCredential.user
-            let fullName = appleIDCredential.fullName
-            let email = appleIDCredential.email
-            // You can now use the received userIdentifier, fullName and email to sign the user in to your app
-            isSignedIn = true
-        }
-    }
-
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        // Handle error.
-    }
-}
-
 
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var isShowing = false
-    @ObservedObject var signInWithAppleManager = SignInWithAppleManager()
     
-    // Add this line to observe your CoreDataManager
+    @ObservedObject var signInWithAppleManager = SignInWithAppleManager.shared
     @ObservedObject var coreDataManager = CoreDataManager.shared
-    
+
     var body: some View {
         if !signInWithAppleManager.isSignedIn {
             Button(action: signInWithAppleManager.handleSignInWithApple) {
@@ -87,6 +58,7 @@ struct ContentView: View {
 }
 
 
+
 struct TabBar: View {
     @Binding var selectedTab: Int
     
@@ -113,11 +85,5 @@ struct TabButton: View {
                 .frame(maxWidth: .infinity, maxHeight: 60)
         }
         .buttonStyle(BorderlessButtonStyle())
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
     }
 }
