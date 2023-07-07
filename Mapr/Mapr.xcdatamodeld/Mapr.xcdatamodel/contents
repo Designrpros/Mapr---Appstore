@@ -9,8 +9,23 @@
         <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChecklistItem" inverseName="children" inverseEntity="ChecklistItem"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="checklistItem" inverseEntity="Project"/>
     </entity>
+    <entity name="CKShareMetadata" representedClassName="CKShareMetadata" syncable="YES" codeGenerationType="class">
+        <attribute name="ownerAcceptStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="ownerName" optional="YES" attributeType="String"/>
+        <attribute name="participantPermission" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="participantStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="participantType" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="recordName" optional="YES" attributeType="String"/>
+        <attribute name="recordType" optional="YES" attributeType="String"/>
+        <attribute name="sharedRecordName" optional="YES" attributeType="String"/>
+        <attribute name="sharedRecordType" optional="YES" attributeType="String"/>
+        <attribute name="shareURL" optional="YES" attributeType="URI"/>
+    </entity>
     <entity name="Contact" representedClassName="Contact" syncable="YES" codeGenerationType="class">
         <attribute name="address" optional="YES" attributeType="String"/>
+        <attribute name="attribute" optional="YES"/>
+        <attribute name="attribute1" optional="YES"/>
+        <attribute name="attribute2" optional="YES"/>
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>

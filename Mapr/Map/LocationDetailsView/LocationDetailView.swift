@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreData
+import CloudKit
 
 class ContactState: ObservableObject {
     @Published var selectedContact: Contact?
@@ -146,6 +147,17 @@ struct LocationDetailView: View {
 
                         
                         Spacer()
+                        
+                        // a person circle icon should be placed here, this should indicate, wich users that has been added to the project, initially the icon should be clickable and activate a popup, to add more users, when a user is added, a new person icon should be added with a new color, than the users can make modifications to the project
+                        
+                        Button(action: shareProject) {
+                            Image(systemName: "person.badge.plus")
+                                .font(.system(size: 20))
+                                .foregroundColor(Color(.systemGray))
+                        }
+                        .padding()
+                        .buttonStyle(BorderlessButtonStyle())
+
                         
                         //Button(action: {
                           //  isShowingNewView = true
@@ -294,6 +306,40 @@ struct LocationDetailView: View {
         }
     }
     
-    
+    func shareProject() {
+        let projectRecord = createCKRecord(from: project)
+
+        let share = CKShare(rootRecord: projectRecord)
+        share[CKShare.SystemFieldKey.title] = "Shared Project" as CKRecordValue?
+        share[CKShare.SystemFieldKey.shareType] = "com.yourcompany.yourappname.project" as CKRecordValue?
+
+        let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: [projectRecord, share], recordIDsToDelete: nil)
+        modifyRecordsOperation.modifyRecordsCompletionBlock = { (savedRecords: [CKRecord]?, deletedRecordIDs: [CKRecord.ID]?, error: Error?) in
+            if let error = error {
+                print("Failed to create share: \(error)")
+            } else {
+                DispatchQueue.main.async {
+                    guard let url = share.url else {
+                        print("Share does not have a URL")
+                        return
+                    }
+
+                    let picker = NSSharingServicePicker(items: [url])
+                    picker.show(relativeTo: NSRect(), of: NSView(), preferredEdge: .minY)
+                }
+            }
+        }
+
+        CKContainer.default().privateCloudDatabase.add(modifyRecordsOperation)
+    }
+    func createCKRecord(from project: Project) -> CKRecord {
+        let record = CKRecord(recordType: "Project")
+        record["projectName"] = project.projectName as CKRecordValue
+        // Add all other properties of Project here...
+        return record
+    }
 }
     
+
+
+
