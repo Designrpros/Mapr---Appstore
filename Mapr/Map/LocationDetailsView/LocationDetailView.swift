@@ -15,8 +15,21 @@ struct LocationDetailView: View {
     @State private var selectedTab = 0
     @State private var isShowingNewView = false
     @State private var refreshID = UUID()
-    @State private var users: [User] = []
+    @State private var selectedUsers: [User] = []
     @State private var showingAddUserModal = false
+
+
+    @FetchRequest(
+        entity: UserEntity.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \UserEntity.name, ascending: true)]
+    ) var userEntities: FetchedResults<UserEntity>
+
+    var coreDataUsers: [User] {
+        userEntities.map { userEntity in
+            retrieveUserFromCoreData(userEntity: userEntity)
+        }
+    }
+
 
 
     @FetchRequest(
@@ -153,19 +166,29 @@ struct LocationDetailView: View {
                         // a person circle icon should be placed here, this should indicate, wich users that has been added to the project, initially the icon should be clickable and activate a popup, to add more users, when a user is added, a new person icon should be added with a new color, than the users can make modifications to the project, it should only be possible to select users that has already been selected in the userlistview. 
                 
 #if os(macOS)
-                        ForEach(users) { user in
+                        ForEach(selectedUsers, id: \.id) { user in
                             HStack {
-                                Circle()
-                                    .fill(user.color)
+                                Image(systemName: "person.crop.circle")
+                                    .resizable()
                                     .frame(width: 20, height: 20)
-                                Text(user.name)
+                                    .help(user.name) // Show the user's name when hovering over the circle
                             }
-                            .onTapGesture {
-                                // Handle tap on user
+                            .contextMenu { // Add a context menu to the HStack
+                                Button(action: {
+                                    // Remove the user from the selectedUsers array
+                                    selectedUsers.removeAll(where: { $0.id == user.id })
+                                }) {
+                                    Label("Remove User", systemImage: "trash")
+                                }.buttonStyle(BorderlessButtonStyle())
                             }
                         }
 
-                        
+
+
+
+
+
+
                         Button(action: {
                             showingAddUserModal = true
                         }) {
@@ -173,15 +196,11 @@ struct LocationDetailView: View {
                                 .font(.system(size: 20))
                                 .foregroundColor(Color(.systemGray))
                         }
-                        .padding()
                         .buttonStyle(BorderlessButtonStyle())
                         .sheet(isPresented: $showingAddUserModal) {
-                            AddUserModal(users: $users)
+                            AddUserModal(project: project, managedObjectContext: managedObjectContext, userEntities: userEntities, selectedUsers: $selectedUsers)
                         }
 
-
-
-                        
 #endif
                         //Button(action: {
                           //  isShowingNewView = true
@@ -395,39 +414,40 @@ struct LocationDetailView: View {
 
 
 struct AddUserModal: View {
+    var project: Project
+    var managedObjectContext: NSManagedObjectContext
+    var userEntities: FetchedResults<UserEntity>
+    @Binding var selectedUsers: [User]
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
-    @Binding var users: [User]
-    
+
+    var users: [User] {
+        userEntities.map { userEntity in
+            retrieveUserFromCoreData(userEntity: userEntity)
+        }
+    }
+
     var body: some View {
-        ZStack {
-            Color.clear
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    presentationMode.wrappedValue.dismiss()
-                }
-            
             VStack {
-                HStack {
-                    TextField("Search...", text: $searchText)
-                        .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
-                        .background(Color(.darkGray))
-                        .cornerRadius(10)
-                        .textFieldStyle(PlainTextFieldStyle())
-                }
-                .padding([.horizontal, .top])
-                
+                TextField("Search...", text: $searchText)
+                    .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+                    .background(Color(.darkGray))
+                    .cornerRadius(10)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .padding([.horizontal, .top])
+
                 List {
                     ForEach(filteredUsers, id: \.id) { user in
                         Button(action: {
-                            // Perform an action when a user is selected
-                            // For example, you might want to add the user to a project
+                            // Add the user to the selectedUsers array when selected
+                            if !selectedUsers.contains(where: { $0.id == user.id }) {
+                                selectedUsers.append(user)
+                            }
                         }) {
                             HStack {
                                 Image(systemName: "person.crop.circle")
                                     .resizable()
                                     .frame(width: 50, height: 50)
-                                    .foregroundColor(user.color)
                                 VStack(alignment: .leading) {
                                     Text(user.name)
                                         .font(.headline)
@@ -436,21 +456,20 @@ struct AddUserModal: View {
                         }
                         .buttonStyle(BorderlessButtonStyle())
                     }
-                }.frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
-                
-                
+                }
+                .frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
+
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("Cancel")
                         .font(.headline)
-                    
-                }.padding()
+                }
+                .padding()
             }
             .navigationTitle("Select User")
         }
-    }
-    
+
     var filteredUsers: [User] {
         if searchText.isEmpty {
             return users
@@ -458,6 +477,18 @@ struct AddUserModal: View {
             return users.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText)
             }
+        }
+    }
+
+    func addUserToProject(user: User) {
+        let userEntity = UserEntity(context: managedObjectContext)
+        userEntity.id = user.id
+        userEntity.name = user.name
+        project.addToUsers(userEntity)
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Failed to add user to project: \(error)")
         }
     }
 }

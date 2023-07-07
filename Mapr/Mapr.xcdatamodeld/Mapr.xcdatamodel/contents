@@ -69,6 +69,7 @@
         <relationship name="location" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Location" inverseName="project" inverseEntity="Location"/>
         <relationship name="material" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Material" inverseName="project" inverseEntity="Material"/>
         <relationship name="timeTracker" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TimeTracker" inverseName="project" inverseEntity="TimeTracker"/>
+        <relationship name="users" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserEntity" inverseName="project" inverseEntity="UserEntity"/>
     </entity>
     <entity name="TimeTracker" representedClassName="TimeTracker" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -81,5 +82,6 @@
         <attribute name="color" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="users" inverseEntity="Project"/>
     </entity>
 </model>

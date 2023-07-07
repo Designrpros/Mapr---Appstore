@@ -10,9 +10,8 @@ import CloudKit
 
 
 struct User: Identifiable {
-    let id: String
+    let id: UUID
     let name: String
-    let color: Color
 }
 
 
@@ -73,7 +72,6 @@ struct Users: View {
                                 }
                             }
                         }
-                        Spacer()
                     }
                     .contextMenu {
                         Button(action: {
@@ -123,6 +121,7 @@ struct Users: View {
 
 
 struct AddUserView: View {
+    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
     @State private var users: [CKRecord] = []
@@ -153,6 +152,10 @@ struct AddUserView: View {
                 List {
                     ForEach(users, id: \.self) { user in
                         Button(action: {
+                            // Save the user to CoreData
+                            let newUser = User(id: UUID(), name: user["username"] as? String ?? "Unknown")
+                            saveUserToCoreData(user: newUser, in: managedObjectContext)
+                            
                             onAddUser?(user)
                             presentationMode.wrappedValue.dismiss()
                         }) {
@@ -197,7 +200,7 @@ struct AddUserView: View {
                     let filteredRecords = records.filter { record in
                         let username = record["username"] as? String ?? ""
                         let email = record["email"] as? String ?? ""
-                        return username.localizedCaseInsensitiveContains(searchText) || email.localizedCaseInsensitiveContains(searchText)
+                        return (username.localizedCaseInsensitiveContains(searchText) || email.localizedCaseInsensitiveContains(searchText)) && !userSelection.users.contains(where: { $0.recordID == record.recordID })
                     }
                     users = filteredRecords
                     // Print out the records
@@ -211,11 +214,23 @@ struct AddUserView: View {
             }
         }
     }
+}
 
+func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectContext) {
+    let userEntity = UserEntity(context: managedObjectContext)
+    userEntity.id = user.id
+    userEntity.name = user.name
+    do {
+        try managedObjectContext.save()
+    } catch {
+        print("Failed to save user: \(error)")
+    }
+}
 
-
-
-
+func retrieveUserFromCoreData(userEntity: UserEntity) -> User {
+    let id = userEntity.id ?? UUID()
+    let name = userEntity.name ?? ""
+    return User(id: id, name: name)
 }
 
 
