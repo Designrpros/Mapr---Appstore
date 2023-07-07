@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ADB555FD2A57D56A004D089E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ADB555BB2A55E61F004D089E /* Info.plist */; };
 		ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283C2A53A7470096D87D /* MaprApp.swift */; };
 		ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283E2A53A7470096D87D /* AppDelegate.swift */; };
 		ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADF428402A53A7470096D87D /* Mapr.xcdatamodeld */; };
@@ -323,6 +324,7 @@
 			files = (
 				ADF4284A2A53A7490096D87D /* Preview Assets.xcassets in Resources */,
 				ADF428462A53A7490096D87D /* Assets.xcassets in Resources */,
+				ADB555FD2A57D56A004D089E /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

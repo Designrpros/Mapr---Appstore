@@ -45,7 +45,8 @@ struct MapView: UIViewRepresentable {
 
             let markerView = annotationView as! MKMarkerAnnotationView
             markerView.markerTintColor = annotation.project.isFinished ? UIColor.yellow : UIColor.red
-
+            markerView.glyphTintColor = .black
+            
             return annotationView
         }
     }
@@ -95,6 +96,7 @@ struct MapView: NSViewRepresentable {
 
             let markerView = annotationView as! MKMarkerAnnotationView
             markerView.markerTintColor = annotation.project.isFinished ? NSColor.yellow : NSColor.red
+            markerView.glyphTintColor = .black
 
             return annotationView
         }

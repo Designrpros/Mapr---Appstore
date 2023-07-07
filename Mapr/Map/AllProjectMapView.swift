@@ -154,7 +154,8 @@ struct AllProjectsMapView: NSViewRepresentable {
 
             annotationView?.canShowCallout = true
             annotationView?.markerTintColor = annotation.color
-
+            annotationView?.glyphTintColor = .black
+            
             return annotationView
         }
     }
