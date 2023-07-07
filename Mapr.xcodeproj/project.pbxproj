@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ADB555FD2A57D56A004D089E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ADB555BB2A55E61F004D089E /* Info.plist */; };
 		ADB556032A57F618004D089E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556022A57F618004D089E /* Users.swift */; };
 		ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556042A57FE64004D089E /* UserDetailView.swift */; };
 		ADB556072A5809D1004D089E /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556062A5809D1004D089E /* CloudKitManager.swift */; };
@@ -333,7 +332,6 @@
 			files = (
 				ADF4284A2A53A7490096D87D /* Preview Assets.xcassets in Resources */,
 				ADF428462A53A7490096D87D /* Assets.xcassets in Resources */,
-				ADB555FD2A57D56A004D089E /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,7 +553,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.2;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Designr.pro.Handy-Mapr";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -596,7 +594,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.2;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Designr.pro.Handy-Mapr";
 				PRODUCT_NAME = "$(TARGET_NAME)";

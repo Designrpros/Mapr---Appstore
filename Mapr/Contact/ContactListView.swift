@@ -14,7 +14,6 @@ struct ContactListView: View {
     
     var body: some View {
         VStack {
-            CustomContactSegmentedControl(selectedTab: $selectedSegment)
             if selectedSegment == 0 {
                 HStack {
                     TextField("Search...", text: $searchText)
@@ -37,7 +36,7 @@ struct ContactListView: View {
                         }
                     }
                 }
-                .padding([.horizontal])
+                .padding([.horizontal, .top])
                 
                 List {
                     ForEach(filteredContacts, id: \.self) { contact in
@@ -78,7 +77,7 @@ struct ContactListView: View {
                 Users()
             }
         }.navigationTitle("Contacts & Users")
-        
+        CustomContactSegmentedControl(selectedTab: $selectedSegment)
     }
     
     var filteredContacts: [Contact] {
@@ -172,7 +171,6 @@ struct AddContactView: View {
 }
 
 
-
 struct CustomContactSegmentedControl: View {
     @Binding var selectedTab: Int
 
@@ -183,37 +181,46 @@ struct CustomContactSegmentedControl: View {
                     selectedTab = 0
                 }
             }) {
-                ZStack {
-                    Rectangle()
-                        .fill(selectedTab == 0 ? Color.clear : Color.clear)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                HStack {
+                    Image(systemName: "person.crop.circle")
+                        .font(.system(size: 15))
                     Text("Contacts")
-                        .fontWeight(.bold)
-                        .foregroundColor(selectedTab == 0 ? .white : .gray)
                 }
+                .foregroundColor(selectedTab == 0 ? Color("CostumGray") : Color.primary)
+                .frame(maxWidth: .infinity, maxHeight: 30)
+                .overlay(
+                    Rectangle()
+                        .frame(height: 2)
+                        .foregroundColor(selectedTab == 0 ? Color("CostumGray") : Color.clear),
+                    alignment: .top
+                )
             }
-            .frame(maxWidth: .infinity)
-            .background(Color.clear)
+            .buttonStyle(BorderlessButtonStyle())
             
             Button(action: {
                 withAnimation {
                     selectedTab = 1
                 }
             }) {
-                ZStack {
-                    Rectangle()
-                        .fill(selectedTab == 1 ? Color.clear : Color.clear)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                HStack {
+                    Image(systemName: "person.2.fill")
+                        .font(.system(size: 15))
                     Text("Users")
-                        .fontWeight(.bold)
-                        .foregroundColor(selectedTab == 1 ? .white : .gray)
                 }
+                .foregroundColor(selectedTab == 1 ? Color("CostumGray") : Color.primary)
+                .frame(maxWidth: .infinity, maxHeight: 30)
+                .overlay(
+                    Rectangle()
+                        .frame(height: 2)
+                        .foregroundColor(selectedTab == 1 ? Color("CostumGray") : Color.clear),
+                    alignment: .top
+                )
             }
-            .frame(maxWidth: .infinity)
-            .background(Color.clear)
+            .buttonStyle(BorderlessButtonStyle())
         }
-        .frame(height: 40)
-        .padding(.horizontal)
+        .frame(height: 30)
     }
 }
+
+
 

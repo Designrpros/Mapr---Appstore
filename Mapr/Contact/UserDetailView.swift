@@ -32,6 +32,7 @@ struct UserDetailView: View {
 struct UpdateUserView: View {
     @State private var username = ""
     @State private var email = ""
+    @State private var showError = false
 
     var body: some View {
         VStack {
@@ -39,6 +40,10 @@ struct UpdateUserView: View {
             TextField("Email", text: $email)
             Button("Update") {
                 updateUser()
+            }
+            if showError {
+                Text("Please sign in to iCloud to update your user information.")
+                    .foregroundColor(.red)
             }
         }
     }
@@ -48,6 +53,9 @@ struct UpdateUserView: View {
         CKContainer.default().fetchUserRecordID { (recordID, error) in
             if let error = error {
                 print("Failed to fetch user record ID: \(error)")
+                DispatchQueue.main.async {
+                    showError = true
+                }
             } else if let recordID = recordID {
                 CKContainer.default().publicCloudDatabase.fetch(withRecordID: recordID) { (record, error) in
                     if let error = error {
@@ -69,3 +77,4 @@ struct UpdateUserView: View {
         }
     }
 }
+

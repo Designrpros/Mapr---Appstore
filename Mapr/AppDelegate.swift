@@ -1,14 +1,14 @@
 import SwiftUI
 import CoreData
+import AuthenticationServices
 
 #if os(iOS)
 import UIKit
-import AuthenticationServices
+
 #elseif os(macOS)
 import AppKit
 #endif
 
-import AuthenticationServices
 
 class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate {
     static let shared = SignInWithAppleManager()

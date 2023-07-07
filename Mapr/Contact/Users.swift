@@ -12,10 +12,14 @@ struct Users: View {
     @State private var searchText = ""
     @State private var showingAddUser = false
     @State private var users: [CKRecord] = []
-    @State private var showingUpdateUser = false
     
     var body: some View {
         VStack {
+            Button(action: {
+                self.addUser()
+            }) {
+                Text("Add User")
+            }
             HStack {
                 TextField("Search...", text: $searchText)
                     .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
@@ -38,16 +42,9 @@ struct Users: View {
                 }
             }
             .padding([.horizontal])
-            
-            Button(action: {
-                showingUpdateUser = true
-            }) {
-                Text("Update User")
-            }
-            .sheet(isPresented: $showingUpdateUser) {
-                UpdateUserView()
-            }
                 
+            
+
             List {
                 ForEach(filteredUsers, id: \.self) { user in
                     HStack {
@@ -87,8 +84,9 @@ struct Users: View {
                 }
             }
         }
+        .navigationTitle("Add User")
         .onAppear {
-            fetchUsers()
+            self.fetchUsers()
         }
     }
     var filteredUsers: [CKRecord] {
@@ -104,16 +102,40 @@ struct Users: View {
     
     func fetchUsers() {
         let query = CKQuery(recordType: "User", predicate: NSPredicate(value: true))
-        CKContainer.default().publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+        let container = CKContainer(identifier: "iCloud.handy-mapr")
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
+                    print("Successfully fetched all users")
                     users = records
                 } else if let error = error {
-                    print("Failed to fetch users: \(error)")
+                    print("Failed to fetch users: \(error.localizedDescription)")
                 }
             }
         }
     }
+
+
+
+    func addUser() {
+        let recordID = CKRecord.ID(recordName: "newUser")
+        let record = CKRecord(recordType: "User", recordID: recordID)
+        record["username"] = "newUser"
+        record["email"] = "newUser@example.com"
+
+        let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
+        modifyRecordsOperation.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
+            if let error = error {
+                print("Failed to add user: \(error.localizedDescription)")
+            } else {
+                print("Successfully added user")
+                self.fetchUsers()
+            }
+        }
+
+        CKContainer.default().publicCloudDatabase.add(modifyRecordsOperation)
+    }
+
 }
 
 
@@ -124,14 +146,14 @@ struct AddUserView: View {
     @State private var searchText = ""
     @State private var users: [CKRecord] = []
     var onAddUser: ((CKRecord) -> Void)?
-
+    
     var body: some View {
         ZStack {
             Color.clear
-            .contentShape(Rectangle())
-            .onTapGesture {
-                presentationMode.wrappedValue.dismiss()
-            }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    presentationMode.wrappedValue.dismiss()
+                }
             
             VStack {
                 HStack {
@@ -168,33 +190,35 @@ struct AddUserView: View {
                         .buttonStyle(BorderlessButtonStyle())
                     }
                 }.frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
-
+                
                 
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("Cancel")
                         .font(.headline)
-                        
+                    
                 }.padding()
             }
             .navigationTitle("Add User")
         }
     }
-
     func fetchUsers(searchText: String) {
-        let predicate = NSPredicate(format: "username CONTAINS[c] %@ OR email CONTAINS[c] %@", searchText, searchText)
+        let predicate = NSPredicate(format: "username CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
         let query = CKQuery(recordType: "User", predicate: predicate)
-        CKContainer.default().publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+        let container = CKContainer(identifier: "iCloud.handy-mapr")
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
+                    print("Successfully fetched all users")
                     users = records
                 } else if let error = error {
-                    print("Failed to fetch users: \(error)")
+                    print("Failed to fetch users: \(error.localizedDescription)")
                 }
             }
         }
     }
+
 }
 
 
