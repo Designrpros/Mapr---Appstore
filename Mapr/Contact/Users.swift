@@ -8,18 +8,27 @@
 import SwiftUI
 import CloudKit
 
+
+struct User: Identifiable {
+    let id: String
+    let name: String
+    let color: Color
+}
+
+
+class UserSelection: ObservableObject {
+    @Published var users: [CKRecord] = []
+}
+
 struct Users: View {
     @State private var searchText = ""
     @State private var showingAddUser = false
+    @EnvironmentObject var userSelection: UserSelection
     @State private var users: [CKRecord] = []
     
     var body: some View {
         VStack {
-            Button(action: {
-                self.addUser()
-            }) {
-                Text("Add User")
-            }
+            
             HStack {
                 TextField("Search...", text: $searchText)
                     .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
@@ -37,11 +46,13 @@ struct Users: View {
                 .buttonStyle(BorderlessButtonStyle())
                 .sheet(isPresented: $showingAddUser) {
                     AddUserView { newUser in
-                        users.append(newUser)
+                        if !userSelection.users.contains(where: { $0.recordID == newUser.recordID }) {
+                            userSelection.users.append(newUser)
+                        }
                     }
                 }
             }
-            .padding([.horizontal])
+            .padding([.horizontal, .top])
                 
             
 
@@ -66,43 +77,35 @@ struct Users: View {
                     }
                     .contextMenu {
                         Button(action: {
-                            // Delete the user from CloudKit
-                            CKContainer.default().publicCloudDatabase.delete(withRecordID: user.recordID) { (recordID, error) in
-                                if let error = error {
-                                    print("Failed to delete user: \(error)")
-                                } else {
-                                    DispatchQueue.main.async {
-                                        users.removeAll(where: { $0.recordID == recordID })
-                                    }
-                                }
+                            // Remove the user from the list
+                            DispatchQueue.main.async {
+                                userSelection.users.removeAll(where: { $0.recordID == user.recordID })
                             }
                         }) {
-                            Text("Delete User")
+                            Text("Remove User from List")
                             Image(systemName: "trash")
                         }
                     }
+
                 }
             }
         }
         .navigationTitle("Add User")
-        .onAppear {
-            self.fetchUsers()
-        }
     }
     var filteredUsers: [CKRecord] {
         if searchText.isEmpty {
-            return users
+            return userSelection.users
         } else {
-            return users.filter {
+            return userSelection.users.filter {
                 ($0["username"] as? String)?.contains(searchText) ?? false ||
                 ($0["email"] as? String)?.contains(searchText) ?? false
             }
         }
     }
-    
     func fetchUsers() {
-        let query = CKQuery(recordType: "User", predicate: NSPredicate(value: true))
-        let container = CKContainer(identifier: "iCloud.handy-mapr")
+        let predicate = NSPredicate(value: true)
+        let query = CKQuery(recordType: "User", predicate: predicate)
+        let container = CKContainer(identifier: "iCloud.Mapr")
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
@@ -114,28 +117,6 @@ struct Users: View {
             }
         }
     }
-
-
-
-    func addUser() {
-        let recordID = CKRecord.ID(recordName: "newUser")
-        let record = CKRecord(recordType: "User", recordID: recordID)
-        record["username"] = "newUser"
-        record["email"] = "newUser@example.com"
-
-        let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
-        modifyRecordsOperation.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
-            if let error = error {
-                print("Failed to add user: \(error.localizedDescription)")
-            } else {
-                print("Successfully added user")
-                self.fetchUsers()
-            }
-        }
-
-        CKContainer.default().publicCloudDatabase.add(modifyRecordsOperation)
-    }
-
 }
 
 
@@ -145,6 +126,7 @@ struct AddUserView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
     @State private var users: [CKRecord] = []
+    @EnvironmentObject var userSelection: UserSelection
     var onAddUser: ((CKRecord) -> Void)?
     
     var body: some View {
@@ -203,21 +185,36 @@ struct AddUserView: View {
             .navigationTitle("Add User")
         }
     }
+    
     func fetchUsers(searchText: String) {
-        let predicate = NSPredicate(format: "username CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
+        let predicate = NSPredicate(value: true)
         let query = CKQuery(recordType: "User", predicate: predicate)
-        let container = CKContainer(identifier: "iCloud.handy-mapr")
+        let container = CKContainer(identifier: "iCloud.Mapr")
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
                     print("Successfully fetched all users")
-                    users = records
+                    let filteredRecords = records.filter { record in
+                        let username = record["username"] as? String ?? ""
+                        let email = record["email"] as? String ?? ""
+                        return username.localizedCaseInsensitiveContains(searchText) || email.localizedCaseInsensitiveContains(searchText)
+                    }
+                    users = filteredRecords
+                    // Print out the records
+                    for record in filteredRecords {
+                        print("Record: \(record)")
+                    }
                 } else if let error = error {
+                    // Print out the error message
                     print("Failed to fetch users: \(error.localizedDescription)")
                 }
             }
         }
     }
+
+
+
+
 
 }
 

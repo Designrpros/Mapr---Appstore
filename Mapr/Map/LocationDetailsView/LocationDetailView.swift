@@ -15,6 +15,8 @@ struct LocationDetailView: View {
     @State private var selectedTab = 0
     @State private var isShowingNewView = false
     @State private var refreshID = UUID()
+    @State private var users: [User] = []
+    @State private var showingAddUserModal = false
 
 
     @FetchRequest(
@@ -148,17 +150,39 @@ struct LocationDetailView: View {
                         
                         Spacer()
                         
-                        // a person circle icon should be placed here, this should indicate, wich users that has been added to the project, initially the icon should be clickable and activate a popup, to add more users, when a user is added, a new person icon should be added with a new color, than the users can make modifications to the project
+                        // a person circle icon should be placed here, this should indicate, wich users that has been added to the project, initially the icon should be clickable and activate a popup, to add more users, when a user is added, a new person icon should be added with a new color, than the users can make modifications to the project, it should only be possible to select users that has already been selected in the userlistview. 
+                
+#if os(macOS)
+                        ForEach(users) { user in
+                            HStack {
+                                Circle()
+                                    .fill(user.color)
+                                    .frame(width: 20, height: 20)
+                                Text(user.name)
+                            }
+                            .onTapGesture {
+                                // Handle tap on user
+                            }
+                        }
+
                         
-                        Button(action: shareProject) {
+                        Button(action: {
+                            showingAddUserModal = true
+                        }) {
                             Image(systemName: "person.badge.plus")
                                 .font(.system(size: 20))
                                 .foregroundColor(Color(.systemGray))
                         }
                         .padding()
                         .buttonStyle(BorderlessButtonStyle())
+                        .sheet(isPresented: $showingAddUserModal) {
+                            AddUserModal(users: $users)
+                        }
+
+
 
                         
+#endif
                         //Button(action: {
                           //  isShowingNewView = true
                         //}) {
@@ -306,6 +330,7 @@ struct LocationDetailView: View {
         }
     }
     
+#if os(macOS)
     func shareProject() {
         guard let recordName = project.recordID else {
             print("Project does not have a CKRecord ID")
@@ -322,8 +347,8 @@ struct LocationDetailView: View {
                 share[CKShare.SystemFieldKey.title] = "Shared Project" as CKRecordValue?
                 share[CKShare.SystemFieldKey.shareType] = "com.yourcompany.yourappname.project" as CKRecordValue?
 
-                // Create a CKShareMetadata object and save it to CoreData
-                let shareMetadata = CKShareMetadata(context: managedObjectContext)
+                // Create a CustomCKShareMetadata object and save it to CoreData
+                let shareMetadata = CustomCKShareMetadata(context: managedObjectContext)
                 shareMetadata.recordName = share.recordID.recordName
                 shareMetadata.recordType = share.recordType
                 shareMetadata.shareURL = share.url
@@ -363,9 +388,77 @@ struct LocationDetailView: View {
         }
         CKContainer.default().privateCloudDatabase.add(fetchRecordsOperation)
     }
-
+#endif
 }
     
 
 
+
+struct AddUserModal: View {
+    @Environment(\.presentationMode) var presentationMode
+    @State private var searchText = ""
+    @Binding var users: [User]
+    
+    var body: some View {
+        ZStack {
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            
+            VStack {
+                HStack {
+                    TextField("Search...", text: $searchText)
+                        .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+                        .background(Color(.darkGray))
+                        .cornerRadius(10)
+                        .textFieldStyle(PlainTextFieldStyle())
+                }
+                .padding([.horizontal, .top])
+                
+                List {
+                    ForEach(filteredUsers, id: \.id) { user in
+                        Button(action: {
+                            // Perform an action when a user is selected
+                            // For example, you might want to add the user to a project
+                        }) {
+                            HStack {
+                                Image(systemName: "person.crop.circle")
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .foregroundColor(user.color)
+                                VStack(alignment: .leading) {
+                                    Text(user.name)
+                                        .font(.headline)
+                                }
+                            }
+                        }
+                        .buttonStyle(BorderlessButtonStyle())
+                    }
+                }.frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
+                
+                
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Cancel")
+                        .font(.headline)
+                    
+                }.padding()
+            }
+            .navigationTitle("Select User")
+        }
+    }
+    
+    var filteredUsers: [User] {
+        if searchText.isEmpty {
+            return users
+        } else {
+            return users.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+}
 

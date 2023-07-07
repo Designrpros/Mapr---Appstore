@@ -12,7 +12,8 @@ struct MapView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        let region = MKCoordinateRegion(center: project.location?.coordinate ?? CLLocationCoordinate2D(), latitudinalMeters: 1000, longitudinalMeters: 1000)
+        let coordinate = CLLocationCoordinate2D(latitude: project.location?.latitude ?? 0, longitude: project.location?.longitude ?? 0)
+        let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
         uiView.setRegion(region, animated: true)
 
         let annotation = ProjectAnnotation(project: project)

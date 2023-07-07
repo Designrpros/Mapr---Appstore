@@ -23,9 +23,9 @@ struct AllProjectsMapView: UIViewRepresentable {
     private var locations: FetchedResults<Location>
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
+            Coordinator(self)
+        }
+
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
@@ -72,6 +72,16 @@ struct AllProjectsMapView: UIViewRepresentable {
             print("Invalid region")
         }
     }
+    class Coordinator: NSObject, MKMapViewDelegate {
+        var parent: AllProjectsMapView
+
+        init(_ parent: AllProjectsMapView) {
+            self.parent = parent
+        }
+
+        // Implement MKMapViewDelegate methods here
+    }
+
 }
 
 

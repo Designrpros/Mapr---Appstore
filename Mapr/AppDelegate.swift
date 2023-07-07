@@ -89,6 +89,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 @main
 struct Mapr: App {
+    @StateObject private var userSelection = UserSelection()
+    
     #if os(iOS)
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #elseif os(macOS)
@@ -100,6 +102,7 @@ struct Mapr: App {
             ContentView()
                 .preferredColorScheme(.dark)
                 .environment(\.managedObjectContext, CoreDataManager.shared.context)
+                .environmentObject(userSelection)
         }
         #if os(macOS)
         Settings {
