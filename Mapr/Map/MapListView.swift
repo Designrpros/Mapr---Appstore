@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreData
+import CloudKit
 
 #if os(macOS)
 import AppKit
@@ -200,6 +201,11 @@ struct MapListView: View {
         // Set the other properties of the project
         project.projectName = mapItem.name
 
+        // Create a new CKRecord for the project
+        let newRecord = CKRecord(recordType: "Project")
+        // Save the CKRecord's recordID to the project
+        project.recordID = newRecord.recordID.recordName
+
         print("Saving project...")
         do {
             try viewContext.save()
@@ -207,7 +213,6 @@ struct MapListView: View {
         } catch {
             print("Failed to save project: \(error)")
         }
-
 
         // Update the search results to remove the newly saved location
         if let index = searchResults.firstIndex(where: { $0.name == mapItem.name }) {
@@ -219,6 +224,7 @@ struct MapListView: View {
 
         return project
     }
+
 
 
 

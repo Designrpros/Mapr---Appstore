@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		ADB555FD2A57D56A004D089E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ADB555BB2A55E61F004D089E /* Info.plist */; };
+		ADB556032A57F618004D089E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556022A57F618004D089E /* Users.swift */; };
+		ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556042A57FE64004D089E /* UserDetailView.swift */; };
 		ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283C2A53A7470096D87D /* MaprApp.swift */; };
 		ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283E2A53A7470096D87D /* AppDelegate.swift */; };
 		ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADF428402A53A7470096D87D /* Mapr.xcdatamodeld */; };
@@ -54,6 +56,8 @@
 
 /* Begin PBXFileReference section */
 		ADB555BB2A55E61F004D089E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		ADB556022A57F618004D089E /* Users.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
+		ADB556042A57FE64004D089E /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
 		ADF428392A53A7470096D87D /* Mapr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mapr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADF4283C2A53A7470096D87D /* MaprApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaprApp.swift; sourceTree = "<group>"; };
 		ADF4283E2A53A7470096D87D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -213,6 +217,8 @@
 			isa = PBXGroup;
 			children = (
 				ADF4288A2A53A8E50096D87D /* ContactListView.swift */,
+				ADB556022A57F618004D089E /* Users.swift */,
+				ADB556042A57FE64004D089E /* UserDetailView.swift */,
 				ADF4288C2A53A8F70096D87D /* ContactView.swift */,
 			);
 			path = Contact;
@@ -359,9 +365,11 @@
 				ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */,
 				ADF4288B2A53A8E50096D87D /* ContactListView.swift in Sources */,
 				ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */,
+				ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */,
 				ADF4287F2A53A8550096D87D /* DetailsView.swift in Sources */,
 				ADF428892A53A8C30096D87D /* StreetView.swift in Sources */,
 				ADF428442A53A7470096D87D /* ContentView.swift in Sources */,
+				ADB556032A57F618004D089E /* Users.swift in Sources */,
 				ADF4287D2A53A8410096D87D /* Segment.swift in Sources */,
 				ADF4286D2A53A7950096D87D /* CoreDataManager.swift in Sources */,
 				ADF428872A53A8B10096D87D /* PreviewView.swift in Sources */,

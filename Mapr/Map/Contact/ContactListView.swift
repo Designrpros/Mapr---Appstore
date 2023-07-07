@@ -9,70 +9,76 @@ struct ContactListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var searchText = ""
     @State private var showingAddContact = false
+    @State private var selectedSegment = 0
     
     
     var body: some View {
         VStack {
-            HStack {
-                TextField("Search...", text: $searchText)
-                    .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
-                    .background(Color(.darkGray))
-                    .cornerRadius(10)
-                    .textFieldStyle(PlainTextFieldStyle())
-                
-                Button(action: {
-                    showingAddContact = true
-                }) {
-                    Image(systemName: "person.crop.circle.badge.plus")
-                        .foregroundColor(.white)
-                }
-                .padding(.leading, 8)
-                .buttonStyle(BorderlessButtonStyle())
-                .sheet(isPresented: $showingAddContact) {
-                    AddContactView {
-                        // Refresh the contacts array when a new contact is added
+            CustomContactSegmentedControl(selectedTab: $selectedSegment)
+            if selectedSegment == 0 {
+                HStack {
+                    TextField("Search...", text: $searchText)
+                        .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+                        .background(Color(.darkGray))
+                        .cornerRadius(10)
+                        .textFieldStyle(PlainTextFieldStyle())
+                    
+                    Button(action: {
+                        showingAddContact = true
+                    }) {
+                        Image(systemName: "person.crop.circle.badge.plus")
+                            .foregroundColor(.white)
+                    }
+                    .padding(.leading, 8)
+                    .buttonStyle(BorderlessButtonStyle())
+                    .sheet(isPresented: $showingAddContact) {
+                        AddContactView {
+                            // Refresh the contacts array when a new contact is added
+                        }
                     }
                 }
-            }
-            .padding([.horizontal, .top])
-            
-            List {
-                ForEach(filteredContacts, id: \.self) { contact in
-                    HStack {
-                        NavigationLink(destination: ContactDetailView(contact: contact)) {
-                            HStack {
-                                Image(systemName: "person.crop.circle")
-                                    .resizable()
-                                    .frame(width: 50, height: 50)
-                                VStack(alignment: .leading) {
-                                    Text(contact.name ?? "Unknown")
-                                        .font(.headline)
-                                    Text(contact.email ?? "")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
+                .padding([.horizontal])
+                
+                List {
+                    ForEach(filteredContacts, id: \.self) { contact in
+                        HStack {
+                            NavigationLink(destination: ContactDetailView(contact: contact)) {
+                                HStack {
+                                    Image(systemName: "person.crop.circle")
+                                        .resizable()
+                                        .frame(width: 50, height: 50)
+                                    VStack(alignment: .leading) {
+                                        Text(contact.name ?? "Unknown")
+                                            .font(.headline)
+                                        Text(contact.email ?? "")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
                                 }
                             }
+                            Spacer()
                         }
-                        Spacer()
-                    }
-                    .contextMenu { // Add this modifier
-                        Button(action: {
-                            // Delete the contact from Core Data
-                            viewContext.delete(contact)
-                            do {
-                                try viewContext.save()
-                            } catch {
-                                print("Failed to delete contact: \(error)")
+                        .contextMenu { // Add this modifier
+                            Button(action: {
+                                // Delete the contact from Core Data
+                                viewContext.delete(contact)
+                                do {
+                                    try viewContext.save()
+                                } catch {
+                                    print("Failed to delete contact: \(error)")
+                                }
+                            }) {
+                                Text("Delete Contact")
+                                Image(systemName: "trash")
                             }
-                        }) {
-                            Text("Delete Contact")
-                            Image(systemName: "trash")
                         }
                     }
                 }
+            } else {
+                Users()
             }
-        }
-        .navigationTitle("Contacts")
+        }.navigationTitle("Contacts & Users")
+        
     }
     
     var filteredContacts: [Contact] {
@@ -166,4 +172,48 @@ struct AddContactView: View {
 }
 
 
+
+struct CustomContactSegmentedControl: View {
+    @Binding var selectedTab: Int
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Button(action: {
+                withAnimation {
+                    selectedTab = 0
+                }
+            }) {
+                ZStack {
+                    Rectangle()
+                        .fill(selectedTab == 0 ? Color.clear : Color.clear)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    Text("Contacts")
+                        .fontWeight(.bold)
+                        .foregroundColor(selectedTab == 0 ? .white : .gray)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .background(Color.clear)
+            
+            Button(action: {
+                withAnimation {
+                    selectedTab = 1
+                }
+            }) {
+                ZStack {
+                    Rectangle()
+                        .fill(selectedTab == 1 ? Color.clear : Color.clear)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    Text("Users")
+                        .fontWeight(.bold)
+                        .foregroundColor(selectedTab == 1 ? .white : .gray)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .background(Color.clear)
+        }
+        .frame(height: 40)
+        .padding(.horizontal)
+    }
+}
 

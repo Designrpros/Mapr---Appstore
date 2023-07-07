@@ -307,37 +307,63 @@ struct LocationDetailView: View {
     }
     
     func shareProject() {
-        let projectRecord = createCKRecord(from: project)
-
-        let share = CKShare(rootRecord: projectRecord)
-        share[CKShare.SystemFieldKey.title] = "Shared Project" as CKRecordValue?
-        share[CKShare.SystemFieldKey.shareType] = "com.yourcompany.yourappname.project" as CKRecordValue?
-
-        let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: [projectRecord, share], recordIDsToDelete: nil)
-        modifyRecordsOperation.modifyRecordsCompletionBlock = { (savedRecords: [CKRecord]?, deletedRecordIDs: [CKRecord.ID]?, error: Error?) in
-            if let error = error {
-                print("Failed to create share: \(error)")
-            } else {
-                DispatchQueue.main.async {
-                    guard let url = share.url else {
-                        print("Share does not have a URL")
-                        return
-                    }
-
-                    let picker = NSSharingServicePicker(items: [url])
-                    picker.show(relativeTo: NSRect(), of: NSView(), preferredEdge: .minY)
-                }
-            }
+        guard let recordName = project.recordID else {
+            print("Project does not have a CKRecord ID")
+            return
         }
 
-        CKContainer.default().privateCloudDatabase.add(modifyRecordsOperation)
+        let recordID = CKRecord.ID(recordName: recordName)
+        let fetchRecordsOperation = CKFetchRecordsOperation(recordIDs: [recordID])
+        fetchRecordsOperation.fetchRecordsCompletionBlock = { records, error in
+            if let error = error {
+                print("Failed to fetch CKRecord: \(error)")
+            } else if let projectRecord = records?[recordID] {
+                let share = CKShare(rootRecord: projectRecord)
+                share[CKShare.SystemFieldKey.title] = "Shared Project" as CKRecordValue?
+                share[CKShare.SystemFieldKey.shareType] = "com.yourcompany.yourappname.project" as CKRecordValue?
+
+                // Create a CKShareMetadata object and save it to CoreData
+                let shareMetadata = CKShareMetadata(context: managedObjectContext)
+                shareMetadata.recordName = share.recordID.recordName
+                shareMetadata.recordType = share.recordType
+                shareMetadata.shareURL = share.url
+                shareMetadata.sharedRecordName = projectRecord.recordID.recordName
+                shareMetadata.sharedRecordType = projectRecord.recordType
+                shareMetadata.ownerName = share.owner.userIdentity.userRecordID?.recordName
+                shareMetadata.ownerAcceptStatus = Int16(share.owner.acceptanceStatus.rawValue)
+                shareMetadata.participantStatus = Int16(share.currentUserParticipant?.acceptanceStatus.rawValue ?? CKShare.ParticipantAcceptanceStatus.unknown.rawValue)
+                shareMetadata.participantType = Int16(share.currentUserParticipant?.role.rawValue ?? CKShare.Participant.Role.unknown.rawValue)
+                shareMetadata.participantPermission = Int16(share.currentUserParticipant?.permission.rawValue ?? 0)
+
+                do {
+                    try managedObjectContext.save()
+                } catch {
+                    print("Failed to save share metadata: \(error)")
+                }
+
+                let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: [projectRecord], recordIDsToDelete: nil)
+                modifyRecordsOperation.modifyRecordsCompletionBlock = { (savedRecords: [CKRecord]?, deletedRecordIDs: [CKRecord.ID]?, error: Error?) in
+                    if let error = error {
+                        print("Failed to create share: \(error)")
+                    } else {
+                        DispatchQueue.main.async {
+                            guard let url = share.url else {
+                                print("Share does not have a URL")
+                                return
+                            }
+
+                            let picker = NSSharingServicePicker(items: [url])
+                            picker.show(relativeTo: NSRect(), of: NSView(), preferredEdge: .minY)
+                        }
+                    }
+                }
+
+                CKContainer.default().privateCloudDatabase.add(modifyRecordsOperation)
+            }
+        }
+        CKContainer.default().privateCloudDatabase.add(fetchRecordsOperation)
     }
-    func createCKRecord(from project: Project) -> CKRecord {
-        let record = CKRecord(recordType: "Project")
-        record["projectName"] = project.projectName as CKRecordValue
-        // Add all other properties of Project here...
-        return record
-    }
+
 }
     
 

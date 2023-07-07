@@ -23,9 +23,6 @@
     </entity>
     <entity name="Contact" representedClassName="Contact" syncable="YES" codeGenerationType="class">
         <attribute name="address" optional="YES" attributeType="String"/>
-        <attribute name="attribute" optional="YES"/>
-        <attribute name="attribute1" optional="YES"/>
-        <attribute name="attribute2" optional="YES"/>
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
@@ -65,6 +62,7 @@
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="projectDescription" optional="YES" attributeType="String"/>
         <attribute name="projectName" optional="YES" attributeType="String"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
         <relationship name="checklistItem" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChecklistItem" inverseName="project" inverseEntity="ChecklistItem"/>
         <relationship name="contact" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Contact" inverseName="project" inverseEntity="Contact"/>
         <relationship name="galleryImage" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GalleryImage" inverseName="project" inverseEntity="GalleryImage"/>
@@ -78,5 +76,9 @@
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="notes" optional="YES" attributeType="String"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="timeTracker" inverseEntity="Project"/>
+    </entity>
+    <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
+        <attribute name="email" optional="YES" attributeType="String"/>
+        <attribute name="userName" optional="YES" attributeType="String"/>
     </entity>
 </model>
