@@ -57,7 +57,7 @@ struct ContactListView: View {
                             }
                             Spacer()
                         }
-                        .contextMenu { // Add this modifier
+                        .contextMenu {
                             Button(action: {
                                 // Delete the contact from Core Data
                                 viewContext.delete(contact)

@@ -12,6 +12,10 @@ import CloudKit
 struct User: Identifiable {
     let id: UUID
     let name: String
+    let email: String
+    let role: String
+    let recordID: CKRecord.ID
+    var record: CKRecord
 }
 
 
@@ -153,7 +157,14 @@ struct AddUserView: View {
                     ForEach(users, id: \.self) { user in
                         Button(action: {
                             // Save the user to CoreData
-                            let newUser = User(id: UUID(), name: user["username"] as? String ?? "Unknown")
+                            let newUser = User(
+                                id: UUID(),
+                                name: user["username"] as? String ?? "Unknown",
+                                email: user["email"] as? String ?? "Unknown",
+                                role: user["role"] as? String ?? "Unknown",
+                                recordID: user.recordID,
+                                record: user
+                            )
                             saveUserToCoreData(user: newUser, in: managedObjectContext)
                             
                             onAddUser?(user)
@@ -215,11 +226,20 @@ struct AddUserView: View {
         }
     }
 }
-
 func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectContext) {
     let userEntity = UserEntity(context: managedObjectContext)
     userEntity.id = user.id
     userEntity.name = user.name
+    userEntity.email = user.email
+    userEntity.role = user.role
+
+    // Convert CKRecord.ID and CKRecord to Data
+    let recordIDData = try? NSKeyedArchiver.archivedData(withRootObject: user.recordID, requiringSecureCoding: false)
+    let recordData = try? NSKeyedArchiver.archivedData(withRootObject: user.record, requiringSecureCoding: false)
+
+    userEntity.recordIDData = recordIDData
+    userEntity.recordData = recordData
+
     do {
         try managedObjectContext.save()
     } catch {
@@ -230,8 +250,23 @@ func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectCont
 func retrieveUserFromCoreData(userEntity: UserEntity) -> User {
     let id = userEntity.id ?? UUID()
     let name = userEntity.name ?? ""
-    return User(id: id, name: name)
+    let email = userEntity.email ?? ""
+    let role = userEntity.role ?? ""
+
+    // Check if recordIDData and recordData are not nil
+    if let recordIDData = userEntity.recordIDData, let recordData = userEntity.recordData {
+        // Convert Data back to CKRecord.ID and CKRecord
+        let recordID = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordIDData)) as? CKRecord.ID ?? CKRecord.ID()
+        let record = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordData)) as? CKRecord ?? CKRecord(recordType: "User")
+        return User(id: id, name: name, email: email, role: role, recordID: recordID, record: record)
+    } else {
+        // Return a default User object if recordIDData or recordData is nil
+        return User(id: id, name: name, email: email, role: role, recordID: CKRecord.ID(), record: CKRecord(recordType: "User"))
+    }
 }
+
+
+
 
 
 

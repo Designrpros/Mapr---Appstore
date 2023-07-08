@@ -80,8 +80,12 @@
     </entity>
     <entity name="UserEntity" representedClassName="UserEntity" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="String"/>
+        <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="recordData" optional="YES" attributeType="Binary"/>
+        <attribute name="recordIDData" optional="YES" attributeType="Binary"/>
+        <attribute name="role" optional="YES" attributeType="String"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="users" inverseEntity="Project"/>
     </entity>
 </model>

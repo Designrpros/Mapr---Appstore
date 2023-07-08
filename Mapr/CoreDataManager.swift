@@ -1,4 +1,5 @@
 import CoreData
+import CloudKit
 
 struct PersistenceController {
     static let shared = PersistenceController()
@@ -115,6 +116,8 @@ class CoreDataManager: ObservableObject {
             // Handle successful sync here if needed
         }
     }
+    
+
 }
 
         

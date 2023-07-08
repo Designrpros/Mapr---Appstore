@@ -58,6 +58,10 @@ struct LocationDetailView: View {
             _projectName = State(initialValue: "Unknown")
             _projectDescription = State(initialValue: "Unknown")
             _project = ObservedObject(initialValue: project) // Store the project in a @State variable
+
+            // Initialize the location property with a default value
+            self.location = Location() // replace Location() with a default value or handle the nil case appropriately
+
             return
         }
         let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
@@ -67,7 +71,11 @@ struct LocationDetailView: View {
         _projectName = State(initialValue: project.projectName ?? "")
         _projectDescription = State(initialValue: project.projectDescription ?? "")
         _project = ObservedObject(initialValue: project) // Store the project in a @State variable
+
+        // Initialize the location property
+        self.location = location
     }
+
 
 
     @ObservedObject var project: Project
@@ -91,15 +99,36 @@ struct LocationDetailView: View {
     @StateObject private var timeTrackerViewModel = TimeTrackerViewModel()
     @StateObject private var materialsViewModel = MaterialsViewModel()
     @StateObject private var checklistViewModel = ChecklistViewModel()
+    
+    @Environment(\.managedObjectContext) var context
 
     
+    let location: Location
+
     var body: some View {
+        let currentUser = UserManager.shared.fetchCurrentUser(in: context)
+        switch currentUser.role {
+        case "admin":
+            // Show admin controls
+            AdminView()//location: location)
+        case "employee":
+            // Show employee controls
+            EmployeeView()//location: location)
+        case "apprentice":
+            // Show apprentice controls
+            ApprenticeView()//location: location)
+        case "viewer":
+            // Show viewer controls
+            ViewerView()//location: location)
+        default:
+            // Handle unexpected roles
+            Text("Unexpected role: \(currentUser.role)")
+        }
+        
         ZStack {
             ScrollView {
                 VStack {
                     ZStack {
-                        
-                        
                         MapView(project: project)
                             .frame(height: 300)
                             .cornerRadius(20)

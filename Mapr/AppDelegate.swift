@@ -39,7 +39,7 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
 
             if let email = email {
                 // Add the user to your database
-                CloudKitManager.shared.addUser(username: name, email: email) { (record, error) in
+                CloudKitManager.shared.addUser(username: name, email: email, role: "yourRole") { (record, error) in
                     if let error = error {
                         print("Failed to add user: \(error)")
                     } else {
