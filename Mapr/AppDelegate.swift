@@ -77,7 +77,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, ASAuthorizationControllerDel
 }
 #elseif os(macOS)
 class AppDelegate: NSObject, NSApplicationDelegate {
-
+    let managedObjectContext = CoreDataManager.shared.context
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application

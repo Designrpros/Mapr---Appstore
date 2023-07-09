@@ -19,13 +19,22 @@ struct User: Identifiable, Hashable {
     var record: CKRecord
 
     func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(name)
+        hasher.combine(email)
+        hasher.combine(role)
         hasher.combine(recordID.recordName)
     }
     
     static func ==(lhs: User, rhs: User) -> Bool {
-        return lhs.recordID.recordName == rhs.recordID.recordName
+        return lhs.id == rhs.id &&
+               lhs.name == rhs.name &&
+               lhs.email == rhs.email &&
+               lhs.role == rhs.role &&
+               lhs.recordID.recordName == rhs.recordID.recordName
     }
 }
+
 
 
 
@@ -71,36 +80,21 @@ class UserSelection: ObservableObject {
         let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
         do {
             let userEntities = try managedObjectContext.fetch(fetchRequest)
-            let uniqueUserEntities = Array(Set(userEntities)) // This will remove duplicates
-            // Now you can delete all the userEntities and save the unique ones
-            for userEntity in userEntities {
-                managedObjectContext.delete(userEntity)
-            }
-            for uniqueUserEntity in uniqueUserEntities {
-                let newUserEntity = UserEntity(context: managedObjectContext)
-                // Copy all the properties from uniqueUserEntity to newUserEntity
-                newUserEntity.id = uniqueUserEntity.id
-                newUserEntity.name = uniqueUserEntity.name
-                newUserEntity.email = uniqueUserEntity.email
-                newUserEntity.role = uniqueUserEntity.role
-                newUserEntity.recordIDData = uniqueUserEntity.recordIDData
-                newUserEntity.recordData = uniqueUserEntity.recordData
-                newUserEntity.color = uniqueUserEntity.color
-                newUserEntity.project = uniqueUserEntity.project
-
-                do {
-                    try managedObjectContext.save()
-                } catch {
-                    print("Failed to save context: \(error)")
+            let groupedUserEntities = Dictionary(grouping: userEntities, by: { $0.recordIDData })
+            for (_, group) in groupedUserEntities {
+                // If there's more than one UserEntity with the same recordIDData, delete the duplicates
+                if group.count > 1 {
+                    for i in 1..<group.count {
+                        managedObjectContext.delete(group[i])
+                    }
                 }
-
-                // Save the context
-                try managedObjectContext.save()
             }
+            try managedObjectContext.save()
         } catch {
             print("Failed to fetch UserEntity: \(error)")
         }
     }
+
 
     func recordToUser(_ record: CKRecord) -> User {
         return User(
@@ -170,19 +164,24 @@ struct Users: View {
                         Button(action: {
                             // Remove the user from CoreData
                             if let userEntity = fetchUserEntity(user: user, in: managedObjectContext) {
+                                print("Fetched UserEntity: \(userEntity)")
                                 managedObjectContext.delete(userEntity)
                                 do {
                                     try managedObjectContext.save()
                                     // Also remove the user from the users array
-                                    userSelection.users.removeAll(where: { $0.recordID == user.recordID })
+                                    userSelection.users.removeAll(where: { $0.id == user.id }) // Use id instead of recordID
                                 } catch {
                                     print("Failed to delete user: \(error)")
                                 }
+                            } else {
+                                print("Failed to fetch UserEntity for user: \(user)")
                             }
                         }) {
                             Text("Remove User from List")
                             Image(systemName: "trash")
                         }
+
+
 
 
                     }
@@ -199,7 +198,11 @@ struct Users: View {
 
 func fetchUserEntity(user: User, in managedObjectContext: NSManagedObjectContext) -> UserEntity? {
     let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
-    fetchRequest.predicate = NSPredicate(format: "id == %@", user.id as CVarArg)
+    if let recordIDData = try? NSKeyedArchiver.archivedData(withRootObject: user.recordID, requiringSecureCoding: false) {
+        fetchRequest.predicate = NSPredicate(format: "recordIDData == %@", recordIDData as CVarArg)
+    } else {
+        // Handle the error
+    }
     do {
         let userEntities = try managedObjectContext.fetch(fetchRequest)
         return userEntities.first
@@ -208,6 +211,8 @@ func fetchUserEntity(user: User, in managedObjectContext: NSManagedObjectContext
         return nil
     }
 }
+
+
 
 
 
@@ -344,6 +349,7 @@ func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectCont
         }
     }
 }
+
 
 
 func retrieveUserFromCoreData(userEntity: UserEntity) -> User {

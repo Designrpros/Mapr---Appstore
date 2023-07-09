@@ -41,16 +41,13 @@ class UserManager {
             let record = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordData)) as? CKRecord ?? CKRecord(recordType: "User")
             return User(id: id, name: name, email: email, role: role, recordID: recordID, record: record)
         } else {
-            // Delete the UserEntity object if any of the necessary properties is nil
-            managedObjectContext.delete(userEntity)
-            do {
-                try managedObjectContext.save()
-            } catch {
-                print("Failed to delete invalid UserEntity: \(error)")
-            }
-            return nil
+            // If recordIDData or recordData is nil, create a default CKRecord
+            let recordID = CKRecord.ID()
+            let record = CKRecord(recordType: "User")
+            return User(id: id, name: name, email: email, role: role, recordID: recordID, record: record)
         }
     }
+
 
     
     func fetchUsers(searchText: String, in context: NSManagedObjectContext) -> [User] {
