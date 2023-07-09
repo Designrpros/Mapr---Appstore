@@ -221,7 +221,7 @@ struct LocationDetailView: View {
                         Button(action: {
                             showingAddUserModal = true
                         }) {
-                            Image(systemName: "person.badge.plus")
+                            Image(systemName: "person.crop.circle.badge.plus")
                                 .font(.system(size: 20))
                                 .foregroundColor(Color(.systemGray))
                         }
