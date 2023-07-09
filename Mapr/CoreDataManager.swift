@@ -118,6 +118,15 @@ class CoreDataManager: ObservableObject {
         }
     }
     
+    func addUserToProject(user: UserEntity, project: Project) {
+            project.addToUsers(user)
+            saveContext()
+        }
+
+    func removeUserFromProject(user: UserEntity, project: Project) {
+        project.removeFromUsers(user)
+        saveContext()
+    }
 
 }
 

@@ -25,6 +25,8 @@ class UserSelection: ObservableObject {
 }
 
 struct Users: View {
+    // this view should store the users that the user will be able to collaborate with inside the app, the user should be able to add users to locationdetailview for collaboration, that is why it is important that this view stores the selected users in coredata so that the user dont have to add users after every login
+    
     @State private var searchText = ""
     @State private var showingAddUser = false
     @EnvironmentObject var userSelection: UserSelection
@@ -209,8 +211,8 @@ struct AddUserView: View {
         let query = CKQuery(recordType: "User", predicate: predicate)
         let container = CKContainer(identifier: "iCloud.Mapr")
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
-                DispatchQueue.main.async {
-                    if let records = records {
+            DispatchQueue.main.async {
+                if let records = records {
                     print("Successfully fetched all users")
                     let filteredRecords = records.filter { record in
                         let username = record["username"] as? String ?? ""
@@ -222,7 +224,7 @@ struct AddUserView: View {
                     for record in filteredRecords {
                         print("Record: \(record)")
                     }
-                        print("Fetched users: \(userSelection.users)")
+                    print("Fetched users: \(userSelection.users)")
                 } else if let error = error {
                     // Print out the error message
                     print("Failed to fetch users: \(error.localizedDescription)")
@@ -230,6 +232,7 @@ struct AddUserView: View {
             }
         }
     }
+
     func removeDuplicates() {
             var seen = Set<CKRecord.ID>()
             userSelection.users.removeAll { user in

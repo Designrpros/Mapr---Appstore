@@ -23,6 +23,7 @@ struct MapListView: View {
     @State private var selectedProject: Project? = nil
     @State private var isLinkActive = false
     @State private var showingSettings = false
+    @StateObject var userSelection = UserSelection()
     
     var body: some View {
             VStack {
@@ -76,7 +77,7 @@ struct MapListView: View {
                             .background(
                                 Group {
                                     if let selectedProject = selectedProject {
-                                        NavigationLink(destination: LocationDetailView(project: selectedProject, locations: $locations), isActive: $isLinkActive) {
+                                        NavigationLink(destination: LocationDetailView(project: selectedProject, locations: $locations, userSelection: userSelection)) {
                                             EmptyView()
                                         }
                                     }
@@ -109,7 +110,7 @@ struct MapListView: View {
                         
                         ForEach(projects.filter { !$0.isFinished }, id: \.self) { project in
                             if let location = project.location {
-                                NavigationLink(destination: LocationDetailView(project: project, locations: $locations)) {
+                                NavigationLink(destination: LocationDetailView(project: project, locations: $locations, userSelection: userSelection)) {
                                     HStack {
                                         Image(systemName: "house.fill")
                                             .foregroundColor(.purple)
@@ -147,7 +148,7 @@ struct MapListView: View {
                     Section(header: Text("Finished Projects")) {
                         ForEach(projects.filter { $0.isFinished }, id: \.self) { project in
                             if let location = project.location {
-                                NavigationLink(destination: LocationDetailView(project: project, locations: $locations)) {
+                                NavigationLink(destination: LocationDetailView(project: project, locations: $locations, userSelection: userSelection)) {
                                     HStack {
                                         Image(systemName: "house.fill")
                                             .foregroundColor(.yellow)

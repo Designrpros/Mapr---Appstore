@@ -52,7 +52,7 @@
         <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="material" inverseEntity="Project"/>
     </entity>
-    <entity name="Project" representedClassName="Project" syncable="YES" codeGenerationType="class">
+    <entity name="Project" representedClassName="Project" syncable="YES">
         <attribute name="addressDescription" optional="YES" attributeType="String"/>
         <attribute name="addressSubtitle" optional="YES" attributeType="String"/>
         <attribute name="addressTitle" optional="YES" attributeType="String"/>
@@ -71,6 +71,15 @@
         <relationship name="timeTracker" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TimeTracker" inverseName="project" inverseEntity="TimeTracker"/>
         <relationship name="users" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserEntity" inverseName="project" inverseEntity="UserEntity"/>
     </entity>
+    <entity name="SelectedUserEntity" representedClassName="SelectedUserEntity" syncable="YES">
+        <attribute name="color" optional="YES" attributeType="String"/>
+        <attribute name="email" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="recordData" optional="YES" attributeType="Binary"/>
+        <attribute name="recordIDData" optional="YES" attributeType="Binary"/>
+        <attribute name="role" optional="YES" attributeType="String"/>
+    </entity>
     <entity name="TimeTracker" representedClassName="TimeTracker" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="hours" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -78,7 +87,7 @@
         <attribute name="notes" optional="YES" attributeType="String"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="timeTracker" inverseEntity="Project"/>
     </entity>
-    <entity name="UserEntity" representedClassName="UserEntity" syncable="YES" codeGenerationType="class">
+    <entity name="UserEntity" representedClassName="UserEntity" syncable="YES">
         <attribute name="color" optional="YES" attributeType="String"/>
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>

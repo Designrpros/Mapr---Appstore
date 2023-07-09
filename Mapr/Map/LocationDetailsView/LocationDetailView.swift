@@ -17,7 +17,7 @@ struct LocationDetailView: View {
     @State private var refreshID = UUID()
     @State private var selectedUsers: [User] = []
     @State private var showingAddUserModal = false
-
+    @ObservedObject var userSelection: UserSelection
 
     @FetchRequest(
         entity: UserEntity.entity(),
@@ -29,8 +29,6 @@ struct LocationDetailView: View {
             retrieveUserFromCoreData(userEntity: userEntity)
         }
     }
-
-
 
     @FetchRequest(
         entity: Project.entity(),
@@ -44,42 +42,33 @@ struct LocationDetailView: View {
         predicate: NSPredicate(format: "isFinished == %@", NSNumber(value: true))
     ) var finishedProjects: FetchedResults<Project>
 
-
     @Environment(\.managedObjectContext) var managedObjectContext
 
-    init(project: Project, locations: Binding<[MKMapItem]>) {
-        guard let location = project.location else {
-            // Handle the case where the project doesn't have a location.
-            // This is just an example. You'll need to decide what's appropriate for your app.
-            let coordinate = CLLocationCoordinate2D(latitude: 0, longitude: 0)
-            let placemark = MKPlacemark(coordinate: coordinate)
-            _mapItem = State(initialValue: MKMapItem(placemark: placemark))
-            _locations = locations
-            _projectName = State(initialValue: "Unknown")
-            _projectDescription = State(initialValue: "Unknown")
-            _project = ObservedObject(initialValue: project) // Store the project in a @State variable
-
-            // Initialize the location property with a default value
-            self.location = Location() // replace Location() with a default value or handle the nil case appropriately
-
-            return
-        }
-        let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-        let placemark = MKPlacemark(coordinate: coordinate)
-        _mapItem = State(initialValue: MKMapItem(placemark: placemark))
+    init(project: Project, locations: Binding<[MKMapItem]>, userSelection: UserSelection) {
+        self.userSelection = userSelection
         _locations = locations
         _projectName = State(initialValue: project.projectName ?? "")
         _projectDescription = State(initialValue: project.projectDescription ?? "")
         _project = ObservedObject(initialValue: project) // Store the project in a @State variable
 
-        // Initialize the location property
-        self.location = location
+        // Initialize the mapItem and location properties with default values
+        let defaultCoordinate = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+        let defaultPlacemark = MKPlacemark(coordinate: defaultCoordinate)
+        _mapItem = State(initialValue: MKMapItem(placemark: defaultPlacemark))
+
+        if let location = project.location {
+            let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+            let placemark = MKPlacemark(coordinate: coordinate)
+            _mapItem = State(initialValue: MKMapItem(placemark: placemark))
+            self.location = location
+        } else {
+            // Provide a default value for `location` here
+            self.location = Location() // Replace `Location()` with an appropriate default value
+        }
     }
 
 
-
     @ObservedObject var project: Project
-
     @State private var isEditingDescription = false
     @State private var isEditingName = false
     @State private var projectName: String
@@ -102,10 +91,11 @@ struct LocationDetailView: View {
     
     @Environment(\.managedObjectContext) var context
 
-    
-    let location: Location
+    var location: Location
+
 
     var body: some View {
+        
         let currentUser = UserManager.shared.fetchCurrentUser(in: context)
         switch currentUser.role {
         case "admin":
@@ -206,11 +196,18 @@ struct LocationDetailView: View {
                                 Button(action: {
                                     // Remove the user from the selectedUsers array
                                     selectedUsers.removeAll(where: { $0.id == user.id })
+                                    // Find the corresponding UserEntity
+                                    if let userEntity = userEntities.first(where: { $0.id == user.id }) {
+                                        // Also remove the user from the project
+                                        CoreDataManager.shared.removeUserFromProject(user: userEntity, project: project)
+                                    }
                                 }) {
                                     Label("Remove User", systemImage: "trash")
                                 }.buttonStyle(BorderlessButtonStyle())
+
                             }
                         }
+
 
 
 
@@ -227,8 +224,8 @@ struct LocationDetailView: View {
                         }
                         .buttonStyle(BorderlessButtonStyle())
                         .sheet(isPresented: $showingAddUserModal) {
-                            AddUserModal(project: project, managedObjectContext: managedObjectContext, userEntities: userEntities, selectedUsers: $selectedUsers)
-                        }
+                                    AddUserModal(project: project, managedObjectContext: managedObjectContext, userSelection: userSelection, selectedUsers: $selectedUsers)
+                                }
 
 #endif
                         //Button(action: {
@@ -443,77 +440,103 @@ struct LocationDetailView: View {
 
 
 struct AddUserModal: View {
+    // this view should display the content of users view, the added users in users view should display here
+    
     var project: Project
     var managedObjectContext: NSManagedObjectContext
-    var userEntities: FetchedResults<UserEntity>
+    @ObservedObject var userSelection: UserSelection
     @Binding var selectedUsers: [User]
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
 
-    var users: [User] {
-        userEntities.map { userEntity in
-            retrieveUserFromCoreData(userEntity: userEntity)
-        }
-    }
-
     var body: some View {
-            VStack {
-                TextField("Search...", text: $searchText)
-                    .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
-                    .background(Color(.darkGray))
-                    .cornerRadius(10)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .padding([.horizontal, .top])
+        VStack {
+            TextField("Search...", text: $searchText)
+                .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+                .background(Color(.darkGray))
+                .cornerRadius(10)
+                .textFieldStyle(PlainTextFieldStyle())
+                .padding([.horizontal, .top])
 
-                List {
-                    ForEach(filteredUsers, id: \.id) { user in
-                        Button(action: {
-                            // Add the user to the selectedUsers array when selected
-                            if !selectedUsers.contains(where: { $0.id == user.id }) {
-                                selectedUsers.append(user)
-                            }
-                        }) {
-                            HStack {
-                                Image(systemName: "person.crop.circle")
-                                    .resizable()
-                                    .frame(width: 50, height: 50)
-                                VStack(alignment: .leading) {
-                                    Text(user.name)
-                                        .font(.headline)
-                                }
+            List {
+                ForEach(userSelection.users, id: \.self) { user in
+                    Button(action: {
+                        // Add the user to the selectedUsers array when selected
+                        if !selectedUsers.contains(where: { $0.recordID == user.recordID }) {
+                            let newUser = User(
+                                id: UUID(),
+                                name: user["username"] as? String ?? "Unknown",
+                                email: user["email"] as? String ?? "Unknown",
+                                role: user["role"] as? String ?? "Unknown",
+                                recordID: user.recordID,
+                                record: user
+                            )
+                            selectedUsers.append(newUser)
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "person.crop.circle")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                            VStack(alignment: .leading) {
+                                Text(user["name"] as? String ?? "Unknown")
+                                    .font(.headline)
                             }
                         }
-                        .buttonStyle(BorderlessButtonStyle())
                     }
+                    .buttonStyle(BorderlessButtonStyle())
                 }
-                .frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
-
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("Cancel")
-                        .font(.headline)
-                }
-                .padding()
             }
-            .navigationTitle("Select User")
-        }
+            .frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
 
+            Button(action: {
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Text("Cancel")
+                    .font(.headline)
+            }
+            .padding()
+        }
+        .navigationTitle("Select User")
+    }
+    
     var filteredUsers: [User] {
         if searchText.isEmpty {
-            return users
+            return userSelection.users.map { recordToUser($0) }
         } else {
-            return users.filter {
-                $0.name.localizedCaseInsensitiveContains(searchText)
-            }
+            return userSelection.users.filter {
+                ($0["username"] as? String)?.localizedCaseInsensitiveContains(searchText) ?? false
+            }.map { recordToUser($0) }
         }
     }
+
+    func recordToUser(_ record: CKRecord) -> User {
+        return User(
+            id: UUID(),
+            name: record["username"] as? String ?? "Unknown",
+            email: record["email"] as? String ?? "Unknown",
+            role: record["role"] as? String ?? "Unknown",
+            recordID: record.recordID,
+            record: record
+        )
+    }
+
 
     func addUserToProject(user: User) {
         let userEntity = UserEntity(context: managedObjectContext)
         userEntity.id = user.id
         userEntity.name = user.name
+        userEntity.email = user.email
+        userEntity.role = user.role
         project.addToUsers(userEntity)
+        
+        let selectedUserEntity = SelectedUserEntity(context: managedObjectContext)
+        selectedUserEntity.id = user.id
+        selectedUserEntity.name = user.name
+        selectedUserEntity.email = user.email
+        selectedUserEntity.role = user.role
+        // Save the selectedUserEntity to CoreData
+
         do {
             try managedObjectContext.save()
         } catch {

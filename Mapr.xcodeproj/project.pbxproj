@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD7AB5E52A5A84C700D7F5E6 /* UserEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E12A5A84C700D7F5E6 /* UserEntity+CoreDataClass.swift */; };
+		AD7AB5E62A5A84C700D7F5E6 /* UserEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E22A5A84C700D7F5E6 /* UserEntity+CoreDataProperties.swift */; };
+		AD7AB5E72A5A84C700D7F5E6 /* Project+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E32A5A84C700D7F5E6 /* Project+CoreDataClass.swift */; };
+		AD7AB5E82A5A84C700D7F5E6 /* Project+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E42A5A84C700D7F5E6 /* Project+CoreDataProperties.swift */; };
+		AD7AB5EB2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */; };
+		AD7AB5EC2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */; };
 		ADB556032A57F618004D089E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556022A57F618004D089E /* Users.swift */; };
 		ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556042A57FE64004D089E /* UserDetailView.swift */; };
 		ADB556072A5809D1004D089E /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556062A5809D1004D089E /* CloudKitManager.swift */; };
@@ -60,6 +66,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD7AB5E12A5A84C700D7F5E6 /* UserEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		AD7AB5E22A5A84C700D7F5E6 /* UserEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		AD7AB5E32A5A84C700D7F5E6 /* Project+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+CoreDataClass.swift"; sourceTree = "<group>"; };
+		AD7AB5E42A5A84C700D7F5E6 /* Project+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectedUserEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectedUserEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ADB555BB2A55E61F004D089E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ADB556022A57F618004D089E /* Users.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
 		ADB556042A57FE64004D089E /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
@@ -148,6 +160,12 @@
 		ADF428302A53A7470096D87D = {
 			isa = PBXGroup;
 			children = (
+				AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */,
+				AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */,
+				AD7AB5E12A5A84C700D7F5E6 /* UserEntity+CoreDataClass.swift */,
+				AD7AB5E22A5A84C700D7F5E6 /* UserEntity+CoreDataProperties.swift */,
+				AD7AB5E32A5A84C700D7F5E6 /* Project+CoreDataClass.swift */,
+				AD7AB5E42A5A84C700D7F5E6 /* Project+CoreDataProperties.swift */,
 				ADB555FC2A56A1E3004D089E /* Model */,
 				ADF4283B2A53A7470096D87D /* Mapr */,
 				ADF428522A53A7490096D87D /* MaprTests */,
@@ -383,14 +401,19 @@
 				ADF428712A53A7B80096D87D /* Settingsview.swift in Sources */,
 				ADF428772A53A7EF0096D87D /* AllProjectMapView.swift in Sources */,
 				ADF4288D2A53A8F70096D87D /* ContactView.swift in Sources */,
+				AD7AB5EC2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift in Sources */,
+				AD7AB5EB2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift in Sources */,
 				ADB556102A59343D004D089E /* ApprenticeView.swift in Sources */,
 				ADF428852A53A89F0096D87D /* ChecklistView.swift in Sources */,
 				ADF4287B2A53A82E0096D87D /* LocationDetailView.swift in Sources */,
 				ADB556092A593384004D089E /* UserManager.swift in Sources */,
+				AD7AB5E52A5A84C700D7F5E6 /* UserEntity+CoreDataClass.swift in Sources */,
+				AD7AB5E72A5A84C700D7F5E6 /* Project+CoreDataClass.swift in Sources */,
 				ADF428732A53A7C80096D87D /* MapListView.swift in Sources */,
 				ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */,
 				ADF4288B2A53A8E50096D87D /* ContactListView.swift in Sources */,
 				ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */,
+				AD7AB5E62A5A84C700D7F5E6 /* UserEntity+CoreDataProperties.swift in Sources */,
 				ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */,
 				ADF4287F2A53A8550096D87D /* DetailsView.swift in Sources */,
 				ADB556072A5809D1004D089E /* CloudKitManager.swift in Sources */,
@@ -402,6 +425,7 @@
 				ADF4286D2A53A7950096D87D /* CoreDataManager.swift in Sources */,
 				ADB5560C2A593404004D089E /* AdminView.swift in Sources */,
 				ADF428872A53A8B10096D87D /* PreviewView.swift in Sources */,
+				AD7AB5E82A5A84C700D7F5E6 /* Project+CoreDataProperties.swift in Sources */,
 				ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */,
 				ADB556122A59344D004D089E /* ViewerView.swift in Sources */,
 				ADF428752A53A7D80096D87D /* MapView.swift in Sources */,
