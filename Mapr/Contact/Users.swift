@@ -119,27 +119,23 @@ struct Users: View {
                     }
                     .contextMenu {
                         Button(action: {
-                            // Remove the user from the list
-                            DispatchQueue.main.async {
-                                if let index = userSelection.users.firstIndex(where: { $0.recordID == user.recordID }) {
-                                    // Delete user from Core Data
-                                    let userEntity = UserEntity(context: managedObjectContext)
-                                    userEntity.id = user.id
-                                    managedObjectContext.delete(userEntity)
-                                    do {
-                                        try managedObjectContext.save()
-                                    } catch {
-                                        print("Failed to delete user: \(error)")
-                                    }
-                                    
-                                    // Delete user from array
-                                    userSelection.users.remove(at: index)
+                            // Remove the user from CoreData
+                            if let userEntity = fetchUserEntity(user: user, in: managedObjectContext) {
+                                managedObjectContext.delete(userEntity)
+                                do {
+                                    try managedObjectContext.save()
+                                    // Also remove the user from the users array
+                                    userSelection.users.removeAll(where: { $0.recordID == user.recordID })
+                                } catch {
+                                    print("Failed to delete user: \(error)")
                                 }
                             }
                         }) {
                             Text("Remove User from List")
                             Image(systemName: "trash")
                         }
+
+
                     }
 
                 }
@@ -152,12 +148,62 @@ struct Users: View {
     }
 }
 
+func fetchUserEntity(user: User, in managedObjectContext: NSManagedObjectContext) -> UserEntity? {
+    let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+    fetchRequest.predicate = NSPredicate(format: "id == %@", user.id as CVarArg)
+    do {
+        let userEntities = try managedObjectContext.fetch(fetchRequest)
+        return userEntities.first
+    } catch {
+        print("Failed to fetch UserEntity: \(error)")
+        return nil
+    }
+}
+
+
+
+class AddUserSelection: ObservableObject {
+    @Published var users: [User] = []
+
+    func fetchUsers(searchText: String? = nil) {
+        let predicate: NSPredicate
+        if let searchText = searchText, !searchText.isEmpty {
+            predicate = NSPredicate(format: "username CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
+        } else {
+            predicate = NSPredicate(value: true)
+        }
+        let query = CKQuery(recordType: "User", predicate: predicate)
+        let container = CKContainer(identifier: "iCloud.Mapr")
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+            DispatchQueue.main.async {
+                if let records = records {
+                    print("Successfully fetched all users")
+                    self.users = records.map { self.recordToUser($0) }
+                } else if let error = error {
+                    print("Failed to fetch users: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    func recordToUser(_ record: CKRecord) -> User {
+        return User(
+            id: UUID(),
+            name: record["username"] as? String ?? "Unknown",
+            email: record["email"] as? String ?? "Unknown",
+            role: record["role"] as? String ?? "Unknown",
+            recordID: record.recordID,
+            record: record
+        )
+    }
+}
 
 struct AddUserView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
     @EnvironmentObject var userSelection: UserSelection
+    @ObservedObject var addUserSelection = AddUserSelection()
     var onAddUser: ((User) -> Void)?
     
     var body: some View {
@@ -176,13 +222,13 @@ struct AddUserView: View {
                         .cornerRadius(10)
                         .textFieldStyle(PlainTextFieldStyle())
                         .onChange(of: searchText) { newValue in
-                            userSelection.fetchUsers(searchText: newValue)
+                            addUserSelection.fetchUsers(searchText: newValue) // Use addUserSelection here
                         }
                 }
                 .padding([.horizontal, .top])
                 
                 List {
-                    ForEach(userSelection.users, id: \.self) { user in
+                    ForEach(addUserSelection.users.sorted(by: { $0.name < $1.name }), id: \.self) { user in // Use addUserSelection here
                         Button(action: {
                             // Save the user to CoreData
                             saveUserToCoreData(user: user, in: managedObjectContext)
@@ -218,7 +264,7 @@ struct AddUserView: View {
             }
             .navigationTitle("Add User")
             .onAppear {
-                userSelection.fetchUsers()
+                addUserSelection.fetchUsers() // Use addUserSelection here
             }
         }
     }
