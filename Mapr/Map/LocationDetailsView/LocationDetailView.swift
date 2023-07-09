@@ -96,24 +96,24 @@ struct LocationDetailView: View {
 
     var body: some View {
         
-        let currentUser = UserManager.shared.fetchCurrentUser(in: context)
-        switch currentUser.role {
-        case "admin":
-            // Show admin controls
-            AdminView()//location: location)
-        case "employee":
-            // Show employee controls
-            EmployeeView()//location: location)
-        case "apprentice":
-            // Show apprentice controls
-            ApprenticeView()//location: location)
-        case "viewer":
-            // Show viewer controls
-            ViewerView()//location: location)
-        default:
-            // Handle unexpected roles
-            Text("Unexpected role: \(currentUser.role)")
-        }
+//        let currentUser = UserManager.shared.fetchCurrentUser(in: context)
+//        switch currentUser.role {
+//        case "admin":
+//            // Show admin controls
+//            AdminView()//location: location)
+//        case "employee":
+//            // Show employee controls
+//            EmployeeView()//location: location)
+//        case "apprentice":
+//            // Show apprentice controls
+//            ApprenticeView()//location: location)
+//        case "viewer":
+//            // Show viewer controls
+//            ViewerView()//location: location)
+//        default:
+//            // Handle unexpected roles
+//            Text("Unexpected role: \(currentUser.role)")
+//       }
         
         ZStack {
             ScrollView {
