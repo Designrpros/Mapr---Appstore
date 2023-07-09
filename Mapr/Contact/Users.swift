@@ -23,8 +23,13 @@ struct User: Identifiable, Hashable {
 class UserSelection: ObservableObject {
     @Published var users: [User] = []
 
-    func fetchUsers() {
-        let predicate = NSPredicate(value: true)
+    func fetchUsers(searchText: String? = nil) {
+        let predicate: NSPredicate
+        if let searchText = searchText, !searchText.isEmpty {
+            predicate = NSPredicate(format: "username CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
+        } else {
+            predicate = NSPredicate(value: true)
+        }
         let query = CKQuery(recordType: "User", predicate: predicate)
         let container = CKContainer(identifier: "iCloud.Mapr")
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
@@ -36,6 +41,16 @@ class UserSelection: ObservableObject {
                     print("Failed to fetch users: \(error.localizedDescription)")
                 }
             }
+        }
+    }
+
+    func fetchSelectedUsers() {
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        do {
+            let userEntities = try PersistenceController.shared.container.viewContext.fetch(fetchRequest)
+            self.users = userEntities.map { retrieveUserFromCoreData(userEntity: $0) }
+        } catch {
+            print("Failed to fetch selected users: \(error)")
         }
     }
 
@@ -51,12 +66,11 @@ class UserSelection: ObservableObject {
     }
 }
 
-
 struct Users: View {
-    // this view should store the users that the user will be able to collaborate with inside the app, the user should be able to add users to locationdetailview for collaboration, that is why it is important that this view stores the selected users in coredata so that the user dont have to add users after every login
     @State private var searchText = ""
     @State private var showingAddUser = false
     @EnvironmentObject var userSelection: UserSelection
+    @Environment(\.managedObjectContext) var managedObjectContext
     
     var body: some View {
         VStack {
@@ -86,7 +100,7 @@ struct Users: View {
             .padding([.horizontal, .top])
                 
             List {
-                ForEach(filteredUsers, id: \.self) { user in
+                ForEach(userSelection.users, id: \.self) { user in
                     HStack {
                         NavigationLink(destination: UserDetailView()) {
                             HStack {
@@ -107,28 +121,37 @@ struct Users: View {
                         Button(action: {
                             // Remove the user from the list
                             DispatchQueue.main.async {
-                                userSelection.users.removeAll(where: { $0.recordID == user.recordID })
+                                if let index = userSelection.users.firstIndex(where: { $0.recordID == user.recordID }) {
+                                    // Delete user from Core Data
+                                    let userEntity = UserEntity(context: managedObjectContext)
+                                    userEntity.id = user.id
+                                    managedObjectContext.delete(userEntity)
+                                    do {
+                                        try managedObjectContext.save()
+                                    } catch {
+                                        print("Failed to delete user: \(error)")
+                                    }
+                                    
+                                    // Delete user from array
+                                    userSelection.users.remove(at: index)
+                                }
                             }
                         }) {
                             Text("Remove User from List")
                             Image(systemName: "trash")
                         }
                     }
+
                 }
             }
         }
         .navigationTitle("Add User")
-    }
-    var filteredUsers: [User] {
-        if searchText.isEmpty {
-            return userSelection.users
-        } else {
-            return userSelection.users.filter {
-                $0.name.contains(searchText) || $0.email.contains(searchText)
-            }
+        .onAppear {
+            userSelection.fetchSelectedUsers()
         }
     }
 }
+
 
 struct AddUserView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
@@ -153,7 +176,7 @@ struct AddUserView: View {
                         .cornerRadius(10)
                         .textFieldStyle(PlainTextFieldStyle())
                         .onChange(of: searchText) { newValue in
-                            userSelection.fetchUsers()
+                            userSelection.fetchUsers(searchText: newValue)
                         }
                 }
                 .padding([.horizontal, .top])

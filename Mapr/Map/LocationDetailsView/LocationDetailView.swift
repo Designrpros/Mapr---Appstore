@@ -432,17 +432,16 @@ struct LocationDetailView: View {
 }
     
 
-
+// this view should display the content of users view, the added users in users view should display here
 
 struct AddUserModal: View {
-    // this view should display the content of users view, the added users in users view should display here
-    
     var project: Project
     var managedObjectContext: NSManagedObjectContext
     @ObservedObject var userSelection: UserSelection
     @Binding var selectedUsers: [User]
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
+    @State private var allUsers: [User] = []
 
     var body: some View {
         VStack {
@@ -451,10 +450,12 @@ struct AddUserModal: View {
                 .background(Color(.darkGray))
                 .cornerRadius(10)
                 .textFieldStyle(PlainTextFieldStyle())
-                .padding([.horizontal, .top])
+                .onChange(of: searchText) { newValue in
+                    fetchUsers(searchText: newValue)
+                }
 
             List {
-                ForEach(userSelection.users, id: \.self) { user in
+                ForEach(allUsers, id: \.self) { user in
                     Button(action: {
                         // Add the user to the selectedUsers array when selected
                         if !selectedUsers.contains(where: { $0.recordID == user.recordID }) {
@@ -495,27 +496,32 @@ struct AddUserModal: View {
         .navigationTitle("Select User")
     }
 
-
-    func addUserToProject(user: User) {
-        let userEntity = UserEntity(context: managedObjectContext)
-        userEntity.id = user.id
-        userEntity.name = user.name
-        userEntity.email = user.email
-        userEntity.role = user.role
-        project.addToUsers(userEntity)
-        
-        let selectedUserEntity = SelectedUserEntity(context: managedObjectContext)
-        selectedUserEntity.id = user.id
-        selectedUserEntity.name = user.name
-        selectedUserEntity.email = user.email
-        selectedUserEntity.role = user.role
-        // Save the selectedUserEntity to CoreData
-
-        do {
-            try managedObjectContext.save()
-        } catch {
-            print("Failed to add user to project: \(error)")
+    func fetchUsers(searchText: String) {
+        let predicate = NSPredicate(format: "username CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
+        let query = CKQuery(recordType: "User", predicate: predicate)
+        let container = CKContainer(identifier: "iCloud.Mapr")
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+            DispatchQueue.main.async {
+                if let records = records {
+                    print("Successfully fetched all users")
+                    allUsers = records.map { recordToUser($0) }
+                } else if let error = error {
+                    print("Failed to fetch users: \(error.localizedDescription)")
+                }
+            }
         }
     }
+
+    func recordToUser(_ record: CKRecord) -> User {
+        return User(
+            id: UUID(),
+            name: record["username"] as? String ?? "Unknown",
+            email: record["email"] as? String ?? "Unknown",
+            role: record["role"] as? String ?? "Unknown",
+            recordID: record.recordID,
+            record: record
+        )
+    }
 }
+
 
