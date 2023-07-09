@@ -10,7 +10,7 @@ import CloudKit
 import CoreData
 
 
-struct User: Identifiable {
+struct User: Identifiable, Hashable {
     let id: UUID
     let name: String
     let email: String
@@ -21,20 +21,45 @@ struct User: Identifiable {
 
 
 class UserSelection: ObservableObject {
-    @Published var users: [CKRecord] = []
+    @Published var users: [User] = []
+
+    func fetchUsers() {
+        let predicate = NSPredicate(value: true)
+        let query = CKQuery(recordType: "User", predicate: predicate)
+        let container = CKContainer(identifier: "iCloud.Mapr")
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+            DispatchQueue.main.async {
+                if let records = records {
+                    print("Successfully fetched all users")
+                    self.users = records.map { self.recordToUser($0) }
+                } else if let error = error {
+                    print("Failed to fetch users: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    func recordToUser(_ record: CKRecord) -> User {
+        return User(
+            id: UUID(),
+            name: record["username"] as? String ?? "Unknown",
+            email: record["email"] as? String ?? "Unknown",
+            role: record["role"] as? String ?? "Unknown",
+            recordID: record.recordID,
+            record: record
+        )
+    }
 }
+
 
 struct Users: View {
     // this view should store the users that the user will be able to collaborate with inside the app, the user should be able to add users to locationdetailview for collaboration, that is why it is important that this view stores the selected users in coredata so that the user dont have to add users after every login
-    
     @State private var searchText = ""
     @State private var showingAddUser = false
     @EnvironmentObject var userSelection: UserSelection
-    @State private var users: [CKRecord] = []
     
     var body: some View {
         VStack {
-            
             HStack {
                 TextField("Search...", text: $searchText)
                     .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
@@ -60,8 +85,6 @@ struct Users: View {
             }
             .padding([.horizontal, .top])
                 
-            
-
             List {
                 ForEach(filteredUsers, id: \.self) { user in
                     HStack {
@@ -71,9 +94,9 @@ struct Users: View {
                                     .resizable()
                                     .frame(width: 50, height: 50)
                                 VStack(alignment: .leading) {
-                                    Text(user["username"] as? String ?? "Unknown")
+                                    Text(user.name)
                                         .font(.headline)
-                                    Text(user["email"] as? String ?? "")
+                                    Text(user.email)
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                 }
@@ -91,49 +114,28 @@ struct Users: View {
                             Image(systemName: "trash")
                         }
                     }
-
                 }
             }
         }
         .navigationTitle("Add User")
     }
-    var filteredUsers: [CKRecord] {
+    var filteredUsers: [User] {
         if searchText.isEmpty {
             return userSelection.users
         } else {
             return userSelection.users.filter {
-                ($0["username"] as? String)?.contains(searchText) ?? false ||
-                ($0["email"] as? String)?.contains(searchText) ?? false
-            }
-        }
-    }
-    func fetchUsers() {
-        let predicate = NSPredicate(value: true)
-        let query = CKQuery(recordType: "User", predicate: predicate)
-        let container = CKContainer(identifier: "iCloud.Mapr")
-        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
-            DispatchQueue.main.async {
-                if let records = records {
-                    print("Successfully fetched all users")
-                    users = records
-                } else if let error = error {
-                    print("Failed to fetch users: \(error.localizedDescription)")
-                }
+                $0.name.contains(searchText) || $0.email.contains(searchText)
             }
         }
     }
 }
 
-
-
-
 struct AddUserView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
-    @State private var users: [CKRecord] = []
     @EnvironmentObject var userSelection: UserSelection
-    var onAddUser: ((CKRecord) -> Void)?
+    var onAddUser: ((User) -> Void)?
     
     var body: some View {
         ZStack {
@@ -151,24 +153,16 @@ struct AddUserView: View {
                         .cornerRadius(10)
                         .textFieldStyle(PlainTextFieldStyle())
                         .onChange(of: searchText) { newValue in
-                            fetchUsers(searchText: newValue)
+                            userSelection.fetchUsers()
                         }
                 }
                 .padding([.horizontal, .top])
                 
                 List {
-                    ForEach(users, id: \.self) { user in
+                    ForEach(userSelection.users, id: \.self) { user in
                         Button(action: {
                             // Save the user to CoreData
-                            let newUser = User(
-                                id: UUID(),
-                                name: user["username"] as? String ?? "Unknown",
-                                email: user["email"] as? String ?? "Unknown",
-                                role: user["role"] as? String ?? "Unknown",
-                                recordID: user.recordID,
-                                record: user
-                            )
-                            saveUserToCoreData(user: newUser, in: managedObjectContext)
+                            saveUserToCoreData(user: user, in: managedObjectContext)
                             
                             onAddUser?(user)
                             presentationMode.wrappedValue.dismiss()
@@ -178,9 +172,9 @@ struct AddUserView: View {
                                     .resizable()
                                     .frame(width: 50, height: 50)
                                 VStack(alignment: .leading) {
-                                    Text(user["username"] as? String ?? "Unknown")
+                                    Text(user.name)
                                         .font(.headline)
-                                    Text(user["email"] as? String ?? "")
+                                    Text(user.email)
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                 }
@@ -201,50 +195,12 @@ struct AddUserView: View {
             }
             .navigationTitle("Add User")
             .onAppear {
-                        removeDuplicates()
-                    }
-        }
-    }
-    
-    func fetchUsers(searchText: String) {
-        let predicate = NSPredicate(value: true)
-        let query = CKQuery(recordType: "User", predicate: predicate)
-        let container = CKContainer(identifier: "iCloud.Mapr")
-        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
-            DispatchQueue.main.async {
-                if let records = records {
-                    print("Successfully fetched all users")
-                    let filteredRecords = records.filter { record in
-                        let username = record["username"] as? String ?? ""
-                        let email = record["email"] as? String ?? ""
-                        return (username.localizedCaseInsensitiveContains(searchText) || email.localizedCaseInsensitiveContains(searchText)) && !userSelection.users.contains(where: { $0.recordID == record.recordID })
-                    }
-                    users = filteredRecords
-                    // Print out the records
-                    for record in filteredRecords {
-                        print("Record: \(record)")
-                    }
-                    print("Fetched users: \(userSelection.users)")
-                } else if let error = error {
-                    // Print out the error message
-                    print("Failed to fetch users: \(error.localizedDescription)")
-                }
+                userSelection.fetchUsers()
             }
         }
     }
-
-    func removeDuplicates() {
-            var seen = Set<CKRecord.ID>()
-            userSelection.users.removeAll { user in
-                if seen.insert(user.recordID).inserted {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        }
-
 }
+
 func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectContext) {
     let userEntity = UserEntity(context: managedObjectContext)
     userEntity.id = user.id

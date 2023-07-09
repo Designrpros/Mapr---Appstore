@@ -210,11 +210,6 @@ struct LocationDetailView: View {
 
 
 
-
-
-
-
-
                         Button(action: {
                             showingAddUserModal = true
                         }) {
@@ -465,11 +460,11 @@ struct AddUserModal: View {
                         if !selectedUsers.contains(where: { $0.recordID == user.recordID }) {
                             let newUser = User(
                                 id: UUID(),
-                                name: user["username"] as? String ?? "Unknown",
-                                email: user["email"] as? String ?? "Unknown",
-                                role: user["role"] as? String ?? "Unknown",
+                                name: user.name,
+                                email: user.email,
+                                role: user.role,
                                 recordID: user.recordID,
-                                record: user
+                                record: user.record
                             )
                             selectedUsers.append(newUser)
                         }
@@ -479,7 +474,7 @@ struct AddUserModal: View {
                                 .resizable()
                                 .frame(width: 50, height: 50)
                             VStack(alignment: .leading) {
-                                Text(user["name"] as? String ?? "Unknown")
+                                Text(user.name)
                                     .font(.headline)
                             }
                         }
@@ -498,27 +493,6 @@ struct AddUserModal: View {
             .padding()
         }
         .navigationTitle("Select User")
-    }
-    
-    var filteredUsers: [User] {
-        if searchText.isEmpty {
-            return userSelection.users.map { recordToUser($0) }
-        } else {
-            return userSelection.users.filter {
-                ($0["username"] as? String)?.localizedCaseInsensitiveContains(searchText) ?? false
-            }.map { recordToUser($0) }
-        }
-    }
-
-    func recordToUser(_ record: CKRecord) -> User {
-        return User(
-            id: UUID(),
-            name: record["username"] as? String ?? "Unknown",
-            email: record["email"] as? String ?? "Unknown",
-            role: record["role"] as? String ?? "Unknown",
-            recordID: record.recordID,
-            record: record
-        )
     }
 
 
