@@ -77,15 +77,22 @@ class AppDelegate: NSObject, UIApplicationDelegate, ASAuthorizationControllerDel
 }
 #elseif os(macOS)
 class AppDelegate: NSObject, NSApplicationDelegate {
+
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
+        if let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last {
+            print("Core Data file path: \(url)")
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
     }
+    
 }
 #endif
+
 
 @main
 struct Mapr: App {

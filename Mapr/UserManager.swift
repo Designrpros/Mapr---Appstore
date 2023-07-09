@@ -14,7 +14,7 @@ class UserManager {
             let userEntities = try context.fetch(fetchRequest)
             // Assuming there's only one user stored in CoreData
             if let userEntity = userEntities.first {
-                return retrieveUserFromCoreData(userEntity: userEntity)
+                return retrieveUserFromEntity(userEntity: userEntity, in: context) ?? User(id: UUID(), name: "Unknown", email: "Unknown", role: "Unknown", recordID: CKRecord.ID(), record: CKRecord(recordType: "User"))
             } else {
                 // Handle the case where no user is stored in CoreData
                 // This is just a placeholder and you'll need to replace it with your own logic
@@ -25,6 +25,43 @@ class UserManager {
             // This is just a placeholder and you'll need to replace it with your own logic
             print("Failed to fetch user: \(error)")
             return User(id: UUID(), name: "Unknown", email: "Unknown", role: "Unknown", recordID: CKRecord.ID(), record: CKRecord(recordType: "User"))
+        }
+    }
+    
+    func retrieveUserFromEntity(userEntity: UserEntity, in managedObjectContext: NSManagedObjectContext) -> User? {
+        let id = userEntity.id ?? UUID()
+        let name = userEntity.name ?? ""
+        let email = userEntity.email ?? ""
+        let role = userEntity.role ?? ""
+
+        // Check if recordIDData and recordData are not nil
+        if let recordIDData = userEntity.recordIDData, let recordData = userEntity.recordData {
+            // Convert Data back to CKRecord.ID and CKRecord
+            let recordID = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordIDData)) as? CKRecord.ID ?? CKRecord.ID()
+            let record = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordData)) as? CKRecord ?? CKRecord(recordType: "User")
+            return User(id: id, name: name, email: email, role: role, recordID: recordID, record: record)
+        } else {
+            // Delete the UserEntity object if any of the necessary properties is nil
+            managedObjectContext.delete(userEntity)
+            do {
+                try managedObjectContext.save()
+            } catch {
+                print("Failed to delete invalid UserEntity: \(error)")
+            }
+            return nil
+        }
+    }
+
+    
+    func fetchUsers(searchText: String, in context: NSManagedObjectContext) -> [User] {
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "name CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
+        do {
+            let userEntities = try context.fetch(fetchRequest)
+            return userEntities.compactMap { retrieveUserFromEntity(userEntity: $0, in: context) }
+        } catch {
+            print("Failed to fetch users: \(error)")
+            return []
         }
     }
     

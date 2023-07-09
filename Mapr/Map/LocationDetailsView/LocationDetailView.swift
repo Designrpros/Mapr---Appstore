@@ -451,8 +451,8 @@ struct AddUserModal: View {
                 .cornerRadius(10)
                 .textFieldStyle(PlainTextFieldStyle())
                 .onChange(of: searchText) { newValue in
-                    fetchUsers(searchText: newValue)
-                }
+                    fetchUsers(searchText: newValue, in: managedObjectContext)
+                }.padding()
 
             List {
                 ForEach(allUsers, id: \.self) { user in
@@ -496,21 +496,21 @@ struct AddUserModal: View {
         .navigationTitle("Select User")
     }
 
-    func fetchUsers(searchText: String) {
-        let predicate = NSPredicate(format: "username CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
-        let query = CKQuery(recordType: "User", predicate: predicate)
-        let container = CKContainer(identifier: "iCloud.Mapr")
-        container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
-            DispatchQueue.main.async {
-                if let records = records {
-                    print("Successfully fetched all users")
-                    allUsers = records.map { recordToUser($0) }
-                } else if let error = error {
-                    print("Failed to fetch users: \(error.localizedDescription)")
-                }
-            }
+    func fetchUsers(searchText: String, in context: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "name CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
+        do {
+            let userEntities = try context.fetch(fetchRequest)
+            print("Fetched UserEntities: \(userEntities)") // Print the fetched UserEntity objects
+            let users = userEntities.map { retrieveUserFromCoreData(userEntity: $0) }
+            print("Mapped Users: \(users)") // Print the mapped User objects
+            allUsers = users // Update allUsers with the fetched users
+        } catch {
+            print("Failed to fetch users: \(error)")
+            allUsers = [] // Update allUsers to be an empty array
         }
     }
+
 
     func recordToUser(_ record: CKRecord) -> User {
         return User(

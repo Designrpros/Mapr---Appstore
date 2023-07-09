@@ -17,7 +17,17 @@ struct User: Identifiable, Hashable {
     let role: String
     let recordID: CKRecord.ID
     var record: CKRecord
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(recordID.recordName)
+    }
+    
+    static func ==(lhs: User, rhs: User) -> Bool {
+        return lhs.recordID.recordName == rhs.recordID.recordName
+    }
 }
+
+
 
 
 class UserSelection: ObservableObject {
@@ -48,9 +58,47 @@ class UserSelection: ObservableObject {
         let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
         do {
             let userEntities = try PersistenceController.shared.container.viewContext.fetch(fetchRequest)
+            // Remove duplicates before updating the users array
+            removeDuplicates(in: PersistenceController.shared.container.viewContext)
             self.users = userEntities.map { retrieveUserFromCoreData(userEntity: $0) }
         } catch {
             print("Failed to fetch selected users: \(error)")
+        }
+    }
+
+
+    func removeDuplicates(in managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        do {
+            let userEntities = try managedObjectContext.fetch(fetchRequest)
+            let uniqueUserEntities = Array(Set(userEntities)) // This will remove duplicates
+            // Now you can delete all the userEntities and save the unique ones
+            for userEntity in userEntities {
+                managedObjectContext.delete(userEntity)
+            }
+            for uniqueUserEntity in uniqueUserEntities {
+                let newUserEntity = UserEntity(context: managedObjectContext)
+                // Copy all the properties from uniqueUserEntity to newUserEntity
+                newUserEntity.id = uniqueUserEntity.id
+                newUserEntity.name = uniqueUserEntity.name
+                newUserEntity.email = uniqueUserEntity.email
+                newUserEntity.role = uniqueUserEntity.role
+                newUserEntity.recordIDData = uniqueUserEntity.recordIDData
+                newUserEntity.recordData = uniqueUserEntity.recordData
+                newUserEntity.color = uniqueUserEntity.color
+                newUserEntity.project = uniqueUserEntity.project
+
+                do {
+                    try managedObjectContext.save()
+                } catch {
+                    print("Failed to save context: \(error)")
+                }
+
+                // Save the context
+                try managedObjectContext.save()
+            }
+        } catch {
+            print("Failed to fetch UserEntity: \(error)")
         }
     }
 
@@ -65,6 +113,7 @@ class UserSelection: ObservableObject {
         )
     }
 }
+
 
 struct Users: View {
     @State private var searchText = ""
@@ -178,7 +227,9 @@ class AddUserSelection: ObservableObject {
             DispatchQueue.main.async {
                 if let records = records {
                     print("Successfully fetched all users")
-                    self.users = records.map { self.recordToUser($0) }
+                    let users = records.map { self.recordToUser($0) }
+                    // Filter out duplicate users
+                    self.users = Array(Set(users))
                 } else if let error = error {
                     print("Failed to fetch users: \(error.localizedDescription)")
                 }
@@ -271,25 +322,29 @@ struct AddUserView: View {
 }
 
 func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectContext) {
-    let userEntity = UserEntity(context: managedObjectContext)
-    userEntity.id = user.id
-    userEntity.name = user.name
-    userEntity.email = user.email
-    userEntity.role = user.role
+    // Only save the user to CoreData if they're not already in it
+    if fetchUserEntity(user: user, in: managedObjectContext) == nil {
+        let userEntity = UserEntity(context: managedObjectContext)
+        userEntity.id = user.id
+        userEntity.name = user.name
+        userEntity.email = user.email
+        userEntity.role = user.role
 
-    // Convert CKRecord.ID and CKRecord to Data
-    let recordIDData = try? NSKeyedArchiver.archivedData(withRootObject: user.recordID, requiringSecureCoding: false)
-    let recordData = try? NSKeyedArchiver.archivedData(withRootObject: user.record, requiringSecureCoding: false)
+        // Convert CKRecord.ID and CKRecord to Data
+        let recordIDData = try? NSKeyedArchiver.archivedData(withRootObject: user.recordID, requiringSecureCoding: false)
+        let recordData = try? NSKeyedArchiver.archivedData(withRootObject: user.record, requiringSecureCoding: false)
 
-    userEntity.recordIDData = recordIDData
-    userEntity.recordData = recordData
+        userEntity.recordIDData = recordIDData
+        userEntity.recordData = recordData
 
-    do {
-        try managedObjectContext.save()
-    } catch {
-        print("Failed to save user: \(error)")
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Failed to save user: \(error)")
+        }
     }
 }
+
 
 func retrieveUserFromCoreData(userEntity: UserEntity) -> User {
     let id = userEntity.id ?? UUID()
