@@ -288,8 +288,9 @@ struct LocationDetailView: View {
             }
             .onAppear {
                 // Load the selectedUsers array from CoreData when the view appears
-                selectedUsers = UserManager.shared.loadUsersFromCoreData(in: managedObjectContext)
+                selectedUsers = project.users?.allObjects.compactMap { $0 as? UserEntity }.map { retrieveUserFromCoreData(userEntity: $0) } ?? []
             }
+
             .onAppear {
                 guard let location = project.location else {
                     return
