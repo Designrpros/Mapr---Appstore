@@ -11,7 +11,7 @@ import CoreData
 
 
 struct User: Identifiable, Hashable {
-    let id: UUID
+    var id: String // Change this to String
     let name: String
     let email: String
     let role: String
@@ -32,6 +32,16 @@ struct User: Identifiable, Hashable {
                lhs.email == rhs.email &&
                lhs.role == rhs.role &&
                lhs.recordID.recordName == rhs.recordID.recordName
+    }
+    func recordToUser(_ record: CKRecord) -> User {
+        return User(
+            id: record.recordID.recordName, // Use the recordName as the id
+            name: record["username"] as? String ?? "Unknown",
+            email: record["email"] as? String ?? "Unknown",
+            role: record["role"] as? String ?? "Unknown",
+            recordID: record.recordID,
+            record: record
+        )
     }
 }
 
@@ -98,7 +108,7 @@ class UserSelection: ObservableObject {
 
     func recordToUser(_ record: CKRecord) -> User {
         return User(
-            id: UUID(),
+            id: record.recordID.recordName,
             name: record["username"] as? String ?? "Unknown",
             email: record["email"] as? String ?? "Unknown",
             role: record["role"] as? String ?? "Unknown",
@@ -143,7 +153,7 @@ struct Users: View {
             .padding([.horizontal, .top])
                 
             List {
-                ForEach(userSelection.users, id: \.self) { user in
+                ForEach(userSelection.users, id: \.id) { user in
                     HStack {
                         NavigationLink(destination: UserDetailView()) {
                             HStack {
@@ -244,7 +254,7 @@ class AddUserSelection: ObservableObject {
 
     func recordToUser(_ record: CKRecord) -> User {
         return User(
-            id: UUID(),
+            id: record.recordID.recordName, // Use the recordName as the id
             name: record["username"] as? String ?? "Unknown",
             email: record["email"] as? String ?? "Unknown",
             role: record["role"] as? String ?? "Unknown",
@@ -284,7 +294,7 @@ struct AddUserView: View {
                 .padding([.horizontal, .top])
                 
                 List {
-                    ForEach(addUserSelection.users.sorted(by: { $0.name < $1.name }), id: \.self) { user in // Use addUserSelection here
+                    ForEach(addUserSelection.users.sorted(by: { $0.name < $1.name }), id: \.id) { user in
                         Button(action: {
                             // Save the user to CoreData
                             saveUserToCoreData(user: user, in: managedObjectContext)
@@ -330,7 +340,11 @@ func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectCont
     // Only save the user to CoreData if they're not already in it
     if fetchUserEntity(user: user, in: managedObjectContext) == nil {
         let userEntity = UserEntity(context: managedObjectContext)
-        userEntity.id = user.id
+        if let uuid = UUID(uuidString: user.id) {
+            userEntity.id = uuid
+        } else {
+            // Handle the error
+        }
         userEntity.name = user.name
         userEntity.email = user.email
         userEntity.role = user.role
@@ -363,11 +377,12 @@ func retrieveUserFromCoreData(userEntity: UserEntity) -> User {
         // Convert Data back to CKRecord.ID and CKRecord
         let recordID = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordIDData)) as? CKRecord.ID ?? CKRecord.ID()
         let record = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordData)) as? CKRecord ?? CKRecord(recordType: "User")
-        return User(id: id, name: name, email: email, role: role, recordID: recordID, record: record)
-    } else {
-        // Return a default User object if recordIDData or recordData is nil
-        return User(id: id, name: name, email: email, role: role, recordID: CKRecord.ID(), record: CKRecord(recordType: "User"))
-    }
+        return User(id: id.uuidString, name: name, email: email, role: role, recordID: recordID, record: record)
+        } else {
+            // Return a default User object if recordIDData or recordData is nil
+            return User(id: id.uuidString, name: name, email: email, role: role, recordID: CKRecord.ID(), record: CKRecord(recordType: "User"))
+        }
+
 }
 
 

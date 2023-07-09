@@ -182,7 +182,7 @@ struct LocationDetailView: View {
                         
                         Spacer()
                         
-                        // a person circle icon should be placed here, this should indicate, wich users that has been added to the project, initially the icon should be clickable and activate a popup, to add more users, when a user is added, a new person icon should be added with a new color, than the users can make modifications to the project, it should only be possible to select users that has already been selected in the userlistview. 
+                        //
                 
 #if os(macOS)
                         ForEach(selectedUsers, id: \.id) { user in
@@ -197,13 +197,19 @@ struct LocationDetailView: View {
                                     // Remove the user from the selectedUsers array
                                     selectedUsers.removeAll(where: { $0.id == user.id })
                                     // Find the corresponding UserEntity
-                                    if let userEntity = userEntities.first(where: { $0.id == user.id }) {
+                                    if let userEntity = userEntities.first(where: { $0.id?.uuidString == user.id }) {
                                         // Also remove the user from the project
-                                        CoreDataManager.shared.removeUserFromProject(user: userEntity, project: project)
+                                        userEntity.removeFromProject(project)
+                                        do {
+                                            try managedObjectContext.save()
+                                        } catch {
+                                            print("Failed to remove user from project: \(error)")
+                                        }
                                     }
                                 }) {
                                     Label("Remove User", systemImage: "trash")
                                 }.buttonStyle(BorderlessButtonStyle())
+
 
                             }
                         }
@@ -219,8 +225,9 @@ struct LocationDetailView: View {
                         }
                         .buttonStyle(BorderlessButtonStyle())
                         .sheet(isPresented: $showingAddUserModal) {
-                                    AddUserModal(project: project, managedObjectContext: managedObjectContext, userSelection: userSelection, selectedUsers: $selectedUsers)
-                                }
+                            AddUserModal(project: project, managedObjectContext: managedObjectContext, userSelection: userSelection, selectedUsers: $selectedUsers, userEntities: userEntities)
+                        }
+
 
 #endif
                         //Button(action: {
@@ -278,6 +285,10 @@ struct LocationDetailView: View {
                     //.background(Color.black.opacity(0.5))
                         .edgesIgnoringSafeArea(.all)
                 }
+            }
+            .onAppear {
+                // Load the selectedUsers array from CoreData when the view appears
+                selectedUsers = UserManager.shared.loadUsersFromCoreData(in: managedObjectContext)
             }
             .onAppear {
                 guard let location = project.location else {
@@ -439,6 +450,7 @@ struct AddUserModal: View {
     var managedObjectContext: NSManagedObjectContext
     @ObservedObject var userSelection: UserSelection
     @Binding var selectedUsers: [User]
+    var userEntities: FetchedResults<UserEntity>
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
     @State private var allUsers: [User] = []
@@ -458,9 +470,9 @@ struct AddUserModal: View {
                 ForEach(allUsers, id: \.self) { user in
                     Button(action: {
                         // Add the user to the selectedUsers array when selected
-                        if !selectedUsers.contains(where: { $0.recordID == user.recordID }) {
+                        if !selectedUsers.contains(where: { $0.id == user.id }) {
                             let newUser = User(
-                                id: UUID(),
+                                id: UUID().uuidString, // Convert UUID to String
                                 name: user.name,
                                 email: user.email,
                                 role: user.role,
@@ -468,6 +480,16 @@ struct AddUserModal: View {
                                 record: user.record
                             )
                             selectedUsers.append(newUser)
+                            // Find the corresponding UserEntity
+                            if let userEntity = userEntities.first(where: { $0.id?.uuidString == user.id }) {
+                                // Also add the user to the project
+                                userEntity.addToProject(project)
+                                do {
+                                    try managedObjectContext.save()
+                                } catch {
+                                    print("Failed to add user to project: \(error)")
+                                }
+                            }
                         }
                     }) {
                         HStack {
@@ -514,7 +536,7 @@ struct AddUserModal: View {
 
     func recordToUser(_ record: CKRecord) -> User {
         return User(
-            id: UUID(),
+            id: UUID().uuidString,
             name: record["username"] as? String ?? "Unknown",
             email: record["email"] as? String ?? "Unknown",
             role: record["role"] as? String ?? "Unknown",
