@@ -86,6 +86,6 @@
         <attribute name="recordData" optional="YES" attributeType="Binary"/>
         <attribute name="recordIDData" optional="YES" attributeType="Binary"/>
         <attribute name="role" optional="YES" attributeType="String"/>
-        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="users" inverseEntity="Project"/>
+        <relationship name="project" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Project" inverseName="users" inverseEntity="Project"/>
     </entity>
 </model>
