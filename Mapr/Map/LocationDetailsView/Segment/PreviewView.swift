@@ -118,7 +118,7 @@ struct PreviewView: View {
             
             // TimeTracker data
             VStack(alignment: .leading) {
-                Text("Time Tracker")
+                Text("Time")
                     .font(.headline)
                     .padding(.top)
                 HStack {
