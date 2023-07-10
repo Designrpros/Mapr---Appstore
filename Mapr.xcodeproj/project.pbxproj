@@ -14,6 +14,14 @@
 		AD7AB5EB2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */; };
 		AD7AB5EC2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */; };
 		AD7AB5F22A5BB6F300D7F5E6 /* ProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5F12A5BB6F300D7F5E6 /* ProjectManager.swift */; };
+		AD7AB5F42A5C6FD400D7F5E6 /* CustomChecklistItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5F32A5C6FD400D7F5E6 /* CustomChecklistItemDetailView.swift */; };
+		AD7AB5F62A5C70F600D7F5E6 /* CostumChecklistview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5F52A5C70F600D7F5E6 /* CostumChecklistview.swift */; };
+		AD7AB5F92A5C726E00D7F5E6 /* ChecklistItem+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5F72A5C726E00D7F5E6 /* ChecklistItem+CoreDataClass.swift */; };
+		AD7AB5FA2A5C726E00D7F5E6 /* ChecklistItem+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5F82A5C726E00D7F5E6 /* ChecklistItem+CoreDataProperties.swift */; };
+		AD7AB6012A5C764600D7F5E6 /* CustomChecklistItem+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5FF2A5C764600D7F5E6 /* CustomChecklistItem+CoreDataClass.swift */; };
+		AD7AB6022A5C764600D7F5E6 /* CustomChecklistItem+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB6002A5C764600D7F5E6 /* CustomChecklistItem+CoreDataProperties.swift */; };
+		AD7AB6052A5C7BE400D7F5E6 /* CustomChecklist+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB6032A5C7BE400D7F5E6 /* CustomChecklist+CoreDataClass.swift */; };
+		AD7AB6062A5C7BE400D7F5E6 /* CustomChecklist+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB6042A5C7BE400D7F5E6 /* CustomChecklist+CoreDataProperties.swift */; };
 		ADB556032A57F618004D089E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556022A57F618004D089E /* Users.swift */; };
 		ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556042A57FE64004D089E /* UserDetailView.swift */; };
 		ADB556072A5809D1004D089E /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556062A5809D1004D089E /* CloudKitManager.swift */; };
@@ -74,6 +82,14 @@
 		AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectedUserEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectedUserEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		AD7AB5F12A5BB6F300D7F5E6 /* ProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectManager.swift; sourceTree = "<group>"; };
+		AD7AB5F32A5C6FD400D7F5E6 /* CustomChecklistItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomChecklistItemDetailView.swift; sourceTree = "<group>"; };
+		AD7AB5F52A5C70F600D7F5E6 /* CostumChecklistview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostumChecklistview.swift; sourceTree = "<group>"; };
+		AD7AB5F72A5C726E00D7F5E6 /* ChecklistItem+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChecklistItem+CoreDataClass.swift"; sourceTree = "<group>"; };
+		AD7AB5F82A5C726E00D7F5E6 /* ChecklistItem+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChecklistItem+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		AD7AB5FF2A5C764600D7F5E6 /* CustomChecklistItem+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomChecklistItem+CoreDataClass.swift"; sourceTree = "<group>"; };
+		AD7AB6002A5C764600D7F5E6 /* CustomChecklistItem+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomChecklistItem+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		AD7AB6032A5C7BE400D7F5E6 /* CustomChecklist+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomChecklist+CoreDataClass.swift"; sourceTree = "<group>"; };
+		AD7AB6042A5C7BE400D7F5E6 /* CustomChecklist+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomChecklist+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ADB555BB2A55E61F004D089E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ADB556022A57F618004D089E /* Users.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
 		ADB556042A57FE64004D089E /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
@@ -162,6 +178,12 @@
 		ADF428302A53A7470096D87D = {
 			isa = PBXGroup;
 			children = (
+				AD7AB6032A5C7BE400D7F5E6 /* CustomChecklist+CoreDataClass.swift */,
+				AD7AB6042A5C7BE400D7F5E6 /* CustomChecklist+CoreDataProperties.swift */,
+				AD7AB5FF2A5C764600D7F5E6 /* CustomChecklistItem+CoreDataClass.swift */,
+				AD7AB6002A5C764600D7F5E6 /* CustomChecklistItem+CoreDataProperties.swift */,
+				AD7AB5F72A5C726E00D7F5E6 /* ChecklistItem+CoreDataClass.swift */,
+				AD7AB5F82A5C726E00D7F5E6 /* ChecklistItem+CoreDataProperties.swift */,
 				AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */,
 				AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */,
 				AD7AB5E12A5A84C700D7F5E6 /* UserEntity+CoreDataClass.swift */,
@@ -266,6 +288,8 @@
 				ADB556022A57F618004D089E /* Users.swift */,
 				ADB556042A57FE64004D089E /* UserDetailView.swift */,
 				ADF4288C2A53A8F70096D87D /* ContactView.swift */,
+				AD7AB5F32A5C6FD400D7F5E6 /* CustomChecklistItemDetailView.swift */,
+				AD7AB5F52A5C70F600D7F5E6 /* CostumChecklistview.swift */,
 			);
 			path = Contact;
 			sourceTree = "<group>";
@@ -407,6 +431,8 @@
 				AD7AB5EC2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift in Sources */,
 				AD7AB5EB2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift in Sources */,
 				ADB556102A59343D004D089E /* ApprenticeView.swift in Sources */,
+				AD7AB6062A5C7BE400D7F5E6 /* CustomChecklist+CoreDataProperties.swift in Sources */,
+				AD7AB5F92A5C726E00D7F5E6 /* ChecklistItem+CoreDataClass.swift in Sources */,
 				ADF428852A53A89F0096D87D /* ChecklistView.swift in Sources */,
 				ADF4287B2A53A82E0096D87D /* LocationDetailView.swift in Sources */,
 				ADB556092A593384004D089E /* UserManager.swift in Sources */,
@@ -415,7 +441,10 @@
 				AD7AB5F22A5BB6F300D7F5E6 /* ProjectManager.swift in Sources */,
 				ADF428732A53A7C80096D87D /* MapListView.swift in Sources */,
 				ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */,
+				AD7AB5F42A5C6FD400D7F5E6 /* CustomChecklistItemDetailView.swift in Sources */,
 				ADF4288B2A53A8E50096D87D /* ContactListView.swift in Sources */,
+				AD7AB6012A5C764600D7F5E6 /* CustomChecklistItem+CoreDataClass.swift in Sources */,
+				AD7AB6022A5C764600D7F5E6 /* CustomChecklistItem+CoreDataProperties.swift in Sources */,
 				ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */,
 				AD7AB5E62A5A84C700D7F5E6 /* UserEntity+CoreDataProperties.swift in Sources */,
 				ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */,
@@ -425,10 +454,13 @@
 				ADF428892A53A8C30096D87D /* StreetView.swift in Sources */,
 				ADF428442A53A7470096D87D /* ContentView.swift in Sources */,
 				ADB556032A57F618004D089E /* Users.swift in Sources */,
+				AD7AB6052A5C7BE400D7F5E6 /* CustomChecklist+CoreDataClass.swift in Sources */,
 				ADF4287D2A53A8410096D87D /* Segment.swift in Sources */,
 				ADF4286D2A53A7950096D87D /* CoreDataManager.swift in Sources */,
 				ADB5560C2A593404004D089E /* AdminView.swift in Sources */,
 				ADF428872A53A8B10096D87D /* PreviewView.swift in Sources */,
+				AD7AB5FA2A5C726E00D7F5E6 /* ChecklistItem+CoreDataProperties.swift in Sources */,
+				AD7AB5F62A5C70F600D7F5E6 /* CostumChecklistview.swift in Sources */,
 				AD7AB5E82A5A84C700D7F5E6 /* Project+CoreDataProperties.swift in Sources */,
 				ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */,
 				ADB556122A59344D004D089E /* ViewerView.swift in Sources */,

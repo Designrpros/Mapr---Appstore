@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22D68" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
-    <entity name="ChecklistItem" representedClassName="ChecklistItem" syncable="YES" codeGenerationType="class">
+    <entity name="ChecklistItem" representedClassName="ChecklistItem" syncable="YES">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -16,6 +16,20 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="phone" optional="YES" attributeType="String"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="contact" inverseEntity="Project"/>
+    </entity>
+    <entity name="CustomChecklist" representedClassName="CustomChecklist" syncable="YES">
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CustomChecklistItem" inverseName="checklist" inverseEntity="CustomChecklistItem"/>
+    </entity>
+    <entity name="CustomChecklistItem" representedClassName="CustomChecklistItem" syncable="YES">
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="item" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="checklist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CustomChecklist" inverseName="items" inverseEntity="CustomChecklist"/>
+        <relationship name="childern" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CustomChecklistItem" inverseName="parent" inverseEntity="CustomChecklistItem"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CustomChecklistItem" inverseName="childern" inverseEntity="CustomChecklistItem"/>
     </entity>
     <entity name="CustomCKShareMetadata" representedClassName="CustomCKShareMetadata" syncable="YES" codeGenerationType="class">
         <attribute name="ownerAcceptStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
