@@ -1,80 +1,52 @@
-//
-//  UserDetailView.swift
-//  Mapr
-//
-//  Created by Vegar Berentsen on 07/07/2023.
-//
-
 import SwiftUI
 import CloudKit
 
 struct UserDetailView: View {
-    @State private var showingUpdateUser = false
+    var user: User  // Assuming you have a User model
 
     var body: some View {
-        VStack {
-            Text("User Detail View")
+        VStack(alignment: .leading, spacing: 20) {
+            HStack {
+                Image(systemName: "person.circle")
+                    .resizable()
+                    .frame(width: 100, height: 100)
+                VStack(alignment: .leading) {
+                    Text(user.name)
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text(user.email)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+            }
             
-            Button(action: {
-                showingUpdateUser = true
-            }) {
-                Text("Update User")
+            Divider()
+            
+            HStack {
+                Image(systemName: "envelope")
+                    .foregroundColor(.gray)
+                Text(user.email)
+                    .font(.headline)
             }
-            .sheet(isPresented: $showingUpdateUser) {
-                UpdateUserView()
+            
+            HStack {
+                Image(systemName: "person.fill.questionmark")
+                    .foregroundColor(.gray)
+                Text(user.role)
+                    .font(.headline)
             }
+            
+            HStack {
+                Image(systemName: "doc.text")
+                    .foregroundColor(.gray)
+                Text(user.recordID.recordName)
+                    .font(.headline)
+            }
+            
+            Spacer()
         }
-    }
-}
-
-
-
-struct UpdateUserView: View {
-    @State private var username = ""
-    @State private var email = ""
-    @State private var showError = false
-
-    var body: some View {
-        VStack {
-            TextField("Username", text: $username)
-            TextField("Email", text: $email)
-            Button("Update") {
-                updateUser()
-            }
-            if showError {
-                Text("Please sign in to iCloud to update your user information.")
-                    .foregroundColor(.red)
-            }
-        }
-    }
-
-    func updateUser() {
-        // Fetch the current user's record
-        CKContainer.default().fetchUserRecordID { (recordID, error) in
-            if let error = error {
-                print("Failed to fetch user record ID: \(error)")
-                DispatchQueue.main.async {
-                    showError = true
-                }
-            } else if let recordID = recordID {
-                CKContainer.default().publicCloudDatabase.fetch(withRecordID: recordID) { (record, error) in
-                    if let error = error {
-                        print("Failed to fetch user record: \(error)")
-                    } else if let record = record {
-                        // Update the user's record with the new username and email
-                        record["username"] = username
-                        record["email"] = email
-                        CKContainer.default().publicCloudDatabase.save(record) { (record, error) in
-                            if let error = error {
-                                print("Failed to update user record: \(error)")
-                            } else {
-                                print("User record updated successfully")
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        .padding()
+        .navigationTitle(Text(user.name))
     }
 }
 

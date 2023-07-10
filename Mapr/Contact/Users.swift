@@ -155,7 +155,7 @@ struct Users: View {
             List {
                 ForEach(userSelection.users, id: \.id) { user in
                     HStack {
-                        NavigationLink(destination: UserDetailView()) {
+                        NavigationLink(destination: UserDetailView(user: user)) {
                             HStack {
                                 Image(systemName: "person.crop.circle")
                                     .resizable()

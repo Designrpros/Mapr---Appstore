@@ -21,10 +21,15 @@ class ProjectManager {
         fetchRecordsOperation.fetchRecordsCompletionBlock = { records, error in
             if let error = error {
                 print("Failed to fetch CKRecord: \(error)")
+                if let nsError = error as NSError? {
+                    print("Detailed error: \(nsError.localizedDescription)")
+                    print("Debug Description: \(nsError.debugDescription)")
+                    print("User Info: \(nsError.userInfo)")
+                }
             } else if let projectRecord = records?[recordID] {
                 let share = CKShare(rootRecord: projectRecord)
                 share[CKShare.SystemFieldKey.title] = "Shared Project" as CKRecordValue?
-                share[CKShare.SystemFieldKey.shareType] = "iCloud.Handy-Mapr" as CKRecordValue?
+                share[CKShare.SystemFieldKey.shareType] = "iCloud.Mapr" as CKRecordValue?
                 
                 // Add each selected user as a participant
                 for user in selectedUsers { // <-- Here

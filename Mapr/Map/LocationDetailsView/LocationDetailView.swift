@@ -92,9 +92,11 @@ struct LocationDetailView: View {
     @Environment(\.managedObjectContext) var context
 
     var location: Location
+    
+#if os(macOS)
     let projectManager = ProjectManager()
-
-
+#endif
+    
     var body: some View {
         
 //        let currentUser = UserManager.shared.fetchCurrentUser(in: context)
@@ -396,8 +398,11 @@ struct AddUserModal: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
     @State private var allUsers: [User] = []
+    
+#if os(macOS)
     let projectManager = ProjectManager()
-
+#endif
+    
     var body: some View {
         VStack {
             TextField("Search...", text: $searchText)
@@ -434,8 +439,10 @@ struct AddUserModal: View {
                                 }
                             }
                         }
+#if os(macOS)
                         // Share the project with the newly added user
                         projectManager.shareProjectWithSelectedUsers(project: project, selectedUsers: selectedUsers)
+#endif
                     }) {
                         HStack {
                             Image(systemName: "person.crop.circle")
