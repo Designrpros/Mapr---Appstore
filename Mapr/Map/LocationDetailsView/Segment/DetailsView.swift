@@ -104,6 +104,14 @@ struct DetailsView: View {
                         
                         Spacer()
                         
+                        Button(action: {
+                            downloadImages()
+                        }) {
+                            Image(systemName: "arrow.down.circle")
+                        }
+                        //.foregroundColor(.white)
+                        .buttonStyle(BorderlessButtonStyle())
+                        
 #if os(macOS)
 Button(action: {
     let panel = NSOpenPanel()
@@ -243,6 +251,54 @@ Button(action: {
     private func updateProject() {
             saveContext()
         }
+
+    private func downloadImages() {
+        if let imagesSet = project.galleryImage as? Set<GalleryImage>, !imagesSet.isEmpty {
+            let imagesArray = Array(imagesSet)
+            var nsImages = [NSImage]()
+            for galleryImage in imagesArray {
+                if let imageData = galleryImage.imageData, let nsImage = NSImage(data: imageData) {
+                    nsImages.append(nsImage)
+                }
+            }
+            if let combinedImage = combineImages(nsImages) {
+                let panel = NSSavePanel()
+                panel.nameFieldStringValue = "combined.png"
+                panel.begin { response in
+                    if response == .OK, let url = panel.url {
+                        if let pngData = combinedImage.tiffRepresentation?.pngData {
+                            try? pngData.write(to: url)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func combineImages(_ images: [NSImage]) -> NSImage? {
+        guard !images.isEmpty else { return nil }
+        
+        var totalHeight: CGFloat = 0
+        let maxWidth = images.max(by: { $0.size.width < $1.size.width })?.size.width ?? 0
+        for image in images {
+            totalHeight += image.size.height
+        }
+        
+        let size = NSSize(width: maxWidth, height: totalHeight)
+        let combinedImage = NSImage(size: size)
+        
+        combinedImage.lockFocus()
+        var currentHeight: CGFloat = 0
+        for image in images {
+            let rect = NSRect(origin: NSPoint(x: 0, y: currentHeight), size: image.size)
+            image.draw(in: rect)
+            currentHeight += image.size.height
+        }
+        combinedImage.unlockFocus()
+        
+        return combinedImage
+    }
+
 }
 
 extension Optional where Wrapped == String {
