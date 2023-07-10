@@ -226,8 +226,7 @@ struct PreviewView: View {
         let contentHeight = timeEntriesHeight + materialsHeight + checklistItemsHeight + otherContentHeight
 
         let pdfWidth = CGFloat(595) // Width of a standard A4 page
-        let pdfHeight = CGFloat(842) // Height of a standard A4 page
-        let pageCount = Int(ceil(contentHeight / pdfHeight)) // Calculate the number of pages
+        let pdfHeight = contentHeight // Set the PDF height to the total content height
 
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
@@ -239,7 +238,7 @@ struct PreviewView: View {
 
                 let renderer = ImageRenderer(content: pdfView)
                 renderer.render { size, context in
-                    var box = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+                    var box = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
                     guard let pdfContext = CGContext(pdfURL as CFURL, mediaBox: &box, nil) else {
                         return
                     }
@@ -247,20 +246,16 @@ struct PreviewView: View {
                     let margin = CGFloat(20) // Adjust this to change the margin size
                     let contentRect = CGRect(x: margin, y: margin, width: box.width - 2 * margin, height: box.height - 2 * margin)
 
-                    // Draw the rest of the pages
-                    for pageIndex in 0..<pageCount {
-                        // Create a new view for each page
-                        let pageView = pdfView
-                            .frame(width: contentRect.width, height: contentRect.height)
-                            .offset(y: -CGFloat(pageIndex) * contentRect.height)
+                    // Draw the content
+                    let pageView = pdfView
+                        .frame(width: contentRect.width, height: contentRect.height)
 
-                        let renderer = ImageRenderer(content: pageView)
-                        guard let cgImage = renderer.cgImage else { continue }
+                    let renderer = ImageRenderer(content: pageView)
+                    guard let cgImage = renderer.cgImage else { return }
 
-                        pdfContext.beginPDFPage(nil)
-                        pdfContext.draw(cgImage, in: contentRect)
-                        pdfContext.endPDFPage()
-                    }
+                    pdfContext.beginPDFPage(nil)
+                    pdfContext.draw(cgImage, in: contentRect)
+                    pdfContext.endPDFPage()
 
                     pdfContext.closePDF()
 
