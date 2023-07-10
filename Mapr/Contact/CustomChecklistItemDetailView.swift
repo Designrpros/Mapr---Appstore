@@ -24,6 +24,18 @@ class CustomChecklistViewModel: ObservableObject {
     }
 
 
+    func saveContext() {
+        guard let viewContext = viewContext else { return }
+        
+        do {
+            try viewContext.save()
+            print("Context Saved Successfully") // Print after successful save
+            fetchChecklistItems() // Fetch the checklist items again after saving the context.
+        } catch {
+            print("Failed to save context: \(error)") // Print the error
+        }
+    }
+
     func fetchChecklistItems() {
         guard let viewContext = viewContext, let checklist = checklist else { return }
         
@@ -33,20 +45,9 @@ class CustomChecklistViewModel: ObservableObject {
 
         do {
             checklistItems = try viewContext.fetch(fetchRequest)
-            print(checklistItems) // Print the fetched items
+            print("Fetched Checklist Items: \(checklistItems)") // Print the fetched items
         } catch {
             print("Failed to fetch checklist items: \(error)")
-        }
-    }
-
-    func saveContext() {
-        guard let viewContext = viewContext else { return }
-        
-        do {
-            try viewContext.save()
-            fetchChecklistItems() // Fetch the checklist items again after saving the context.
-        } catch {
-            print("Failed to save context: \(error)") // Print the error
         }
     }
 }
@@ -99,8 +100,10 @@ struct CustomChecklistItemDetailView: View {
                 newChecklistItem.item = ""
                 newChecklistItem.isChecked = false
                 newChecklistItem.checklist = checklist
-                print(newChecklistItem) // Print the newChecklistItem
+                checklist.addToItems(newChecklistItem) // Add the new item to the checklist's items set
+                print("New Checklist Item Created: \(newChecklistItem)") // Print the newChecklistItem
                 viewModel.saveContext()
+                print("Context Saved") // Print after saving the context
             }) {
                 Text("Add Row")
                     .font(.headline)
@@ -145,7 +148,7 @@ struct CustomChecklistItemDetailView: View {
             HStack(spacing: 20) {
                 Button(action: {
                     if let parent = checklistItem.parent {
-                        parent.removeFromChildern(checklistItem) // Remove the item from the parent's children
+                        parent.removeFromChildern(checklistItem) // Use the generated accessor method to remove the item from the parent's children set
                         if parent.childern?.count == 0 {
                             viewContext.delete(parent)
                         }
@@ -167,7 +170,7 @@ struct CustomChecklistItemDetailView: View {
                         newChecklistItem.item = ""
                         newChecklistItem.isChecked = false
                         newChecklistItem.creationDate = Date() // Set the creation date to the current date
-                        checklistItem.addToChildren(newChecklistItem) // Manually add the new item to the parent's children
+                        checklistItem.addToChildern(newChecklistItem) // Use the generated accessor method to add the new item to the children set
                         newChecklistItem.parent = checklistItem // Set the parent of the new item
                         viewModel.saveContext() // Call saveContext on the viewModel
                     }) {
