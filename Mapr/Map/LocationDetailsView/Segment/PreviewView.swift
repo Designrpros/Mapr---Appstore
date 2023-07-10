@@ -226,7 +226,7 @@ struct PreviewView: View {
         let contentHeight = timeEntriesHeight + materialsHeight + checklistItemsHeight + otherContentHeight
 
         let pdfWidth = CGFloat(595) // Width of a standard A4 page
-        let pdfHeight = contentHeight // Set the PDF height to the total content height
+        let pdfHeight = contentHeight + 2 * 20 // Set the height to the content height plus top and bottom margins
 
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
@@ -246,9 +246,10 @@ struct PreviewView: View {
                     let margin = CGFloat(20) // Adjust this to change the margin size
                     let contentRect = CGRect(x: margin, y: margin, width: box.width - 2 * margin, height: box.height - 2 * margin)
 
-                    // Draw the content
+                    // Create a new view for the page
                     let pageView = pdfView
                         .frame(width: contentRect.width, height: contentRect.height)
+                        .padding(.vertical, margin) // Add padding to top and bottom
 
                     let renderer = ImageRenderer(content: pageView)
                     guard let cgImage = renderer.cgImage else { return }
@@ -266,6 +267,7 @@ struct PreviewView: View {
             }
         }
     }
+
 
 }
 #endif
