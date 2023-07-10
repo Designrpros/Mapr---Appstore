@@ -24,7 +24,7 @@ class ProjectManager {
             } else if let projectRecord = records?[recordID] {
                 let share = CKShare(rootRecord: projectRecord)
                 share[CKShare.SystemFieldKey.title] = "Shared Project" as CKRecordValue?
-                share[CKShare.SystemFieldKey.shareType] = "ICloud.Mapr" as CKRecordValue?
+                share[CKShare.SystemFieldKey.shareType] = "iCloud.Handy-Mapr" as CKRecordValue?
                 
                 // Add each selected user as a participant
                 for user in selectedUsers { // <-- Here
