@@ -103,7 +103,7 @@ struct DetailsView: View {
                             .font(.headline)
                         
                         Spacer()
-                        
+#if os(macOS)
                         Button(action: {
                             downloadImages()
                         }) {
@@ -112,29 +112,29 @@ struct DetailsView: View {
                         //.foregroundColor(.white)
                         .buttonStyle(BorderlessButtonStyle())
                         
-#if os(macOS)
-Button(action: {
-    let panel = NSOpenPanel()
-    panel.allowsMultipleSelection = true
-    panel.canChooseDirectories = false
-    panel.canCreateDirectories = false
-    panel.canChooseFiles = true
-    panel.allowedFileTypes = ["png", "jpg", "jpeg"]
-    if panel.runModal() == .OK {
-        for url in panel.urls {
-            if let image = NSImage(contentsOf: url) {
-                let newImage = GalleryImage(context: viewContext)
-                newImage.id = UUID()
-                newImage.imageData = image.tiffRepresentation // Save the original NSImage data
-                newImage.project = project
-            }
-        }
-        saveContext()
-    }
-}) {
-    Image(systemName: "plus")
-}
-.buttonStyle(BorderlessButtonStyle())
+
+                        Button(action: {
+                            let panel = NSOpenPanel()
+                            panel.allowsMultipleSelection = true
+                            panel.canChooseDirectories = false
+                            panel.canCreateDirectories = false
+                            panel.canChooseFiles = true
+                            panel.allowedFileTypes = ["png", "jpg", "jpeg"]
+                            if panel.runModal() == .OK {
+                                for url in panel.urls {
+                                    if let image = NSImage(contentsOf: url) {
+                                        let newImage = GalleryImage(context: viewContext)
+                                        newImage.id = UUID()
+                                        newImage.imageData = image.tiffRepresentation // Save the original NSImage data
+                                        newImage.project = project
+                                    }
+                                }
+                                saveContext()
+                            }
+                        }) {
+                            Image(systemName: "plus")
+                        }
+                        .buttonStyle(BorderlessButtonStyle())
 #endif
 
 #if os(iOS)
@@ -251,7 +251,7 @@ Button(action: {
     private func updateProject() {
             saveContext()
         }
-
+#if os(macOS)
     private func downloadImages() {
         if let imagesSet = project.galleryImage as? Set<GalleryImage>, !imagesSet.isEmpty {
             let imagesArray = Array(imagesSet)
@@ -274,7 +274,7 @@ Button(action: {
             }
         }
     }
-
+   
     private func combineImages(_ images: [NSImage]) -> NSImage? {
         guard !images.isEmpty else { return nil }
         
@@ -298,7 +298,7 @@ Button(action: {
         
         return combinedImage
     }
-
+    #endif
 }
 
 extension Optional where Wrapped == String {

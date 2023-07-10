@@ -77,7 +77,7 @@ struct ContactListView: View {
                 Users()
             }
         }.navigationTitle("Contacts & Users")
-        CustomContactSegmentedControl(selectedTab: $selectedSegment)
+        //CustomContactSegmentedControl(selectedTab: $selectedSegment)
     }
     
     var filteredContacts: [Contact] {

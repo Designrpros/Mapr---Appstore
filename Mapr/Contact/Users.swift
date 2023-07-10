@@ -60,7 +60,7 @@ class UserSelection: ObservableObject {
             predicate = NSPredicate(value: true)
         }
         let query = CKQuery(recordType: "User", predicate: predicate)
-        let container = CKContainer(identifier: "iCloud.Mapr")
+        let container = CKContainer(identifier: "iCloud.Handy-Mapr")
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
@@ -237,7 +237,7 @@ class AddUserSelection: ObservableObject {
             predicate = NSPredicate(value: true)
         }
         let query = CKQuery(recordType: "User", predicate: predicate)
-        let container = CKContainer(identifier: "iCloud.Mapr")
+        let container = CKContainer(identifier: "iCloud.Handy-Mapr")
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
