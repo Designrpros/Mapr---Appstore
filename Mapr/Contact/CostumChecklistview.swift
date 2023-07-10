@@ -10,9 +10,9 @@ import CoreData
 
 struct CustomChecklistView: View {
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \CustomChecklistItem.title, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \CustomChecklist.title, ascending: true)],
         animation: .default)
-    private var checklistItems: FetchedResults<CustomChecklistItem>
+    private var checklists: FetchedResults<CustomChecklist>
     @Environment(\.managedObjectContext) private var viewContext
     @State private var searchText = ""
     @State private var showingAddChecklistItem = false
@@ -35,69 +35,41 @@ struct CustomChecklistView: View {
                 .padding(.leading, 8)
                 .buttonStyle(BorderlessButtonStyle())
                 .sheet(isPresented: $showingAddChecklistItem) {
-                    AddCustomChecklistItemView {
-                        // Refresh the checklist items array when a new item is added
+                    AddCustomChecklistView {
+                        // Refresh the checklists array when a new checklist is added
                     }
                 }
             }
             .padding([.horizontal, .top])
             
             List {
-                ForEach(filteredChecklistItems, id: \.self) { checklistItem in
-                    HStack {
-                        NavigationLink(destination: CustomChecklistItemDetailView(checklistItem: checklistItem)) {
-                            HStack {
-                                Image(systemName: checklistItem.isChecked ? "checkmark.square" : "square")
-                                    .resizable()
-                                    .frame(width: 50, height: 50)
-                                VStack(alignment: .leading) {
-                                    Text(checklistItem.title ?? "Unknown")
-                                        .font(.headline)
-                                    Text(checklistItem.item ?? "")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                        }
-                        Spacer()
-                    }
-                    .contextMenu {
-                        Button(action: {
-                            // Delete the checklist item from Core Data
-                            viewContext.delete(checklistItem)
-                            do {
-                                try viewContext.save()
-                            } catch {
-                                print("Failed to delete checklist item: \(error)")
-                            }
-                        }) {
-                            Text("Delete Item")
-                            Image(systemName: "trash")
-                        }
+                ForEach(filteredChecklists, id: \.self) { checklist in
+                    NavigationLink(destination: CustomChecklistItemDetailView(checklist: checklist)) {
+                        Text(checklist.title ?? "Unknown")
+                            .font(.headline)
                     }
                 }
             }
         }.navigationTitle("Checklist")
     }
     
-    var filteredChecklistItems: [CustomChecklistItem] {
+    var filteredChecklists: [CustomChecklist] {
         if searchText.isEmpty {
-            return Array(checklistItems)
+            return Array(checklists)
         } else {
-            return Array(checklistItems).filter {
-                $0.title?.contains(searchText) ?? false ||
-                $0.item?.contains(searchText) ?? false
+            return Array(checklists).filter {
+                $0.title?.contains(searchText) ?? false
             }
         }
     }
 }
 
-struct AddCustomChecklistItemView: View {
+
+struct AddCustomChecklistView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.managedObjectContext) private var viewContext
     @State private var newTitle = ""
-    @State private var newItem = ""
-    var onAddChecklistItem: (() -> Void)?
+    var onAddChecklist: (() -> Void)?
 
     var body: some View {
         ZStack {
@@ -108,17 +80,11 @@ struct AddCustomChecklistItemView: View {
             }
             
             VStack {
-                Text("Add Checklist Item")
+                Text("Add Checklist")
                     .font(.title)
                     .padding()
                 VStack{
                     TextField("Title", text: $newTitle)
-                        .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
-                        .background(Color(.darkGray))
-                        .cornerRadius(10)
-                        .textFieldStyle(PlainTextFieldStyle())
-                    
-                    TextField("Item", text: $newItem)
                         .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
                         .background(Color(.darkGray))
                         .cornerRadius(10)
@@ -131,23 +97,22 @@ struct AddCustomChecklistItemView: View {
                     }
                     Spacer()
                     Button("Add") {
-                        let newChecklistItem = CustomChecklistItem(context: viewContext)
-                        newChecklistItem.title = newTitle
-                        newChecklistItem.item = newItem
-                        newChecklistItem.isChecked = false
+                        let newChecklist = CustomChecklist(context: viewContext)
+                        newChecklist.title = newTitle
                         do {
                             try viewContext.save()
-                            onAddChecklistItem?()
+                            onAddChecklist?()
                             presentationMode.wrappedValue.dismiss()
                         } catch {
-                            print("Failed to add checklist item: \(error)")
+                            print("Failed to add checklist: \(error)")
                         }
                     }
                 }
                 .padding()
                 .frame(width: 250, height: 50)
             }
-            .navigationTitle("Add Checklist Item")
+            .navigationTitle("Add Checklist")
         }
     }
 }
+

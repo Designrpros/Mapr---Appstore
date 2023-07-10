@@ -8,20 +8,28 @@
 import SwiftUI
 import CoreData
 
+
 class CustomChecklistViewModel: ObservableObject {
     @Published var checklistItems: [CustomChecklistItem] = []
     private var viewContext: NSManagedObjectContext?
+    private var checklist: CustomChecklist?
 
-    func setup(viewContext: NSManagedObjectContext) {
+    func setup(viewContext: NSManagedObjectContext, checklist: CustomChecklist) {
         self.viewContext = viewContext
+        self.checklist = checklist
         fetchChecklistItems()
     }
+    init(checklist: CustomChecklist) {
+        self.checklist = checklist
+    }
+
 
     func fetchChecklistItems() {
-        guard let viewContext = viewContext else { return }
+        guard let viewContext = viewContext, let checklist = checklist else { return }
         
         let fetchRequest: NSFetchRequest<CustomChecklistItem> = CustomChecklistItem.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \CustomChecklistItem.creationDate, ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "checklist == %@", checklist.objectID)
 
         do {
             checklistItems = try viewContext.fetch(fetchRequest)
@@ -29,18 +37,6 @@ class CustomChecklistViewModel: ObservableObject {
         } catch {
             print("Failed to fetch checklist items: \(error)")
         }
-    }
-
-    private func flatten(items: [CustomChecklistItem]) -> [CustomChecklistItem] {
-        var flattenedItems: [CustomChecklistItem] = []
-        for item in items {
-            flattenedItems.append(item)
-            if let childrenSet = item.childern as? Set<CustomChecklistItem> {
-                let childrenArray = Array(childrenSet)
-                flattenedItems.append(contentsOf: flatten(items: childrenArray))
-            }
-        }
-        return flattenedItems
     }
 
     func saveContext() {
@@ -55,16 +51,19 @@ class CustomChecklistViewModel: ObservableObject {
     }
 }
 
+
 struct CustomChecklistItemDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @ObservedObject var checklistItem: CustomChecklistItem
+    @ObservedObject var checklist: CustomChecklist
     @ObservedObject var viewModel: CustomChecklistViewModel
-    
-    init(checklistItem: CustomChecklistItem) {
-        self.checklistItem = checklistItem
-        self.viewModel = CustomChecklistViewModel()
-        self.viewModel.setup(viewContext: checklistItem.managedObjectContext ?? NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType))
+
+    init(checklist: CustomChecklist) {
+        self.checklist = checklist
+        self.viewModel = CustomChecklistViewModel(checklist: checklist)
     }
+    
+    
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack(spacing: 0) {
@@ -99,6 +98,7 @@ struct CustomChecklistItemDetailView: View {
                 newChecklistItem.id = UUID() // Assign a new UUID to each ChecklistItem object
                 newChecklistItem.item = ""
                 newChecklistItem.isChecked = false
+                newChecklistItem.checklist = checklist
                 print(newChecklistItem) // Print the newChecklistItem
                 viewModel.saveContext()
             }) {
@@ -115,7 +115,7 @@ struct CustomChecklistItemDetailView: View {
         }
         .padding()
         .onAppear {
-            viewModel.setup(viewContext: viewContext)
+            viewModel.setup(viewContext: viewContext, checklist: checklist)
         }
     }
     
@@ -167,7 +167,7 @@ struct CustomChecklistItemDetailView: View {
                         newChecklistItem.item = ""
                         newChecklistItem.isChecked = false
                         newChecklistItem.creationDate = Date() // Set the creation date to the current date
-                        checklistItem.addToChildern(newChecklistItem) // Manually add the new item to the parent's children
+                        checklistItem.addToChildren(newChecklistItem) // Manually add the new item to the parent's children
                         newChecklistItem.parent = checklistItem // Set the parent of the new item
                         viewModel.saveContext() // Call saveContext on the viewModel
                     }) {
@@ -188,3 +188,11 @@ struct CustomChecklistItemDetailView: View {
     }
 }
 
+extension CustomChecklistItem {
+    func addToChildren(_ value: CustomChecklistItem) {
+        let items = self.childern as? Set<CustomChecklistItem> ?? []
+        var newItems = items
+        newItems.insert(value)
+        self.childern = newItems as NSSet
+    }
+}
