@@ -14,6 +14,8 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
     static let shared = SignInWithAppleManager()
     
     @Published var isSignedIn = false
+    @Published var userName: String = ""
+    @Published var userEmail: String = ""
 
     func handleSignInWithApple() {
         let appleIDProvider = ASAuthorizationAppleIDProvider()
@@ -48,6 +50,10 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
                 }
             }
 
+            // Store the user's name and email
+            self.userName = name
+            self.userEmail = email ?? ""
+
             isSignedIn = true
         }
     }
@@ -57,6 +63,7 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
         print("Sign in with Apple errored: \(error)")
     }
 }
+
 
 
 
