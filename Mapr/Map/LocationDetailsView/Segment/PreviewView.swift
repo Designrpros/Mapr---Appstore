@@ -95,26 +95,26 @@ struct PreviewView: View {
 
             
             // Gallery
-            VStack(alignment: .leading) {
-                Text("Gallery")
-                    .font(.headline)
-                    .padding(.top)
-                
-                if let imagesSet = project.galleryImage as? Set<GalleryImage>, !imagesSet.isEmpty {
-                    let imagesArray = Array(imagesSet)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
-                        ForEach(imagesArray, id: \.id) { galleryImage in
-                            if let imageData = galleryImage.imageData, let nsImage = NSImage(data: imageData) {
-                                Image(nsImage: nsImage)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                            }
-                        }
-                    }
-                } else {
-                    Text("No images")
-                }
-            }
+           // VStack(alignment: .leading) {
+           //     Text("Gallery")
+           //         .font(.headline)
+           //         .padding(.top)
+           //
+           //     if let imagesSet = project.galleryImage as? Set<GalleryImage>, !imagesSet.isEmpty {
+           //         let imagesArray = Array(imagesSet)
+           //        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
+           //             ForEach(imagesArray, id: \.id) { galleryImage in
+           //                 if let imageData = galleryImage.imageData, let nsImage = NSImage(data: imageData) {
+           //                     Image(nsImage: nsImage)
+           //                         .resizable()
+           //                         .aspectRatio(contentMode: .fit)
+           //                 }
+           //             }
+           //         }
+           //     } else {
+           //         Text("No images")
+           //     }
+           // }
             
             // TimeTracker data
             VStack(alignment: .leading) {
