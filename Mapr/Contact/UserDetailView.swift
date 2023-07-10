@@ -2,7 +2,14 @@ import SwiftUI
 import CloudKit
 
 struct UserDetailView: View {
-    var user: User  // Assuming you have a User model
+    @State var selectedRoleIndex: Int
+    let user: User
+    let roles = ["Admin", "User", "Guest"]
+    
+    init(user: User) {
+            self.user = user
+            _selectedRoleIndex = State(initialValue: roles.firstIndex(of: user.role) ?? 0)
+        }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -32,9 +39,15 @@ struct UserDetailView: View {
             HStack {
                 Image(systemName: "person.fill.questionmark")
                     .foregroundColor(.gray)
-                Text(user.role)
+                Text(roles[selectedRoleIndex])
                     .font(.headline)
             }
+            Picker(selection: $selectedRoleIndex, label: Text("Role")) {
+                ForEach(0..<roles.count) {
+                    Text(self.roles[$0]).tag($0)
+                }
+            }
+
             
             HStack {
                 Image(systemName: "doc.text")
@@ -47,6 +60,10 @@ struct UserDetailView: View {
         }
         .padding()
         .navigationTitle(Text(user.name))
+        .onAppear {
+            // Set the initial selected role index based on the user's current role
+            self.selectedRoleIndex = roles.firstIndex(of: user.role) ?? 0
+        }
     }
 }
 
