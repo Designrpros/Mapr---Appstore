@@ -57,5 +57,21 @@ class CloudKitManager: ObservableObject {
             }
         }
     }
-
+    
+    func createParticipantForUser(user: User, completion: @escaping (CKShare.Participant?, Error?) -> Void) {
+        let operation = CKFetchShareParticipantsOperation(userIdentityLookupInfos: [CKUserIdentity.LookupInfo(emailAddress: user.email)])
+        operation.shareParticipantFetchedBlock = { participant in
+            DispatchQueue.main.async {
+                completion(participant, nil)
+            }
+        }
+        operation.fetchShareParticipantsCompletionBlock = { error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+            }
+        }
+        CKContainer.default().add(operation)
+    }
 }

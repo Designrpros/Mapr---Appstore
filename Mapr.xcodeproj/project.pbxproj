@@ -13,6 +13,7 @@
 		AD7AB5E82A5A84C700D7F5E6 /* Project+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E42A5A84C700D7F5E6 /* Project+CoreDataProperties.swift */; };
 		AD7AB5EB2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */; };
 		AD7AB5EC2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */; };
+		AD7AB5F22A5BB6F300D7F5E6 /* ProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AB5F12A5BB6F300D7F5E6 /* ProjectManager.swift */; };
 		ADB556032A57F618004D089E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556022A57F618004D089E /* Users.swift */; };
 		ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556042A57FE64004D089E /* UserDetailView.swift */; };
 		ADB556072A5809D1004D089E /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556062A5809D1004D089E /* CloudKitManager.swift */; };
@@ -72,6 +73,7 @@
 		AD7AB5E42A5A84C700D7F5E6 /* Project+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		AD7AB5E92A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectedUserEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		AD7AB5EA2A5A8B8E00D7F5E6 /* SelectedUserEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectedUserEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		AD7AB5F12A5BB6F300D7F5E6 /* ProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectManager.swift; sourceTree = "<group>"; };
 		ADB555BB2A55E61F004D089E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ADB556022A57F618004D089E /* Users.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
 		ADB556042A57FE64004D089E /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				ADF4286E2A53A7AA0096D87D /* Constants.swift */,
 				ADF428702A53A7B80096D87D /* Settingsview.swift */,
 				ADB556082A593384004D089E /* UserManager.swift */,
+				AD7AB5F12A5BB6F300D7F5E6 /* ProjectManager.swift */,
 				ADF428782A53A8030096D87D /* Map */,
 				ADF4288E2A53A8FE0096D87D /* Contact */,
 				ADF428452A53A7490096D87D /* Assets.xcassets */,
@@ -409,6 +412,7 @@
 				ADB556092A593384004D089E /* UserManager.swift in Sources */,
 				AD7AB5E52A5A84C700D7F5E6 /* UserEntity+CoreDataClass.swift in Sources */,
 				AD7AB5E72A5A84C700D7F5E6 /* Project+CoreDataClass.swift in Sources */,
+				AD7AB5F22A5BB6F300D7F5E6 /* ProjectManager.swift in Sources */,
 				ADF428732A53A7C80096D87D /* MapListView.swift in Sources */,
 				ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */,
 				ADF4288B2A53A8E50096D87D /* ContactListView.swift in Sources */,

@@ -92,6 +92,7 @@ struct LocationDetailView: View {
     @Environment(\.managedObjectContext) var context
 
     var location: Location
+    let projectManager = ProjectManager()
 
 
     var body: some View {
@@ -381,66 +382,6 @@ struct LocationDetailView: View {
             .background(Color("AccentColor"))
         }
     }
-    
-#if os(macOS)
-    func shareProject() {
-        guard let recordName = project.recordID else {
-            print("Project does not have a CKRecord ID")
-            return
-        }
-
-        let recordID = CKRecord.ID(recordName: recordName)
-        let fetchRecordsOperation = CKFetchRecordsOperation(recordIDs: [recordID])
-        fetchRecordsOperation.fetchRecordsCompletionBlock = { records, error in
-            if let error = error {
-                print("Failed to fetch CKRecord: \(error)")
-            } else if let projectRecord = records?[recordID] {
-                let share = CKShare(rootRecord: projectRecord)
-                share[CKShare.SystemFieldKey.title] = "Shared Project" as CKRecordValue?
-                share[CKShare.SystemFieldKey.shareType] = "com.yourcompany.yourappname.project" as CKRecordValue?
-
-                // Create a CustomCKShareMetadata object and save it to CoreData
-                let shareMetadata = CustomCKShareMetadata(context: managedObjectContext)
-                shareMetadata.recordName = share.recordID.recordName
-                shareMetadata.recordType = share.recordType
-                shareMetadata.shareURL = share.url
-                shareMetadata.sharedRecordName = projectRecord.recordID.recordName
-                shareMetadata.sharedRecordType = projectRecord.recordType
-                shareMetadata.ownerName = share.owner.userIdentity.userRecordID?.recordName
-                shareMetadata.ownerAcceptStatus = Int16(share.owner.acceptanceStatus.rawValue)
-                shareMetadata.participantStatus = Int16(share.currentUserParticipant?.acceptanceStatus.rawValue ?? CKShare.ParticipantAcceptanceStatus.unknown.rawValue)
-                shareMetadata.participantType = Int16(share.currentUserParticipant?.role.rawValue ?? CKShare.Participant.Role.unknown.rawValue)
-                shareMetadata.participantPermission = Int16(share.currentUserParticipant?.permission.rawValue ?? 0)
-
-                do {
-                    try managedObjectContext.save()
-                } catch {
-                    print("Failed to save share metadata: \(error)")
-                }
-
-                let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: [projectRecord], recordIDsToDelete: nil)
-                modifyRecordsOperation.modifyRecordsCompletionBlock = { (savedRecords: [CKRecord]?, deletedRecordIDs: [CKRecord.ID]?, error: Error?) in
-                    if let error = error {
-                        print("Failed to create share: \(error)")
-                    } else {
-                        DispatchQueue.main.async {
-                            guard let url = share.url else {
-                                print("Share does not have a URL")
-                                return
-                            }
-
-                            let picker = NSSharingServicePicker(items: [url])
-                            picker.show(relativeTo: NSRect(), of: NSView(), preferredEdge: .minY)
-                        }
-                    }
-                }
-
-                CKContainer.default().privateCloudDatabase.add(modifyRecordsOperation)
-            }
-        }
-        CKContainer.default().privateCloudDatabase.add(fetchRecordsOperation)
-    }
-#endif
 }
     
 
@@ -455,6 +396,7 @@ struct AddUserModal: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
     @State private var allUsers: [User] = []
+    let projectManager = ProjectManager()
 
     var body: some View {
         VStack {
@@ -492,6 +434,8 @@ struct AddUserModal: View {
                                 }
                             }
                         }
+                        // Share the project with the newly added user
+                        projectManager.shareProjectWithSelectedUsers(project: project, selectedUsers: selectedUsers)
                     }) {
                         HStack {
                             Image(systemName: "person.crop.circle")
@@ -504,6 +448,7 @@ struct AddUserModal: View {
                         }
                     }
                     .buttonStyle(BorderlessButtonStyle())
+
                 }
             }
             .frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
