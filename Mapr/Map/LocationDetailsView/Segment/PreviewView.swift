@@ -237,80 +237,40 @@ struct PreviewView: View {
             if response == .OK, let directoryURL = panel.url {
                 let pdfURL = directoryURL.appendingPathComponent("preview.pdf")
 
-                guard let consumer = CGDataConsumer(url: pdfURL as CFURL),
-                      let pdfContext = CGContext(consumer: consumer, mediaBox: nil, nil) else {
-                    return
-                }
-
-                // Create a cover page
-                let coverPage = VStack {
-                    Spacer()
-                    Text(project.location?.name ?? "No Address Title")
-                        .font(.title)
-                    Text("\(project.location?.postalCode ?? ""), \(project.location?.city ?? ""), \(project.location?.country ?? "")")
-                        .font(.subheadline)
-                    // Project Description
-                    Text(project.projectDescription.bound)
-                        .padding(.top)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    Spacer()
-                    if let contact = project.contact {
-                        VStack(alignment: .leading){
-                            HStack {
-                                Image(systemName: "person.fill")
-                                Text("\(contact.name ?? "Unknown")")
-                            }
-                            HStack {
-                                Image(systemName: "envelope.fill")
-                                Text("\(contact.email ?? "Unknown")")
-                            }
-                            HStack {
-                                Image(systemName: "phone.fill")
-                                Text(" \(contact.phone ?? "Unknown")")
-                            }
-                            HStack {
-                                Image(systemName: "location.fill")
-                                Text(" \(contact.address ?? "Unknown")")
-                            }
-                        }.padding(.bottom)
-                         .frame(maxWidth: .infinity, alignment: .center)
-                        Spacer()
+                let renderer = ImageRenderer(content: pdfView)
+                renderer.render { size, context in
+                    var box = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+                    guard let pdfContext = CGContext(pdfURL as CFURL, mediaBox: &box, nil) else {
+                        return
                     }
-                }
-                .frame(width: pdfWidth, height: pdfHeight)
-                let coverRenderer = ImageRenderer(content: coverPage)
-                guard let coverCGImage = coverRenderer.cgImage else { return }
 
-                let margin = CGFloat(20) // Adjust this to change the margin size
-                let contentRect = CGRect(x: margin, y: margin, width: pdfWidth - 2 * margin, height: pdfHeight - 2 * margin)
+                    let margin = CGFloat(20) // Adjust this to change the margin size
+                    let contentRect = CGRect(x: margin, y: margin, width: box.width - 2 * margin, height: box.height - 2 * margin)
 
-                // Draw the cover page
-                pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
-                pdfContext.draw(coverCGImage, in: contentRect)
-                pdfContext.endPDFPage()
+                    // Draw the rest of the pages
+                    for pageIndex in 0..<pageCount {
+                        // Create a new view for each page
+                        let pageView = pdfView
+                            .frame(width: contentRect.width, height: contentRect.height)
+                            .offset(y: -CGFloat(pageIndex) * contentRect.height)
 
-                // Draw the rest of the pages
-                for pageIndex in 0..<pageCount {
-                    // Create a new view for each page
-                    let pageView = pdfView
-                        .frame(width: contentRect.width, height: contentRect.height)
-                        .offset(y: -CGFloat(pageIndex) * contentRect.height)
+                        let renderer = ImageRenderer(content: pageView)
+                        guard let cgImage = renderer.cgImage else { continue }
 
-                    let renderer = ImageRenderer(content: pageView)
-                    guard let cgImage = renderer.cgImage else { continue }
+                        pdfContext.beginPDFPage(nil)
+                        pdfContext.draw(cgImage, in: contentRect)
+                        pdfContext.endPDFPage()
+                    }
 
-                    pdfContext.beginPDFPage([kCGPDFContextMediaBox as String: CGRect(origin: .zero, size: CGSize(width: pdfWidth, height: pdfHeight))] as CFDictionary)
-                    pdfContext.draw(cgImage, in: contentRect)
-                    pdfContext.endPDFPage()
-                }
+                    pdfContext.closePDF()
 
-                pdfContext.closePDF()
-
-                DispatchQueue.main.async {
-                    isPDFSaved = true
+                    DispatchQueue.main.async {
+                        isPDFSaved = true
+                    }
                 }
             }
         }
     }
+
 }
 #endif
