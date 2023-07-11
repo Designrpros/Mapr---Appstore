@@ -69,7 +69,7 @@ struct TabBar: View {
         HStack {
             TabButton(icon: "mappin.and.ellipse", tabNumber: 0, selectedTab: $selectedTab)
             TabButton(icon: "person.2.fill", tabNumber: 1, selectedTab: $selectedTab)
-            TabButton(icon: "person.2.fill", tabNumber: 2, selectedTab: $selectedTab)
+            TabButton(icon: "list.bullet", tabNumber: 2, selectedTab: $selectedTab)
         }
         .frame(height: 60)
         .background(Color.accentColor)
