@@ -249,28 +249,95 @@ struct ChecklistView: View {
         .cornerRadius(5)
     }
 }
+
 struct CustomChecklistSelectionView: View {
-    @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \CustomChecklist.title, ascending: true)],
         animation: .default)
     private var checklists: FetchedResults<CustomChecklist>
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.presentationMode) var presentationMode
+    @State private var searchText = ""
     @Binding var selectedChecklist: CustomChecklist?
     var viewModel: ChecklistViewModel
     var dismiss: () -> Void
     
     var body: some View {
-        List {
-            ForEach(checklists) { checklist in
+        ZStack {
+            Color.clear
+            .contentShape(Rectangle())
+            .onTapGesture {
+                dismiss()
+            }
+            
+            VStack {
+                HStack {
+                    TextField("Search...", text: $searchText)
+                        .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+                        .background(Color(.darkGray))
+                        .cornerRadius(10)
+                        .textFieldStyle(PlainTextFieldStyle())
+                }
+                .padding([.horizontal, .top])
+                
+                List {
+                    ForEach(filteredChecklists, id: \.self) { checklist in
+                        HStack {
+                            Button(action: {
+                                viewModel.addItems(from: checklist)
+                                dismiss()
+                            }) {
+                                HStack {
+                                    Image(systemName: "list.bullet")
+                                        .resizable()
+                                        .frame(width: 20, height: 20) // Adjusted the icon size
+                                    VStack(alignment: .leading) {
+                                        Text(checklist.title ?? "Unknown")
+                                            .font(.headline)
+                                    }
+                                }
+                            }
+                            .buttonStyle(BorderlessButtonStyle())
+                            Spacer()
+                        }
+                        .contextMenu {
+                            Button(action: {
+                                viewContext.delete(checklist)
+                                do {
+                                    try viewContext.save()
+                                } catch {
+                                    print("Failed to delete checklist: \(error)")
+                                }
+                            }) {
+                                Text("Delete Checklist")
+                                Image(systemName: "trash")
+                            }
+                        }
+                    }
+                }.frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
+                
                 Button(action: {
-                    viewModel.addItems(from: checklist)
                     dismiss()
                 }) {
-                    Text(checklist.title ?? "Unknown")
-                }
+                    Text("Cancel")
+                        .font(.headline)
+                }.padding()
+            }
+            .navigationTitle("Checklists")
+        }
+    }
+    
+    var filteredChecklists: [CustomChecklist] {
+        if searchText.isEmpty {
+            return Array(checklists)
+        } else {
+            return Array(checklists).filter {
+                $0.title?.contains(searchText) ?? false
             }
         }
     }
 }
+
+
 
 
