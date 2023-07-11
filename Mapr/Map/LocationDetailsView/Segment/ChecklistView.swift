@@ -29,6 +29,7 @@ class ChecklistViewModel: ObservableObject {
         }
     }
 
+
     func addItems(from customChecklist: CustomChecklist) {
         guard let viewContext = viewContext else { return }
         
@@ -45,12 +46,12 @@ class ChecklistViewModel: ObservableObject {
         newChecklistItem.id = UUID()
         newChecklistItem.item = customChecklistItem.item
         newChecklistItem.isChecked = customChecklistItem.isChecked
+        newChecklistItem.creationDate = Date() // Set the creation date to the current date
 
-        if let customChildren = customChecklistItem.childern as? Set<CustomChecklistItem> {
-            for customChild in customChildren {
+        if let customChildern = customChecklistItem.childern as? Set<CustomChecklistItem> {
+            for customChild in customChildern {
                 let newChild = createChecklistItem(from: customChild, in: context)
                 newChecklistItem.addToChildren(newChild)
-                newChild.parent = newChecklistItem
             }
         }
 
