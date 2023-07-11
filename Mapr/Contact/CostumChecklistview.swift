@@ -44,6 +44,12 @@ struct CustomChecklistView: View {
             List {
                 ForEach(filteredChecklists, id: \.self) { checklist in
                     HStack {
+                        Image(systemName: "list.bullet") // Use a system image as an example
+                            .resizable()
+                            .frame(width: 15, height: 15) // Set the size of the image
+                            .padding(.trailing, 10) // Add some padding to the right of the image
+                            
+                        
                         TextField("Title", text: Binding(get: {
                             checklist.title ?? "Unknown"
                         }, set: {
@@ -57,6 +63,7 @@ struct CustomChecklistView: View {
                         NavigationLink(destination: CustomChecklistItemDetailView(checklist: checklist, viewContext: viewContext)) {
                         }
                     }
+                    .padding(10)
                     .contextMenu {
                         Button(action: {
                             viewContext.delete(checklist)
@@ -68,6 +75,7 @@ struct CustomChecklistView: View {
                     }
                 }
             }
+
 
 
 
