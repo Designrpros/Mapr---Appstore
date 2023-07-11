@@ -62,6 +62,7 @@ struct CustomChecklistItemDetailView: View {
     
     
     var body: some View {
+        ScrollView{
         VStack(alignment: .leading) {
             HStack(spacing: 0) {
                 Text("Item")
@@ -117,71 +118,73 @@ struct CustomChecklistItemDetailView: View {
             viewModel.setup(viewContext: viewContext, checklist: checklist)
         }
     }
+}
     
-    private func checklistRow(checklistItem: CustomChecklistItem) -> some View {
-        HStack(spacing: 0) {
-            TextField("Description", text: Binding(get: {
-                checklistItem.item ?? ""
-            }, set: {
-                checklistItem.item = $0
-                try? viewContext.save()
-            }))
-            .frame(maxWidth: .infinity)
-            .padding()
-            .cornerRadius(5)
-            .textFieldStyle(PlainTextFieldStyle())
-
-            Toggle("", isOn: Binding(get: {
-                checklistItem.isChecked
-            }, set: {
-                checklistItem.isChecked = $0
-                viewModel.saveContext()
-            }))
-            .frame(maxWidth: .infinity)
-            .padding()
-            .cornerRadius(5)
-
-            HStack(spacing: 20) {
-                Button(action: {
-                    if let parent = checklistItem.parent {
-                        parent.removeFromChildern(checklistItem) // Use the generated accessor method to remove the item from the parent's children set
-                    } else {
-                        viewContext.delete(checklistItem)
-                    }
-                    viewModel.saveContext() // Call saveContext on the viewModel
-                }) {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
-                        .font(.body)
-                }
-                .buttonStyle(BorderlessButtonStyle())
-
-                if checklistItem.parent == nil {
+        private func checklistRow(checklistItem: CustomChecklistItem) -> some View {
+            HStack(spacing: 0) {
+                TextField("Description", text: Binding(get: {
+                    checklistItem.item ?? ""
+                }, set: {
+                    checklistItem.item = $0
+                    try? viewContext.save()
+                }))
+                .frame(maxWidth: .infinity)
+                .padding()
+                .cornerRadius(5)
+                .textFieldStyle(PlainTextFieldStyle())
+                
+                Toggle("", isOn: Binding(get: {
+                    checklistItem.isChecked
+                }, set: {
+                    checklistItem.isChecked = $0
+                    viewModel.saveContext()
+                }))
+                .frame(maxWidth: .infinity)
+                .padding()
+                .cornerRadius(5)
+                
+                HStack(spacing: 20) {
                     Button(action: {
-                        let newChecklistItem = CustomChecklistItem(context: self.viewContext)
-                        newChecklistItem.id = UUID() // Assign a new UUID to each ChecklistItem object
-                        newChecklistItem.item = ""
-                        newChecklistItem.isChecked = false
-                        newChecklistItem.creationDate = Date() // Set the creation date to the current date
-                        checklistItem.addToChildern(newChecklistItem) // Use the generated accessor method to add the new item to the children set
-                        newChecklistItem.parent = checklistItem // Set the parent of the new item
+                        if let parent = checklistItem.parent {
+                            parent.removeFromChildern(checklistItem) // Use the generated accessor method to remove the item from the parent's children set
+                        } else {
+                            viewContext.delete(checklistItem)
+                        }
                         viewModel.saveContext() // Call saveContext on the viewModel
                     }) {
-                        Image(systemName: "plus")
-                            .foregroundColor(.blue)
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
                             .font(.body)
                     }
                     .buttonStyle(BorderlessButtonStyle())
+                    
+                    if checklistItem.parent == nil {
+                        Button(action: {
+                            let newChecklistItem = CustomChecklistItem(context: self.viewContext)
+                            newChecklistItem.id = UUID() // Assign a new UUID to each ChecklistItem object
+                            newChecklistItem.item = ""
+                            newChecklistItem.isChecked = false
+                            newChecklistItem.creationDate = Date() // Set the creation date to the current date
+                            checklistItem.addToChildern(newChecklistItem) // Use the generated accessor method to add the new item to the children set
+                            newChecklistItem.parent = checklistItem // Set the parent of the new item
+                            viewModel.saveContext() // Call saveContext on the viewModel
+                        }) {
+                            Image(systemName: "plus")
+                                .foregroundColor(.blue)
+                                .font(.body)
+                        }
+                        .buttonStyle(BorderlessButtonStyle())
+                    }
                 }
+                .padding()
+                .cornerRadius(5)
+                .frame(maxWidth: .infinity)
+                
             }
-            .padding()
+            .background(Color.gray.opacity(0.1))
             .cornerRadius(5)
-            .frame(maxWidth: .infinity)
             
         }
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(5)
-    }
 }
 
 extension CustomChecklistItem {
