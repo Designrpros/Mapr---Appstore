@@ -29,7 +29,19 @@ class ChecklistViewModel: ObservableObject {
         }
     }
 
-
+    func addItems(from customChecklist: CustomChecklist) {
+            guard let viewContext = viewContext else { return }
+            
+            for customChecklistItem in customChecklist.items as? Set<CustomChecklistItem> ?? [] {
+                let newChecklistItem = ChecklistItem(context: viewContext)
+                newChecklistItem.id = UUID()
+                newChecklistItem.item = customChecklistItem.item
+                newChecklistItem.isChecked = customChecklistItem.isChecked
+                newChecklistItem.project = project
+            }
+            
+            saveContext()
+        }
 
 
     private func flatten(items: [ChecklistItem]) -> [ChecklistItem] {
@@ -121,6 +133,17 @@ struct ChecklistView: View {
         .padding()
         .onAppear {
             viewModel.setup(viewContext: viewContext, project: project)
+            if let selected = selectedChecklist {
+                for item in selected.items as? Set<CustomChecklistItem> ?? [] {
+                    let newChecklistItem = ChecklistItem(context: viewContext)
+                    newChecklistItem.id = UUID()
+                    newChecklistItem.item = item.item
+                    newChecklistItem.isChecked = item.isChecked
+                    newChecklistItem.project = project
+                    viewModel.saveContext()
+                }
+                selectedChecklist = nil
+            }
         }
     }
     
@@ -176,8 +199,12 @@ struct ChecklistView: View {
                 }
                 .buttonStyle(BorderlessButtonStyle())
                 .sheet(isPresented: $showingCustomChecklistModal) {
-                    CustomChecklistSelectionView(selectedChecklist: $selectedChecklist)
+                    CustomChecklistSelectionView(selectedChecklist: $selectedChecklist, viewModel: viewModel, dismiss: {
+                        self.showingCustomChecklistModal = false
+                    })
                 }
+
+
 
 
                 if checklistItem.parent == nil {
@@ -216,12 +243,15 @@ struct CustomChecklistSelectionView: View {
         animation: .default)
     private var checklists: FetchedResults<CustomChecklist>
     @Binding var selectedChecklist: CustomChecklist?
+    var viewModel: ChecklistViewModel
+    var dismiss: () -> Void
     
     var body: some View {
         List {
             ForEach(checklists) { checklist in
                 Button(action: {
-                    selectedChecklist = checklist
+                    viewModel.addItems(from: checklist)
+                    dismiss()
                 }) {
                     Text(checklist.title ?? "Unknown")
                 }
@@ -229,3 +259,5 @@ struct CustomChecklistSelectionView: View {
         }
     }
 }
+
+
