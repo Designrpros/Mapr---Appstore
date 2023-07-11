@@ -35,21 +35,22 @@ struct CustomChecklistView: View {
                 .padding(.leading, 8)
                 .buttonStyle(BorderlessButtonStyle())
                 .sheet(isPresented: $showingAddChecklistItem) {
-                    AddCustomChecklistView {
-                        // Refresh the checklists array when a new checklist is added
-                    }
+                    AddCustomChecklistView(onAddChecklist: nil)
                 }
+
             }
             .padding([.horizontal, .top])
             
             List {
                 ForEach(filteredChecklists, id: \.self) { checklist in
-                    NavigationLink(destination: CustomChecklistItemDetailView(checklist: checklist)) {
+                    NavigationLink(destination: CustomChecklistItemDetailView(checklist: checklist, viewContext: viewContext)) {
                         Text(checklist.title ?? "Unknown")
                             .font(.headline)
                     }
                 }
             }
+
+
         }.navigationTitle("Checklist")
     }
     

@@ -8,7 +8,6 @@
 import SwiftUI
 import CoreData
 
-
 class CustomChecklistViewModel: ObservableObject {
     @Published var checklistItems: [CustomChecklistItem] = []
     private var viewContext: NSManagedObjectContext?
@@ -18,22 +17,6 @@ class CustomChecklistViewModel: ObservableObject {
         self.viewContext = viewContext
         self.checklist = checklist
         fetchChecklistItems()
-    }
-    init(checklist: CustomChecklist) {
-        self.checklist = checklist
-    }
-
-
-    func saveContext() {
-        guard let viewContext = viewContext else { return }
-        
-        do {
-            try viewContext.save()
-            print("Context Saved Successfully") // Print after successful save
-            fetchChecklistItems() // Fetch the checklist items again after saving the context.
-        } catch {
-            print("Failed to save context: \(error)") // Print the error
-        }
     }
 
     func fetchChecklistItems() {
@@ -45,12 +28,24 @@ class CustomChecklistViewModel: ObservableObject {
 
         do {
             checklistItems = try viewContext.fetch(fetchRequest)
-            print("Fetched Checklist Items: \(checklistItems)") // Print the fetched items
+            print(checklistItems) // Print the fetched items
         } catch {
             print("Failed to fetch checklist items: \(error)")
         }
     }
+
+    func saveContext() {
+        guard let viewContext = viewContext else { return }
+        
+        do {
+            try viewContext.save()
+            fetchChecklistItems() // Fetch the checklist items again after saving the context.
+        } catch {
+            print("Failed to save context: \(error)") // Print the error
+        }
+    }
 }
+
 
 
 struct CustomChecklistItemDetailView: View {
@@ -58,9 +53,10 @@ struct CustomChecklistItemDetailView: View {
     @ObservedObject var checklist: CustomChecklist
     @ObservedObject var viewModel: CustomChecklistViewModel
 
-    init(checklist: CustomChecklist) {
+    init(checklist: CustomChecklist, viewContext: NSManagedObjectContext) {
         self.checklist = checklist
-        self.viewModel = CustomChecklistViewModel(checklist: checklist)
+        self.viewModel = CustomChecklistViewModel()
+        self.viewModel.setup(viewContext: viewContext, checklist: checklist)
     }
     
     
