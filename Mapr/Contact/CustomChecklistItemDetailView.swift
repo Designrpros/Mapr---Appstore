@@ -145,9 +145,6 @@ struct CustomChecklistItemDetailView: View {
                 Button(action: {
                     if let parent = checklistItem.parent {
                         parent.removeFromChildern(checklistItem) // Use the generated accessor method to remove the item from the parent's children set
-                        if parent.childern?.count == 0 {
-                            viewContext.delete(parent)
-                        }
                     } else {
                         viewContext.delete(checklistItem)
                     }
