@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22D68" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
-    <entity name="ChecklistItem" representedClassName="ChecklistItem" syncable="YES">
+    <entity name="ChecklistItem" representedClassName="ChecklistItem" syncable="YES" codeGenerationType="class">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -17,11 +17,11 @@
         <attribute name="phone" optional="YES" attributeType="String"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="contact" inverseEntity="Project"/>
     </entity>
-    <entity name="CustomChecklist" representedClassName="CustomChecklist" syncable="YES">
+    <entity name="CustomChecklist" representedClassName="CustomChecklist" syncable="YES" codeGenerationType="class">
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CustomChecklistItem" inverseName="checklist" inverseEntity="CustomChecklistItem"/>
     </entity>
-    <entity name="CustomChecklistItem" representedClassName="CustomChecklistItem" syncable="YES">
+    <entity name="CustomChecklistItem" representedClassName="CustomChecklistItem" syncable="YES" codeGenerationType="class">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -66,7 +66,7 @@
         <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="material" inverseEntity="Project"/>
     </entity>
-    <entity name="Project" representedClassName="Project" syncable="YES">
+    <entity name="Project" representedClassName="Project" syncable="YES" codeGenerationType="class">
         <attribute name="addressDescription" optional="YES" attributeType="String"/>
         <attribute name="addressSubtitle" optional="YES" attributeType="String"/>
         <attribute name="addressTitle" optional="YES" attributeType="String"/>
@@ -85,7 +85,7 @@
         <relationship name="timeTracker" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TimeTracker" inverseName="project" inverseEntity="TimeTracker"/>
         <relationship name="users" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserEntity" inverseName="project" inverseEntity="UserEntity"/>
     </entity>
-    <entity name="SelectedUserEntity" representedClassName="SelectedUserEntity" syncable="YES">
+    <entity name="SelectedUserEntity" representedClassName="SelectedUserEntity" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="String"/>
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
@@ -101,7 +101,7 @@
         <attribute name="notes" optional="YES" attributeType="String"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="timeTracker" inverseEntity="Project"/>
     </entity>
-    <entity name="UserEntity" representedClassName="UserEntity" syncable="YES">
+    <entity name="UserEntity" representedClassName="UserEntity" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="String"/>
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>

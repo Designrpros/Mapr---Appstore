@@ -72,7 +72,7 @@ struct TabBar: View {
             TabButton(icon: "list.bullet", tabNumber: 2, selectedTab: $selectedTab)
         }
         .frame(height: 60)
-        .background(Color.accentColor)
+        .background(Color("AccentColor1"))
     }
 }
 

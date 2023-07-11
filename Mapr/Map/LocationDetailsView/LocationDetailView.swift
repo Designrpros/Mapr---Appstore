@@ -381,7 +381,7 @@ struct LocationDetailView: View {
                // NoteListView(isShowing: $isShowing)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color("AccentColor"))
+            .background(Color("AccentColor1"))
         }
     }
 }
