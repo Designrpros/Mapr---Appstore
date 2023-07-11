@@ -21,7 +21,7 @@ struct SettingsView: View {
                         deleteAll()
                         showRestartAlert = true
                     }) {
-                        Text("Delete All Projects & Contacts")
+                        Text("Delete All Projects, Contacts & Checklists")
                             .foregroundColor(.red)
                     }
                 }
@@ -44,36 +44,39 @@ struct SettingsView: View {
             }
         }
     }
-
+    
+    
+    private func deleteAll() {
+        let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = Location.fetchRequest()
+        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = Contact.fetchRequest()
+        let fetchRequest3: NSFetchRequest<NSFetchRequestResult> = Project.fetchRequest()
+        let fetchRequest4: NSFetchRequest<NSFetchRequestResult> = ChecklistItem.fetchRequest()
+        let fetchRequest5: NSFetchRequest<NSFetchRequestResult> = GalleryImage.fetchRequest()
+        let fetchRequest6: NSFetchRequest<NSFetchRequestResult> = Material.fetchRequest()
+        let fetchRequest7: NSFetchRequest<NSFetchRequestResult> = TimeTracker.fetchRequest()
+        let fetchRequest8: NSFetchRequest<NSFetchRequestResult> = CustomChecklist.fetchRequest() // Add this line
         
-        private func deleteAll() {
-            let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = Location.fetchRequest()
-            let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = Contact.fetchRequest()
-            let fetchRequest3: NSFetchRequest<NSFetchRequestResult> = Project.fetchRequest()
-            let fetchRequest4: NSFetchRequest<NSFetchRequestResult> = ChecklistItem.fetchRequest()
-            let fetchRequest5: NSFetchRequest<NSFetchRequestResult> = GalleryImage.fetchRequest()
-            let fetchRequest6: NSFetchRequest<NSFetchRequestResult> = Material.fetchRequest()
-            let fetchRequest7: NSFetchRequest<NSFetchRequestResult> = TimeTracker.fetchRequest()
-            
-            let batchDeleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
-            let batchDeleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
-            let batchDeleteRequest3 = NSBatchDeleteRequest(fetchRequest: fetchRequest3)
-            let batchDeleteRequest4 = NSBatchDeleteRequest(fetchRequest: fetchRequest4)
-            let batchDeleteRequest5 = NSBatchDeleteRequest(fetchRequest: fetchRequest5)
-            let batchDeleteRequest6 = NSBatchDeleteRequest(fetchRequest: fetchRequest6)
-            let batchDeleteRequest7 = NSBatchDeleteRequest(fetchRequest: fetchRequest7)
-            
-            do {
-                try managedObjectContext.execute(batchDeleteRequest1)
-                try managedObjectContext.execute(batchDeleteRequest2)
-                try managedObjectContext.execute(batchDeleteRequest3)
-                try managedObjectContext.execute(batchDeleteRequest4)
-                try managedObjectContext.execute(batchDeleteRequest5)
-                try managedObjectContext.execute(batchDeleteRequest6)
-                try managedObjectContext.execute(batchDeleteRequest7)
-                try managedObjectContext.save()
-            } catch {
-                print("Error deleting all entities: \(error)")
-            }
+        let batchDeleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
+        let batchDeleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
+        let batchDeleteRequest3 = NSBatchDeleteRequest(fetchRequest: fetchRequest3)
+        let batchDeleteRequest4 = NSBatchDeleteRequest(fetchRequest: fetchRequest4)
+        let batchDeleteRequest5 = NSBatchDeleteRequest(fetchRequest: fetchRequest5)
+        let batchDeleteRequest6 = NSBatchDeleteRequest(fetchRequest: fetchRequest6)
+        let batchDeleteRequest7 = NSBatchDeleteRequest(fetchRequest: fetchRequest7)
+        let batchDeleteRequest8 = NSBatchDeleteRequest(fetchRequest: fetchRequest8) // Add this line
+        
+        do {
+            try managedObjectContext.execute(batchDeleteRequest1)
+            try managedObjectContext.execute(batchDeleteRequest2)
+            try managedObjectContext.execute(batchDeleteRequest3)
+            try managedObjectContext.execute(batchDeleteRequest4)
+            try managedObjectContext.execute(batchDeleteRequest5)
+            try managedObjectContext.execute(batchDeleteRequest6)
+            try managedObjectContext.execute(batchDeleteRequest7)
+            try managedObjectContext.execute(batchDeleteRequest8) // Add this line
+            try managedObjectContext.save()
+        } catch {
+            print("Error deleting all entities: \(error)")
         }
     }
+}
