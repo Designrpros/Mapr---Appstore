@@ -43,12 +43,33 @@ struct CustomChecklistView: View {
             
             List {
                 ForEach(filteredChecklists, id: \.self) { checklist in
-                    NavigationLink(destination: CustomChecklistItemDetailView(checklist: checklist, viewContext: viewContext)) {
-                        Text(checklist.title ?? "Unknown")
-                            .font(.headline)
+                    HStack {
+                        TextField("Title", text: Binding(get: {
+                            checklist.title ?? "Unknown"
+                        }, set: {
+                            checklist.title = $0
+                            try? viewContext.save()
+                        }))
+                        .font(.headline)
+                        
+                        Spacer()
+                        
+                        NavigationLink(destination: CustomChecklistItemDetailView(checklist: checklist, viewContext: viewContext)) {
+                        }
+                    }
+                    .contextMenu {
+                        Button(action: {
+                            viewContext.delete(checklist)
+                            try? viewContext.save()
+                        }) {
+                            Text("Delete")
+                            Image(systemName: "trash")
+                        }
                     }
                 }
             }
+
+
 
 
         }.navigationTitle("Checklist")

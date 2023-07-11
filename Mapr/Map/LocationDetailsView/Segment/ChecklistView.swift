@@ -63,6 +63,8 @@ struct ChecklistView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var project: Project
     @ObservedObject var viewModel: ChecklistViewModel
+    @State private var selectedChecklist: CustomChecklist?
+    @State private var showingCustomChecklistModal = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -163,6 +165,19 @@ struct ChecklistView: View {
                 }
                 .buttonStyle(BorderlessButtonStyle())
 
+                //Implement a button to add and chose costum checklist here
+                
+                Button(action: {
+                    showingCustomChecklistModal = true
+                }) {
+                    Image(systemName: "list.bullet")
+                        .foregroundColor(.blue)
+                        .font(.body)
+                }
+                .buttonStyle(BorderlessButtonStyle())
+                .sheet(isPresented: $showingCustomChecklistModal) {
+                    CustomChecklistSelectionView(selectedChecklist: $selectedChecklist)
+                }
 
 
                 if checklistItem.parent == nil {
@@ -191,5 +206,26 @@ struct ChecklistView: View {
         }
         .background(Color.gray.opacity(0.1))
         .cornerRadius(5)
+    }
+}
+
+struct CustomChecklistSelectionView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \CustomChecklist.title, ascending: true)],
+        animation: .default)
+    private var checklists: FetchedResults<CustomChecklist>
+    @Binding var selectedChecklist: CustomChecklist?
+    
+    var body: some View {
+        List {
+            ForEach(checklists) { checklist in
+                Button(action: {
+                    selectedChecklist = checklist
+                }) {
+                    Text(checklist.title ?? "Unknown")
+                }
+            }
+        }
     }
 }
