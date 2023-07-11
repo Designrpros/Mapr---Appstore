@@ -1,7 +1,6 @@
 import SwiftUI
 import CoreData
 
-#if os(macOS)
 
 struct PreviewView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -30,9 +29,11 @@ struct PreviewView: View {
     @State private var isPDFSaved = false
     
     var body: some View {
+#if os(macOS)
         Button("Save as PDF") {
             saveAsPDF(pdfView: previewContent)
         }
+#endif
         
         ScrollView {
                 previewContent
@@ -213,7 +214,7 @@ struct PreviewView: View {
         .background(Color.gray.opacity(0.1))
         .cornerRadius(5)
     }
-
+#if os(macOS)
     private func saveAsPDF(pdfView: some View) {
         // Estimate the height of your content
         let itemHeight = CGFloat(50) // Estimate of the height of each item in your lists
@@ -267,7 +268,6 @@ struct PreviewView: View {
             }
         }
     }
-
+#endif
 
 }
-#endif

@@ -48,9 +48,7 @@ struct CustomSegmentedControl: View {
         case 1: return "clock"
         case 2: return "cube.box"
         case 3: return "checkmark.square"
-#if os(macOS)
         case 4: return "doc.text"
-#endif
         default: return ""
         }
     }

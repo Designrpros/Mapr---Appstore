@@ -267,10 +267,8 @@ struct LocationDetailView: View {
                             MaterialsView(project: project, viewModel: materialsViewModel)
                         case 3:
                             ChecklistView(project: project, viewModel: checklistViewModel)
-                        #if !os(iOS)
                             case 4:
                                 PreviewView(project: project, timeTrackerViewModel: timeTrackerViewModel, materialsViewModel: materialsViewModel, checklistViewModel: checklistViewModel)
-                        #endif
                             
                         default:
                             EmptyView()
