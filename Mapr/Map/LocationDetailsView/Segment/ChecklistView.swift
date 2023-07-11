@@ -30,18 +30,32 @@ class ChecklistViewModel: ObservableObject {
     }
 
     func addItems(from customChecklist: CustomChecklist) {
-            guard let viewContext = viewContext else { return }
-            
-            for customChecklistItem in customChecklist.items as? Set<CustomChecklistItem> ?? [] {
-                let newChecklistItem = ChecklistItem(context: viewContext)
-                newChecklistItem.id = UUID()
-                newChecklistItem.item = customChecklistItem.item
-                newChecklistItem.isChecked = customChecklistItem.isChecked
-                newChecklistItem.project = project
-            }
-            
-            saveContext()
+        guard let viewContext = viewContext else { return }
+        
+        for customChecklistItem in customChecklist.items as? Set<CustomChecklistItem> ?? [] {
+            let newChecklistItem = createChecklistItem(from: customChecklistItem, in: viewContext)
+            newChecklistItem.project = project
         }
+        
+        saveContext()
+    }
+
+    private func createChecklistItem(from customChecklistItem: CustomChecklistItem, in context: NSManagedObjectContext) -> ChecklistItem {
+        let newChecklistItem = ChecklistItem(context: context)
+        newChecklistItem.id = UUID()
+        newChecklistItem.item = customChecklistItem.item
+        newChecklistItem.isChecked = customChecklistItem.isChecked
+
+        if let customChildren = customChecklistItem.childern as? Set<CustomChecklistItem> {
+            for customChild in customChildren {
+                let newChild = createChecklistItem(from: customChild, in: context)
+                newChecklistItem.addToChildren(newChild)
+                newChild.parent = newChecklistItem
+            }
+        }
+
+        return newChecklistItem
+    }
 
 
     private func flatten(items: [ChecklistItem]) -> [ChecklistItem] {
@@ -235,7 +249,6 @@ struct ChecklistView: View {
         .cornerRadius(5)
     }
 }
-
 struct CustomChecklistSelectionView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
