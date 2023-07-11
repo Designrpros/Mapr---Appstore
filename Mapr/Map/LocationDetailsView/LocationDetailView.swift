@@ -252,7 +252,7 @@ struct LocationDetailView: View {
                         }
                         .padding()
                         .buttonStyle(BorderlessButtonStyle())
-                        .popover(isPresented: $showOptions) {
+                        .sheet(isPresented: $showOptions) {
                             OptionsView(refreshID: $refreshID, project: project)
                         }
                     }
