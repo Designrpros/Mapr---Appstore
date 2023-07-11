@@ -239,6 +239,11 @@ struct MapListView: View {
             search.start { (response, error) in
                 guard let response = response else {
                     print("Error: \(error?.localizedDescription ?? "Unknown error")")
+                    DispatchQueue.main.async {
+                        // Fallback to a default location if the search fails
+                        let defaultLocation = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060))) // New York City
+                        self.searchResults = [defaultLocation]
+                    }
                     return
                 }
                 
@@ -252,6 +257,7 @@ struct MapListView: View {
             }
         }
     }
+
 
 
     
