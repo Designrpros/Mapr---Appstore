@@ -10,26 +10,6 @@ struct ContentView: View {
     @ObservedObject var coreDataManager = CoreDataManager.shared
 
     var body: some View {
-        if !signInWithAppleManager.isSignedIn {
-            Button(action: signInWithAppleManager.handleSignInWithApple) {
-                HStack {
-                    Image(systemName: "applelogo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                    Text("Sign in with Apple")
-                        .font(.headline)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.black)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-            }
-            .padding()
-            .buttonStyle(BorderlessButtonStyle())
-        } else {
-            
             NavigationView {
                 VStack {
                     switch selectedTab {
@@ -58,7 +38,6 @@ struct ContentView: View {
                 }
         }
     }
-}
 
 
 

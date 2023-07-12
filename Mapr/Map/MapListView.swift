@@ -17,7 +17,7 @@ struct MapListView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Project.projectName, ascending: true)],
         animation: .default)
     private var projects: FetchedResults<Project>
-
+    
     @State private var searchResults: [MKMapItem] = []
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedProject: Project? = nil
@@ -25,8 +25,30 @@ struct MapListView: View {
     @State private var showingSettings = false
     @StateObject var userSelection = UserSelection()
     
+    @ObservedObject var signInWithAppleManager = SignInWithAppleManager.shared
+    @ObservedObject var coreDataManager = CoreDataManager.shared
+    
     var body: some View {
-            VStack {
+        VStack {
+            if !signInWithAppleManager.isSignedIn {
+                Button(action: signInWithAppleManager.handleSignInWithApple) {
+                    HStack {
+                        Image(systemName: "applelogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                        Text("Sign in with Apple")
+                            .font(.headline)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.black)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding()
+                .buttonStyle(BorderlessButtonStyle())
+            } else {
                 HStack {
                     TextField("Search...", text: $searchText, onCommit: {
                         searchLocations()
@@ -72,7 +94,7 @@ struct MapListView: View {
                                         .font(.system(size: 15))
                                         .foregroundColor(.white)
                                 }.buttonStyle(BorderlessButtonStyle())
-
+                                
                             }
                             .background(
                                 Group {
@@ -166,135 +188,137 @@ struct MapListView: View {
                         }
                     }
                 }
+                }
             }.onAppear {
                 print(projects)
             }
             .toolbar() {
                 ToolbarItem(placement: .automatic) {
-                            Button(action: {
-                                showingSettings = true
-                            }) {
-                                Image(systemName: "gear")
-                            }
-                        }
+                    Button(action: {
+                        showingSettings = true
+                    }) {
+                        Image(systemName: "gear")
                     }
+                }
+            }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
                     .environment(\.managedObjectContext, viewContext)
             }
         }
-    
-    private func createProject(from mapItem: MKMapItem) -> Project {
-        let project = Project(context: viewContext)
-        let location = Location(context: viewContext)
-
-        // Set the properties of the location based on the mapItem
-        location.name = mapItem.name
-        location.postalCode = mapItem.placemark.postalCode
-        location.city = mapItem.placemark.locality
-        location.country = mapItem.placemark.country
-        location.latitude = mapItem.placemark.coordinate.latitude
-        location.longitude = mapItem.placemark.coordinate.longitude
-
-        // Associate the location with the project
-        project.location = location
-
-        // Set the other properties of the project
-        project.projectName = mapItem.name
-
-        // Create a new CKRecord for the project
-        let newRecord = CKRecord(recordType: "Project")
-        // Save the CKRecord's recordID to the project
-        project.recordID = newRecord.recordID.recordName
-
-        print("Saving project...")
-        do {
-            try viewContext.save()
-            print("Project saved successfully.")
-        } catch {
-            print("Failed to save project: \(error)")
-        }
-
-        // Update the search results to remove the newly saved location
-        if let index = searchResults.firstIndex(where: { $0.name == mapItem.name }) {
-            searchResults.remove(at: index)
-        }
-
-        // Clear the search text
-        searchText = ""
-
-        return project
-    }
-
-
-
-
-    
-    private func searchLocations() {
-        DispatchQueue.global(qos: .userInitiated).async {
-            let searchRequest = MKLocalSearch.Request()
-            searchRequest.naturalLanguageQuery = self.searchText
+        
+        private func createProject(from mapItem: MKMapItem) -> Project {
+            let project = Project(context: viewContext)
+            let location = Location(context: viewContext)
             
-            let search = MKLocalSearch(request: searchRequest)
-            search.start { (response, error) in
-                guard let response = response else {
-                    print("Error: \(error?.localizedDescription ?? "Unknown error")")
-                    DispatchQueue.main.async {
-                        // Fallback to a default location if the search fails
-                        let defaultLocation = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060))) // New York City
-                        self.searchResults = [defaultLocation]
-                    }
-                    return
-                }
+            // Set the properties of the location based on the mapItem
+            location.name = mapItem.name
+            location.postalCode = mapItem.placemark.postalCode
+            location.city = mapItem.placemark.locality
+            location.country = mapItem.placemark.country
+            location.latitude = mapItem.placemark.coordinate.latitude
+            location.longitude = mapItem.placemark.coordinate.longitude
+            
+            // Associate the location with the project
+            project.location = location
+            
+            // Set the other properties of the project
+            project.projectName = mapItem.name
+            
+            // Create a new CKRecord for the project
+            let newRecord = CKRecord(recordType: "Project")
+            // Save the CKRecord's recordID to the project
+            project.recordID = newRecord.recordID.recordName
+            
+            print("Saving project...")
+            do {
+                try viewContext.save()
+                print("Project saved successfully.")
+            } catch {
+                print("Failed to save project: \(error)")
+            }
+            
+            // Update the search results to remove the newly saved location
+            if let index = searchResults.firstIndex(where: { $0.name == mapItem.name }) {
+                searchResults.remove(at: index)
+            }
+            
+            // Clear the search text
+            searchText = ""
+            
+            return project
+        }
+        
+        
+        
+        
+        
+        private func searchLocations() {
+            DispatchQueue.global(qos: .userInitiated).async {
+                let searchRequest = MKLocalSearch.Request()
+                searchRequest.naturalLanguageQuery = self.searchText
                 
-                DispatchQueue.main.async {
-                    let savedLocationNames = Set(self.projects.map { $0.location?.name ?? "" })
-                    self.searchResults = response.mapItems.filter { mapItem in
-                        guard let name = mapItem.name else { return false }
-                        return !savedLocationNames.contains(name)
+                let search = MKLocalSearch(request: searchRequest)
+                search.start { (response, error) in
+                    guard let response = response else {
+                        print("Error: \(error?.localizedDescription ?? "Unknown error")")
+                        DispatchQueue.main.async {
+                            // Fallback to a default location if the search fails
+                            let defaultLocation = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060))) // New York City
+                            self.searchResults = [defaultLocation]
+                        }
+                        return
                     }
+                    
+                    DispatchQueue.main.async {
+                        let savedLocationNames = Set(self.projects.map { $0.location?.name ?? "" })
+                        self.searchResults = response.mapItems.filter { mapItem in
+                            guard let name = mapItem.name else { return false }
+                            return !savedLocationNames.contains(name)
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        private func deleteAllProjects() {
+            let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = Project.fetchRequest()
+            let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = Location.fetchRequest()
+            
+            let batchDeleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
+            let batchDeleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
+            
+            do {
+                try viewContext.execute(batchDeleteRequest1)
+                try viewContext.execute(batchDeleteRequest2)
+                try viewContext.save()
+            } catch {
+                print("Error deleting all projects and locations: \(error)")
+            }
+        }
+        
+        
+        struct LocationIndicator: View {
+            let mapItem: MKMapItem
+            
+            var body: some View {
+                let category = mapItem.pointOfInterestCategory
+                
+                if category == .publicTransport {
+                    return AnyView(Image(systemName: "bus").foregroundColor(.red))
+                } else if category == .park {
+                    return AnyView(Image(systemName: "leaf").foregroundColor(.green))
+                } else if category == .school {
+                    return AnyView(Image(systemName: "book").foregroundColor(.blue))
+                } else if category == nil {
+                    return AnyView(Image(systemName: "house").foregroundColor(.purple))
+                } else {
+                    return AnyView(Image(systemName: "mappin.circle.fill").foregroundColor(.gray))
                 }
             }
         }
     }
 
-
-
-    
-    private func deleteAllProjects() {
-        let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = Project.fetchRequest()
-        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = Location.fetchRequest()
-        
-        let batchDeleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
-        let batchDeleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
-        
-        do {
-            try viewContext.execute(batchDeleteRequest1)
-            try viewContext.execute(batchDeleteRequest2)
-            try viewContext.save()
-        } catch {
-            print("Error deleting all projects and locations: \(error)")
-        }
-    }
-
-    
-    struct LocationIndicator: View {
-        let mapItem: MKMapItem
-        
-        var body: some View {
-            let category = mapItem.pointOfInterestCategory
-            
-            if category == .publicTransport {
-                return AnyView(Image(systemName: "bus").foregroundColor(.red))
-            } else if category == .park {
-                return AnyView(Image(systemName: "leaf").foregroundColor(.green))
-            } else if category == .school {
-                return AnyView(Image(systemName: "book").foregroundColor(.blue))
-            } else if category == nil {
-                return AnyView(Image(systemName: "house").foregroundColor(.purple))
-            } else {
-                return AnyView(Image(systemName: "mappin.circle.fill").foregroundColor(.gray))
-            }
-        }
-    }
-}
