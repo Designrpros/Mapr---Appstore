@@ -21,7 +21,7 @@ struct ContentView: View {
                             .navigationTitle("Contacts")
                     case 2:
                         CustomChecklistView()
-                            .navigationTitle("Checklist")
+                            .navigationTitle("Costum Checklist")
                     default:
                         Text("Invalid selection")
                     }

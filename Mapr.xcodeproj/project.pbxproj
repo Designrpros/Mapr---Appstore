@@ -18,6 +18,7 @@
 		ADB5560E2A593413004D089E /* EmployeeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB5560D2A593413004D089E /* EmployeeView.swift */; };
 		ADB556102A59343D004D089E /* ApprenticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB5560F2A59343D004D089E /* ApprenticeView.swift */; };
 		ADB556122A59344D004D089E /* ViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556112A59344D004D089E /* ViewerView.swift */; };
+		ADD31F3A2A604D5600B2F6E9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = ADD31F392A604D5600B2F6E9 /* README.md */; };
 		ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283C2A53A7470096D87D /* MaprApp.swift */; };
 		ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283E2A53A7470096D87D /* AppDelegate.swift */; };
 		ADF428422A53A7470096D87D /* Mapr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADF428402A53A7470096D87D /* Mapr.xcdatamodeld */; };
@@ -75,6 +76,7 @@
 		ADB5560D2A593413004D089E /* EmployeeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeView.swift; sourceTree = "<group>"; };
 		ADB5560F2A59343D004D089E /* ApprenticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprenticeView.swift; sourceTree = "<group>"; };
 		ADB556112A59344D004D089E /* ViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerView.swift; sourceTree = "<group>"; };
+		ADD31F392A604D5600B2F6E9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../Design/README.md; sourceTree = "<group>"; };
 		ADF428392A53A7470096D87D /* Mapr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mapr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADF4283C2A53A7470096D87D /* MaprApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaprApp.swift; sourceTree = "<group>"; };
 		ADF4283E2A53A7470096D87D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 		ADF428302A53A7470096D87D = {
 			isa = PBXGroup;
 			children = (
+				ADD31F392A604D5600B2F6E9 /* README.md */,
 				ADB555FC2A56A1E3004D089E /* Model */,
 				ADF4283B2A53A7470096D87D /* Mapr */,
 				ADF428522A53A7490096D87D /* MaprTests */,
@@ -362,6 +365,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADD31F3A2A604D5600B2F6E9 /* README.md in Resources */,
 				ADF4284A2A53A7490096D87D /* Preview Assets.xcassets in Resources */,
 				ADF428462A53A7490096D87D /* Assets.xcassets in Resources */,
 			);
@@ -571,7 +575,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mapr/Mapr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mapr/Preview Content\"";
 				DEVELOPMENT_TEAM = 8MCGWNL2HK;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -590,11 +594,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.2;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Designr.pro.Handy-Mapr";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -612,7 +616,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mapr/Mapr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mapr/Preview Content\"";
 				DEVELOPMENT_TEAM = 8MCGWNL2HK;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -631,11 +635,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.2;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Designr.pro.Handy-Mapr";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;

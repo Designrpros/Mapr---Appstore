@@ -253,33 +253,42 @@ struct MapListView: View {
         
         
         
-        private func searchLocations() {
-            DispatchQueue.global(qos: .userInitiated).async {
-                let searchRequest = MKLocalSearch.Request()
-                searchRequest.naturalLanguageQuery = self.searchText
+    private func searchLocations() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let searchRequest = MKLocalSearch.Request()
+            searchRequest.naturalLanguageQuery = self.searchText
+            
+            let search = MKLocalSearch(request: searchRequest)
+            search.start { (response, error) in
+                guard let response = response else {
+                    print("Error: \(error?.localizedDescription ?? "Unknown error")")
+                    DispatchQueue.main.async {
+                        self.setDefaultLocation()
+                    }
+                    return
+                }
                 
-                let search = MKLocalSearch(request: searchRequest)
-                search.start { (response, error) in
-                    guard let response = response else {
-                        print("Error: \(error?.localizedDescription ?? "Unknown error")")
-                        DispatchQueue.main.async {
-                            // Fallback to a default location if the search fails
-                            let defaultLocation = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060))) // New York City
-                            self.searchResults = [defaultLocation]
-                        }
-                        return
+                DispatchQueue.main.async {
+                    let savedLocationNames = Set(self.projects.map { $0.location?.name ?? "" })
+                    self.searchResults = response.mapItems.filter { mapItem in
+                        guard let name = mapItem.name else { return false }
+                        return !savedLocationNames.contains(name)
                     }
                     
-                    DispatchQueue.main.async {
-                        let savedLocationNames = Set(self.projects.map { $0.location?.name ?? "" })
-                        self.searchResults = response.mapItems.filter { mapItem in
-                            guard let name = mapItem.name else { return false }
-                            return !savedLocationNames.contains(name)
-                        }
+                    if self.searchResults.isEmpty {
+                        self.setDefaultLocation()
                     }
                 }
             }
         }
+    }
+
+    private func setDefaultLocation() {
+        let defaultLocation = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060))) // New York City
+        self.searchResults = [defaultLocation]
+    }
+
+
         
         
         
