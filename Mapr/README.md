@@ -1,14 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11134" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
-    <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11134"/>
-    </dependencies>
-    <objects>
-        <customObject id="-2" userLabel="File's Owner"/>
-        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-    </objects>
-    
     Mapr is an innovative project management tool designed for macOS & IOS. This application provides a unique, map-based interface that allows users to visualize the geographical distribution of all their ongoing projects. Each project is associated with a specific location on the map, providing a spatial context that can be particularly useful for businesses managing projects across multiple sites or regions.
 
 Beyond its innovative mapping feature, Mapr offers a comprehensive suite of project management tools. Users can dive into each project to manage and track various aspects, including:
@@ -38,4 +27,3 @@ You simply Create a Project by Searching a Location (the name of a project)
 when you pin the location to the navigation view, you create a project, from here you be able to create checklists, upload images and so on. 
 
 use the detailed functionalities as you feel fit, and export it as pdf.
-</document>
