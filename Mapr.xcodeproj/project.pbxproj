@@ -77,6 +77,7 @@
 		ADB5560F2A59343D004D089E /* ApprenticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprenticeView.swift; sourceTree = "<group>"; };
 		ADB556112A59344D004D089E /* ViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerView.swift; sourceTree = "<group>"; };
 		ADD31F392A604D5600B2F6E9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../Design/README.md; sourceTree = "<group>"; };
+		ADD31F3B2A60513400B2F6E9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ADF428392A53A7470096D87D /* Mapr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mapr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADF4283C2A53A7470096D87D /* MaprApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaprApp.swift; sourceTree = "<group>"; };
 		ADF4283E2A53A7470096D87D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -192,6 +193,7 @@
 				ADF4288E2A53A8FE0096D87D /* Contact */,
 				ADF428452A53A7490096D87D /* Assets.xcassets */,
 				ADF428472A53A7490096D87D /* Mapr.entitlements */,
+				ADD31F3B2A60513400B2F6E9 /* README.md */,
 				ADF428402A53A7470096D87D /* Mapr.xcdatamodeld */,
 				ADF428482A53A7490096D87D /* Preview Content */,
 			);
