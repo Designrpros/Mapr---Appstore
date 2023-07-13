@@ -56,10 +56,6 @@ struct MaterialsView: View {
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
-                Text("Note")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
                 Text("Price")
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -69,72 +65,79 @@ struct MaterialsView: View {
                     .padding()
                     .background(Color.gray.opacity(0.2))
             }
+            #if os(macOS)
             .font(.headline)
+            #elseif os(iOS)
+            .font(.system(size: 14.5))
+            #endif
 
             ForEach(viewModel.materials, id: \.id) { material in
-                HStack(spacing: 0) {
-                    TextField("", value: Binding(get: {
-                        Int(material.number)
-                    }, set: {
-                        material.number = Int64($0)
-                        saveContext()
-                    }), formatter: NumberFormatter())
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .cornerRadius(5)
-                        .textFieldStyle(PlainTextFieldStyle())
-                    
-                    TextField("", value: Binding(get: {
-                        Int(material.amount)
-                    }, set: {
-                        material.amount = Int16($0)
-                        saveContext()
-                    }), formatter: NumberFormatter())
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .cornerRadius(5)
-                        .textFieldStyle(PlainTextFieldStyle())
+                VStack {
+                    HStack(spacing: 0) {
+                        TextField("", value: Binding(get: {
+                            Int(material.number)
+                        }, set: {
+                            material.number = Int64($0)
+                            saveContext()
+                        }), formatter: NumberFormatter())
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .cornerRadius(5)
+                            .textFieldStyle(PlainTextFieldStyle())
+                        
+                        TextField("", value: Binding(get: {
+                            Int(material.amount)
+                        }, set: {
+                            material.amount = Int16($0)
+                            saveContext()
+                        }), formatter: NumberFormatter())
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .cornerRadius(5)
+                            .textFieldStyle(PlainTextFieldStyle())
 
+                        TextField("", value: Binding(get: {
+                            material.price
+                        }, set: {
+                            material.price = $0
+                            saveContext()
+                        }), formatter: NumberFormatter())
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .cornerRadius(5)
+                            .textFieldStyle(PlainTextFieldStyle())
+                        
+                        HStack(spacing: 20) {
+                            Button(action: {
+                                viewContext.delete(material)
+                                saveContext()
+                            }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                                    .font(.body)
+                            }
+                            .buttonStyle(BorderlessButtonStyle())
+                        }
+                        .padding()
+                        .cornerRadius(5)
+                        .frame(maxWidth: .infinity)
+                    }
+                    
                     TextField("Description", text: Binding(get: {
                         material.materialDescription ?? ""
                     }, set: {
                         material.materialDescription = $0
                         saveContext()
                     }))
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .cornerRadius(5)
-                        .textFieldStyle(PlainTextFieldStyle())
-                    
-                    TextField("", value: Binding(get: {
-                        material.price
-                    }, set: {
-                        material.price = $0
-                        saveContext()
-                    }), formatter: NumberFormatter())
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .cornerRadius(5)
-                        .textFieldStyle(PlainTextFieldStyle())
-                    
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            viewContext.delete(material)
-                            saveContext()
-                        }) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                                .font(.body)
-                        }
-                        .buttonStyle(BorderlessButtonStyle())
-                    }
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .cornerRadius(5)
-                    .frame(maxWidth: .infinity)
+                    .textFieldStyle(PlainTextFieldStyle())
                 }
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(5)
             }
+
 
             Button(action: {
                 let newMaterial = Material(context: self.viewContext)

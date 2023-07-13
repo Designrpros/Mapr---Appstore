@@ -96,10 +96,6 @@ struct ChecklistView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack(spacing: 0) {
-                Text("Item")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
                 Text("Checked")
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -121,9 +117,9 @@ struct ChecklistView: View {
                     }
                 }
             }
-
-
-
+            
+            
+            
             
             Button(action: {
                 let newChecklistItem = ChecklistItem(context: self.viewContext)
@@ -163,29 +159,19 @@ struct ChecklistView: View {
     }
     
     private func checklistRow(checklistItem: ChecklistItem) -> some View {
-        HStack(spacing: 0) {
-            TextField("Description", text: Binding(get: {
-                checklistItem.item ?? ""
-            }, set: {
-                checklistItem.item = $0
-                try? viewContext.save()
-            }))
-            .frame(maxWidth: .infinity)
-            .padding()
-            .cornerRadius(5)
-            .textFieldStyle(PlainTextFieldStyle())
+        VStack {
+            HStack(spacing: 35) {
+                Toggle("", isOn: Binding(get: {
+                    checklistItem.isChecked
+                }, set: {
+                    checklistItem.isChecked = $0
+                    viewModel.saveContext()
+                }))
+                .padding()
+                .cornerRadius(5)
 
-            Toggle("", isOn: Binding(get: {
-                checklistItem.isChecked
-            }, set: {
-                checklistItem.isChecked = $0
-                viewModel.saveContext()
-            }))
-            .frame(maxWidth: .infinity)
-            .padding()
-            .cornerRadius(5)
-
-            HStack(spacing: 20) {
+                Spacer()
+                
                 Button(action: {
                     if let parent = checklistItem.parent {
                         parent.removeFromChildren(checklistItem) // Remove the item from the parent's children
@@ -219,9 +205,6 @@ struct ChecklistView: View {
                     })
                 }
 
-
-
-
                 if checklistItem.parent == nil {
                     Button(action: {
                         let newChecklistItem = ChecklistItem(context: self.viewContext)
@@ -238,17 +221,27 @@ struct ChecklistView: View {
                             .font(.body)
                     }
                     .buttonStyle(BorderlessButtonStyle())
-
                 }
             }
             .padding()
             .cornerRadius(5)
             .frame(maxWidth: .infinity)
-            
+
+            TextField("Description", text: Binding(get: {
+                checklistItem.item ?? ""
+            }, set: {
+                checklistItem.item = $0
+                try? viewContext.save()
+            }))
+            .frame(maxWidth: .infinity)
+            .padding()
+            .cornerRadius(5)
+            .textFieldStyle(PlainTextFieldStyle())
         }
         .background(Color.gray.opacity(0.1))
         .cornerRadius(5)
     }
+
 }
 
 struct CustomChecklistSelectionView: View {
