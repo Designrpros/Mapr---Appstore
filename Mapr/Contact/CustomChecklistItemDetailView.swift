@@ -59,90 +59,75 @@ struct CustomChecklistItemDetailView: View {
         self.viewModel.setup(viewContext: viewContext, checklist: checklist)
     }
     
-    
-    
     var body: some View {
         ScrollView{
-        VStack(alignment: .leading) {
-            HStack(spacing: 0) {
-                Text("Item")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                Text("Checked")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                Text("Actions")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-            }
-            .font(.headline)
-            
-            ForEach(viewModel.checklistItems, id: \.id) { checklistItem in
-                checklistRow(checklistItem: checklistItem)
-                if let childrenSet = checklistItem.childern as? Set<CustomChecklistItem> {
-                    let childrenArray = Array(childrenSet).sorted(by: { $0.creationDate ?? Date() < $1.creationDate ?? Date() })
-                    ForEach(childrenArray, id: \.id) { child in
-                        checklistRow(checklistItem: child)
-                            .padding(.leading, 20)
+            VStack(alignment: .leading) {
+                HStack(spacing: 0) {
+                    Text("Checked")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                    Text("Actions")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                }
+                .font(.headline)
+                
+                ForEach(viewModel.checklistItems, id: \.id) { checklistItem in
+                    checklistRow(checklistItem: checklistItem)
+                    if let childrenSet = checklistItem.childern as? Set<CustomChecklistItem> {
+                        let childrenArray = Array(childrenSet).sorted(by: { $0.creationDate ?? Date() < $1.creationDate ?? Date() })
+                        ForEach(childrenArray, id: \.id) { child in
+                            checklistRow(checklistItem: child)
+                                .padding(.leading, 20)
+                        }
                     }
                 }
+                
+                Button(action: {
+                    let newChecklistItem = CustomChecklistItem(context: self.viewContext)
+                    newChecklistItem.id = UUID() // Assign a new UUID to each ChecklistItem object
+                    newChecklistItem.item = ""
+                    newChecklistItem.isChecked = false
+                    newChecklistItem.checklist = checklist
+                    checklist.addToItems(newChecklistItem) // Add the new item to the checklist's items set
+                    print("New Checklist Item Created: \(newChecklistItem)") // Print the newChecklistItem
+                    viewModel.saveContext()
+                    print("Context Saved") // Print after saving the context
+                }) {
+                    Text("Add Row")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
+                .buttonStyle(BorderlessButtonStyle())
+                .padding(.top, 10)
             }
-            
-            Button(action: {
-                let newChecklistItem = CustomChecklistItem(context: self.viewContext)
-                newChecklistItem.id = UUID() // Assign a new UUID to each ChecklistItem object
-                newChecklistItem.item = ""
-                newChecklistItem.isChecked = false
-                newChecklistItem.checklist = checklist
-                checklist.addToItems(newChecklistItem) // Add the new item to the checklist's items set
-                print("New Checklist Item Created: \(newChecklistItem)") // Print the newChecklistItem
-                viewModel.saveContext()
-                print("Context Saved") // Print after saving the context
-            }) {
-                Text("Add Row")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
+            .padding()
+            .onAppear {
+                viewModel.setup(viewContext: viewContext, checklist: checklist)
             }
-            .buttonStyle(BorderlessButtonStyle())
-            .padding(.top, 10)
-        }
-        .padding()
-        .onAppear {
-            viewModel.setup(viewContext: viewContext, checklist: checklist)
         }
     }
-}
     
-        private func checklistRow(checklistItem: CustomChecklistItem) -> some View {
-            HStack(spacing: 0) {
-                TextField("Description", text: Binding(get: {
-                    checklistItem.item ?? ""
-                }, set: {
-                    checklistItem.item = $0
-                    try? viewContext.save()
-                }))
-                .frame(maxWidth: .infinity)
-                .padding()
-                .cornerRadius(5)
-                .textFieldStyle(PlainTextFieldStyle())
-                
+    private func checklistRow(checklistItem: CustomChecklistItem) -> some View {
+        VStack {
+            HStack {
                 Toggle("", isOn: Binding(get: {
                     checklistItem.isChecked
                 }, set: {
                     checklistItem.isChecked = $0
                     viewModel.saveContext()
                 }))
-                .frame(maxWidth: .infinity)
                 .padding()
                 .cornerRadius(5)
-                
+
+                Spacer()
+
                 HStack(spacing: 20) {
                     Button(action: {
                         if let parent = checklistItem.parent {
@@ -178,14 +163,26 @@ struct CustomChecklistItemDetailView: View {
                 }
                 .padding()
                 .cornerRadius(5)
-                .frame(maxWidth: .infinity)
-                
             }
-            .background(Color.gray.opacity(0.1))
+
+            TextField("Description", text: Binding(get: {
+                checklistItem.item ?? ""
+            }, set: {
+                checklistItem.item = $0
+                try? viewContext.save()
+            }))
+            .frame(maxWidth: .infinity)
+            .padding()
             .cornerRadius(5)
-            
+            .textFieldStyle(PlainTextFieldStyle())
         }
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(5)
+    }
+
+
 }
+
 
 extension CustomChecklistItem {
     func addToChildren(_ value: CustomChecklistItem) {
