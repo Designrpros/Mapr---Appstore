@@ -57,10 +57,6 @@ struct TimeTrackerView: View {
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.2))
-                    Text("Note")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
                     Text("Action")
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -69,68 +65,69 @@ struct TimeTrackerView: View {
                 .font(.headline)
                 
                 ForEach(viewModel.timeEntries, id: \.id) { timeEntry in
-                    HStack(spacing: 0) {
-                        DatePicker("", selection: Binding(get: {
-                            timeEntry.date ?? Date()
-                        }, set: {
-                            timeEntry.date = $0
-                            saveContext()
-                        }), displayedComponents: .date)
-                        .datePickerStyle(CompactDatePickerStyle())
-                        //.frame(width: 100)
-                        .padding()
-                        .cornerRadius(5)
-                        
-                        Picker(selection: Binding(get: {
-                            Int(timeEntry.hours * 2)
-                        }, set: {
-                            timeEntry.hours = Double($0) / 2
-                            saveContext()
-                        }), label: Text("")) {
-                            ForEach(0...48, id: \.self) { halfHour in
-                                Text("\(Double(halfHour) / 2, specifier: "%.1f")").tag(halfHour)
+                    VStack {
+                        HStack(spacing: 0) {
+                            DatePicker("", selection: Binding(get: {
+                                timeEntry.date ?? Date()
+                            }, set: {
+                                timeEntry.date = $0
+                                saveContext()
+                            }), displayedComponents: .date)
+                            .datePickerStyle(CompactDatePickerStyle())
+                            .padding()
+                            .cornerRadius(5)
+                            
+                            Picker(selection: Binding(get: {
+                                Int(timeEntry.hours * 2)
+                            }, set: {
+                                timeEntry.hours = Double($0) / 2
+                                saveContext()
+                            }), label: Text("")) {
+                                ForEach(0...48, id: \.self) { halfHour in
+                                    Text("\(Double(halfHour) / 2, specifier: "%.1f")").tag(halfHour)
+                                }
                             }
+                            .labelsHidden() // Hide the label
+                            .frame(maxWidth: .infinity)
+                            .clipped() // Clip the view to its bounding frame
+                            .padding()
+                            .cornerRadius(5)
+                            
+                            HStack(spacing: 20) {
+                                Button(action: {
+                                    viewContext.delete(timeEntry)
+                                    saveContext()
+                                }) {
+                                    Image(systemName: "trash")
+                                        .foregroundColor(.red)
+                                        .font(.body)
+                                }
+                                .buttonStyle(BorderlessButtonStyle())
+                            }
+                            .padding()
+                            .cornerRadius(5)
+                            .frame(maxWidth: .infinity)
                         }
-                        .labelsHidden() // Hide the label
-                        .frame(maxWidth: .infinity)
-                        .clipped() // Clip the view to its bounding frame
-                        .padding()
-                        .cornerRadius(5)
-
-                    
-                    TextField("Description", text: Binding(get: {
-                        timeEntry.notes ?? ""
-                    }, set: {
-                        timeEntry.notes = $0
-                        saveContext()
-                    }))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.clear)
-                    .foregroundColor(.white)
-                    .cornerRadius(5)
-                    .font(.system(size: 12))
-                    .textFieldStyle(PlainTextFieldStyle())
-                    
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            viewContext.delete(timeEntry)
-                            saveContext()
-                        }) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                                .font(.body)
-                        }
-                        .buttonStyle(BorderlessButtonStyle())
-                    }
-                    .padding()
-                    .cornerRadius(5)
-                    .frame(maxWidth: .infinity)
                         
+                        TextField("Description", text: Binding(get: {
+                            timeEntry.notes ?? ""
+                        }, set: {
+                            timeEntry.notes = $0
+                            saveContext()
+                        }))
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.clear)
+                        .foregroundColor(.white)
+                        .cornerRadius(5)
+                        .font(.system(size: 12))
+                        .textFieldStyle(PlainTextFieldStyle())
+                        
+                    }
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(5)
                 }
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(5)
-            }
+
             
             Button(action: {
                 let newTimeEntry = TimeTracker(context: self.viewContext)
