@@ -218,7 +218,7 @@ struct LocationDetailView: View {
                         }
 
 
-/*
+///* THIS IS RELEVANT CODE FOR DTS
                         Button(action: {
                             showingAddUserModal = true
                         }) {
@@ -230,7 +230,7 @@ struct LocationDetailView: View {
                         .sheet(isPresented: $showingAddUserModal) {
                             AddUserModal(project: project, managedObjectContext: managedObjectContext, userSelection: userSelection, selectedUsers: $selectedUsers, userEntities: userEntities)
                         }
-*/
+//*/
 
 #endif
                         //Button(action: {
@@ -315,32 +315,22 @@ struct LocationDetailView: View {
     }
     
     
-    struct OptionsView: View {
-        @Environment(\.managedObjectContext) private var viewContext
-        @Binding var refreshID: UUID
-        var project: Project
-        @Environment(\.presentationMode) var presentationMode
-        
+struct OptionsView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @Binding var refreshID: UUID
+    var project: Project
+    @Environment(\.presentationMode) var presentationMode
+    @State private var showingAddContact = false
 
-        var body: some View {
+    var body: some View {
+        ZStack {
+            Color.clear
+            .contentShape(Rectangle())
+            .onTapGesture {
+                presentationMode.wrappedValue.dismiss()
+            }
+            VStack {
                 List {
-                    //Button(action: {
-                    //}) {
-                       // HStack {
-                      //      Image(systemName: "trash")
-                     //           .foregroundColor(.red)
-                    //   Text("Delete Project")
-                    //         .foregroundColor(.red)
-                     //   }
-                    //}
-                    //Button(action: {
-                        // Call your export function here
-                    //}) {
-                        //HStack {
-                       //     Image(systemName: "doc.text")
-                      //      Text("Export as PDF")
-                     //   }
-                    //}
                     Button(action: {
                         // Toggle the isFinished property of the project
                         project.isFinished.toggle()
@@ -360,10 +350,20 @@ struct LocationDetailView: View {
                         }
                     }
                 }
-                .navigationTitle("Options")
-                .background(Color.clear)
+                .frame(minWidth: 100, idealWidth: 300, maxWidth: .infinity, minHeight: 100, idealHeight: 250, maxHeight: .infinity)
+
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Cancel")
+                        .font(.headline)
+                }
+                .padding()
+            }
+            .navigationTitle("Options")
         }
     }
+}
 
 
     
