@@ -413,7 +413,13 @@ struct AddUserModal: View {
                 }.padding()
 
             List {
-                ForEach(allUsers, id: \.self) { user in
+                ForEach(userEntities.filter { userEntity in
+                                searchText.isEmpty ||
+                                userEntity.name?.lowercased().contains(searchText.lowercased()) ?? false ||
+                                userEntity.email?.lowercased().contains(searchText.lowercased()) ?? false
+                            }, id: \.self) { userEntity in
+                                // Convert UserEntity to User
+                                let user = retrieveUserFromCoreData(userEntity: userEntity)
                     Button(action: {
                         // Add the user to the selectedUsers array when selected
                         if !selectedUsers.contains(where: { $0.id == user.id }) {

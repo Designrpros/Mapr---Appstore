@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import CloudKit
 import AuthenticationServices
 
 #if os(iOS)
@@ -16,51 +17,50 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
     @Published var isSignedIn = false
     @Published var userName: String = ""
     @Published var userEmail: String = ""
-
+    
     func handleSignInWithApple() {
         let appleIDProvider = ASAuthorizationAppleIDProvider()
         let request = appleIDProvider.createRequest()
         request.requestedScopes = [.fullName, .email]
-
+        
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
         authorizationController.delegate = self
         authorizationController.performRequests()
     }
-
+    
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
             let userIdentifier = appleIDCredential.user
             let fullName = appleIDCredential.fullName
             let email = appleIDCredential.email
-
+            
             // Now you can use these values to create a new user in your database
             // Make sure to handle the case where fullName and email are nil, as they will only be provided the first time the user signs in
             let formatter = PersonNameComponentsFormatter()
             let name = formatter.string(from: fullName ?? PersonNameComponents())
             print("User id: \(userIdentifier) Full Name: \(name) Email: \(email ?? "")")
-
-            if let email = email {
-                // Add the user to your database
-                CloudKitManager.shared.addUser(username: name, email: email, role: "yourRole") { (record, error) in
-                    if let error = error {
-                        print("Failed to add user: \(error)")
-                    } else {
-                        print("User added successfully")
-                    }
+            
+            // Create a new "PublicUser" record in CloudKit
+            let publicDatabase = CKContainer.default().publicCloudDatabase
+            let newPublicUserRecord = CKRecord(recordType: "User")
+            newPublicUserRecord["username"] = name
+            newPublicUserRecord["userID"] = userIdentifier
+            
+            publicDatabase.save(newPublicUserRecord) { (record, error) in
+                if let error = error {
+                    // Handle the error here
+                    print("Error saving record: \(error)")
+                } else {
+                    print("Successfully saved record!")
                 }
             }
-
+            
             // Store the user's name and email
             self.userName = name
             self.userEmail = email ?? ""
-
+            
             isSignedIn = true
         }
-    }
-
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        // Handle error.
-        print("Sign in with Apple errored: \(error)")
     }
 }
 
