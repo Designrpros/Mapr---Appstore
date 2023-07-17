@@ -201,7 +201,7 @@ struct Users: View {
         }
         .navigationTitle("Add User")
         .onAppear {
-            userSelection.fetchSelectedUsers()
+            userSelection.fetchUsers()
         }
     }
 }
@@ -229,28 +229,22 @@ func fetchUserEntity(user: User, in managedObjectContext: NSManagedObjectContext
 class AddUserSelection: ObservableObject {
     @Published var users: [User] = []
 
-    func fetchUsers(searchText: String? = nil) {
-        let predicate: NSPredicate
-        if let searchText = searchText, !searchText.isEmpty {
-            predicate = NSPredicate(format: "username CONTAINS[cd] %@ OR email CONTAINS[cd] %@", searchText, searchText)
-        } else {
-            predicate = NSPredicate(value: true)
-        }
+    func fetchUsers() {
+        let predicate = NSPredicate(value: true)
         let query = CKQuery(recordType: "User", predicate: predicate)
         let container = CKContainer(identifier: "iCloud.Handy-Mapr")
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
             DispatchQueue.main.async {
                 if let records = records {
                     print("Successfully fetched all users")
-                    let users = records.map { self.recordToUser($0) }
-                    // Filter out duplicate users
-                    self.users = Array(Set(users))
+                    self.users = records.map { self.recordToUser($0) }
                 } else if let error = error {
                     print("Failed to fetch users: \(error.localizedDescription)")
                 }
             }
         }
     }
+
 
     func recordToUser(_ record: CKRecord) -> User {
         return User(
@@ -288,14 +282,18 @@ struct AddUserView: View {
                         .cornerRadius(10)
                         .textFieldStyle(PlainTextFieldStyle())
                         .onChange(of: searchText) { newValue in
-                            addUserSelection.fetchUsers(searchText: newValue) // Use addUserSelection here
+                            addUserSelection.fetchUsers()
                         }
                 }
                 .padding([.horizontal, .top])
                 
                 List {
-                    ForEach(addUserSelection.users.sorted(by: { $0.name < $1.name }), id: \.id) { user in
-                        Button(action: {
+                    ForEach(addUserSelection.users.filter { user in
+                        searchText.isEmpty ||
+                        user.name.lowercased().contains(searchText.lowercased()) ||
+                        user.email.lowercased().contains(searchText.lowercased())
+                    }, id: \.id) { user in
+                            Button(action: {
                             // Save the user to CoreData
                             saveUserToCoreData(user: user, in: managedObjectContext)
                             
