@@ -2,7 +2,7 @@ import CloudKit
 
 class CloudKitManager: ObservableObject {
     static let shared = CloudKitManager()
-    private let publicDatabase = CKContainer.default().publicCloudDatabase
+    let publicDatabase = CKContainer(identifier: "iCloud.Handy-Mapr").publicCloudDatabase
     @Published var currentUser: User?
 
 

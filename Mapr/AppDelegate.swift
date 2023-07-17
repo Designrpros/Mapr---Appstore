@@ -33,35 +33,51 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
             let userIdentifier = appleIDCredential.user
             let fullName = appleIDCredential.fullName
             let email = appleIDCredential.email
-            
-            // Now you can use these values to create a new user in your database
-            // Make sure to handle the case where fullName and email are nil, as they will only be provided the first time the user signs in
+
             let formatter = PersonNameComponentsFormatter()
             let name = formatter.string(from: fullName ?? PersonNameComponents())
             print("User id: \(userIdentifier) Full Name: \(name) Email: \(email ?? "")")
-            
-            // Create a new "PublicUser" record in CloudKit
-            let publicDatabase = CKContainer.default().publicCloudDatabase
-            let newPublicUserRecord = CKRecord(recordType: "User")
-            newPublicUserRecord["username"] = name
-            newPublicUserRecord["userID"] = userIdentifier
-            
-            publicDatabase.save(newPublicUserRecord) { (record, error) in
+
+            let publicDatabase = CKContainer(identifier: "iCloud.Handy-Mapr").publicCloudDatabase
+
+            // Create a predicate to check if the user already exists in the database
+            let predicate = NSPredicate(format: "userID == %@", userIdentifier)
+            let query = CKQuery(recordType: "User", predicate: predicate)
+
+            // Perform the query
+            publicDatabase.perform(query, inZoneWith: nil) { (results, error) in
                 if let error = error {
                     // Handle the error here
-                    print("Error saving record: \(error)")
+                    print("Error performing query: \(error)")
+                } else if let results = results, !results.isEmpty {
+                    // The user already exists in the database, so don't create a new record
+                    print("User already exists in the database")
                 } else {
-                    print("Successfully saved record!")
+                    // The user does not exist in the database, so create a new record
+                    let newPublicUserRecord = CKRecord(recordType: "User")
+                    newPublicUserRecord["username"] = name.isEmpty ? "defaultName\(userIdentifier.prefix(6))" : name
+                    newPublicUserRecord["userID"] = userIdentifier
+
+                    publicDatabase.save(newPublicUserRecord) { (record, error) in
+                        if let error = error {
+                            // Handle the error here
+                            print("Error saving record: \(error)")
+                        } else {
+                            print("Successfully saved record!")
+                        }
+                    }
                 }
             }
-            
+
             // Store the user's name and email
-            self.userName = name
+            self.userName = name.isEmpty ? "defaultName\(userIdentifier.prefix(6))" : name
             self.userEmail = email ?? ""
-            
+
             isSignedIn = true
         }
     }
+
+
 }
 
 

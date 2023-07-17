@@ -491,6 +491,7 @@ struct AddUserModal: View {
     }
 
 
+
     func recordToUser(_ record: CKRecord) -> User {
         return User(
             id: UUID().uuidString,

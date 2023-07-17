@@ -127,6 +127,47 @@ class CoreDataManager: ObservableObject {
         project.removeFromUsers(user)
         saveContext()
     }
+    
+    func synchronizeUsers() {
+        // 1. Fetch all users from CloudKit
+        let publicDatabase = CKContainer(identifier: "iCloud.Handy-Mapr").publicCloudDatabase
+        let query = CKQuery(recordType: "User", predicate: NSPredicate(value: true))
+        publicDatabase.perform(query, inZoneWith: nil) { (records, error) in
+            if let error = error {
+                // Handle the error here
+                print("Error fetching users from CloudKit: \(error)")
+            } else if let records = records {
+                // 2. Fetch all users from CoreData
+                let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+                do {
+                    let userEntities = try self.context.fetch(fetchRequest)
+                    // 3. Compare the two arrays
+                    let cloudKitUsers = records.map { $0.recordID.recordName }
+                    let coreDataUsers = userEntities.compactMap { userEntity in
+                        if let recordIDData = userEntity.recordIDData,
+                           let recordID = try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKRecord.ID.self, from: recordIDData) {
+                            return recordID.recordName
+                        }
+                        return nil
+                    }
+                    let extraUsers = Set(coreDataUsers).subtracting(cloudKitUsers)
+                    // 4. Delete the extra entities
+                    for userEntity in userEntities {
+                        if let recordIDData = userEntity.recordIDData,
+                           let recordID = try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKRecord.ID.self, from: recordIDData),
+                           extraUsers.contains(recordID.recordName) {
+                            self.context.delete(userEntity)
+                        }
+                    }
+                    try self.context.save()
+                } catch {
+                    // Handle the error here
+                    print("Error fetching users from CoreData: \(error)")
+                }
+            }
+        }
+    }
+
 
 }
 

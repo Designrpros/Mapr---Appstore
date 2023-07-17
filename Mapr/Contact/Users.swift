@@ -365,23 +365,21 @@ func saveUserToCoreData(user: User, in managedObjectContext: NSManagedObjectCont
 
 
 func retrieveUserFromCoreData(userEntity: UserEntity) -> User {
-    let id = userEntity.id ?? UUID()
-    let name = userEntity.name ?? ""
-    let email = userEntity.email ?? ""
-    let role = userEntity.role ?? ""
-
-    // Check if recordIDData and recordData are not nil
-    if let recordIDData = userEntity.recordIDData, let recordData = userEntity.recordData {
-        // Convert Data back to CKRecord.ID and CKRecord
-        let recordID = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordIDData)) as? CKRecord.ID ?? CKRecord.ID()
-        let record = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(recordData)) as? CKRecord ?? CKRecord(recordType: "User")
-        return User(id: id.uuidString, name: name, email: email, role: role, recordID: recordID, record: record)
-        } else {
-            // Return a default User object if recordIDData or recordData is nil
-            return User(id: id.uuidString, name: name, email: email, role: role, recordID: CKRecord.ID(), record: CKRecord(recordType: "User"))
-        }
-
+    var recordID: CKRecord.ID = CKRecord.ID(recordName: UUID().uuidString) // Default value
+    if let recordIDData = userEntity.recordIDData {
+        recordID = (try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKRecord.ID.self, from: recordIDData)) ?? recordID
+    }
+    return User(
+        id: userEntity.id?.uuidString ?? "",
+        name: userEntity.name ?? "",
+        email: userEntity.email ?? "",
+        role: userEntity.role ?? "",
+        recordID: recordID,
+        record: CKRecord(recordType: "User") // Default value
+    )
 }
+
+
 
 
 
