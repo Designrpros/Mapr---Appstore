@@ -14,10 +14,6 @@
 		ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556042A57FE64004D089E /* UserDetailView.swift */; };
 		ADB556072A5809D1004D089E /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556062A5809D1004D089E /* CloudKitManager.swift */; };
 		ADB556092A593384004D089E /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556082A593384004D089E /* UserManager.swift */; };
-		ADB5560C2A593404004D089E /* AdminView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB5560B2A593404004D089E /* AdminView.swift */; };
-		ADB5560E2A593413004D089E /* EmployeeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB5560D2A593413004D089E /* EmployeeView.swift */; };
-		ADB556102A59343D004D089E /* ApprenticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB5560F2A59343D004D089E /* ApprenticeView.swift */; };
-		ADB556122A59344D004D089E /* ViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB556112A59344D004D089E /* ViewerView.swift */; };
 		ADD31F3A2A604D5600B2F6E9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = ADD31F392A604D5600B2F6E9 /* README.md */; };
 		ADF4283D2A53A7470096D87D /* MaprApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283C2A53A7470096D87D /* MaprApp.swift */; };
 		ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF4283E2A53A7470096D87D /* AppDelegate.swift */; };
@@ -72,10 +68,6 @@
 		ADB556042A57FE64004D089E /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
 		ADB556062A5809D1004D089E /* CloudKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitManager.swift; sourceTree = "<group>"; };
 		ADB556082A593384004D089E /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
-		ADB5560B2A593404004D089E /* AdminView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminView.swift; sourceTree = "<group>"; };
-		ADB5560D2A593413004D089E /* EmployeeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeView.swift; sourceTree = "<group>"; };
-		ADB5560F2A59343D004D089E /* ApprenticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprenticeView.swift; sourceTree = "<group>"; };
-		ADB556112A59344D004D089E /* ViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerView.swift; sourceTree = "<group>"; };
 		ADD31F392A604D5600B2F6E9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../Design/README.md; sourceTree = "<group>"; };
 		ADD31F3B2A60513400B2F6E9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ADF428392A53A7470096D87D /* Mapr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mapr.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -251,10 +243,6 @@
 			isa = PBXGroup;
 			children = (
 				ADF4287A2A53A82E0096D87D /* LocationDetailView.swift */,
-				ADB5560B2A593404004D089E /* AdminView.swift */,
-				ADB5560D2A593413004D089E /* EmployeeView.swift */,
-				ADB5560F2A59343D004D089E /* ApprenticeView.swift */,
-				ADB556112A59344D004D089E /* ViewerView.swift */,
 				ADB5560A2A5933E7004D089E /* Segment */,
 			);
 			path = LocationDetailsView;
@@ -406,7 +394,6 @@
 				ADF428712A53A7B80096D87D /* Settingsview.swift in Sources */,
 				ADF428772A53A7EF0096D87D /* AllProjectMapView.swift in Sources */,
 				ADF4288D2A53A8F70096D87D /* ContactView.swift in Sources */,
-				ADB556102A59343D004D089E /* ApprenticeView.swift in Sources */,
 				ADF428852A53A89F0096D87D /* ChecklistView.swift in Sources */,
 				ADF4287B2A53A82E0096D87D /* LocationDetailView.swift in Sources */,
 				ADB556092A593384004D089E /* UserManager.swift in Sources */,
@@ -419,17 +406,14 @@
 				ADB556052A57FE64004D089E /* UserDetailView.swift in Sources */,
 				ADF4287F2A53A8550096D87D /* DetailsView.swift in Sources */,
 				ADB556072A5809D1004D089E /* CloudKitManager.swift in Sources */,
-				ADB5560E2A593413004D089E /* EmployeeView.swift in Sources */,
 				ADF428892A53A8C30096D87D /* StreetView.swift in Sources */,
 				ADF428442A53A7470096D87D /* ContentView.swift in Sources */,
 				ADB556032A57F618004D089E /* Users.swift in Sources */,
 				ADF4287D2A53A8410096D87D /* Segment.swift in Sources */,
 				ADF4286D2A53A7950096D87D /* CoreDataManager.swift in Sources */,
-				ADB5560C2A593404004D089E /* AdminView.swift in Sources */,
 				ADF428872A53A8B10096D87D /* PreviewView.swift in Sources */,
 				AD7AB5F62A5C70F600D7F5E6 /* CostumChecklistview.swift in Sources */,
 				ADF4283F2A53A7470096D87D /* AppDelegate.swift in Sources */,
-				ADB556122A59344D004D089E /* ViewerView.swift in Sources */,
 				ADF428752A53A7D80096D87D /* MapView.swift in Sources */,
 				ADF428812A53A86B0096D87D /* TimeTrackerView.swift in Sources */,
 				ADF4286F2A53A7AA0096D87D /* Constants.swift in Sources */,
