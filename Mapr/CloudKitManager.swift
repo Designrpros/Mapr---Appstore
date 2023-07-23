@@ -74,4 +74,25 @@ class CloudKitManager: ObservableObject {
         }
         CKContainer.default().add(operation)
     }
+    
+    func checkShareStatus(of record: CKRecord) {
+        if let shareReference = record.share {
+            let operation = CKFetchRecordsOperation(recordIDs: [shareReference.recordID])
+            operation.perRecordCompletionBlock = { fetchedRecord, _, error in
+                if let error = error {
+                    print("Error fetching share: \(error)")
+                } else if let share = fetchedRecord as? CKShare {
+                    if share.participants.isEmpty {
+                        print("Record is not shared")
+                    } else {
+                        print("Record is shared with \(share.participants.count) participants")
+                    }
+                }
+            }
+            publicDatabase.add(operation)
+        } else {
+            print("Record is not shared")
+        }
+    }
+
 }

@@ -76,7 +76,7 @@ struct ContactListView: View {
             } else {
                 Users()
             }
-        }.navigationTitle("Contacts & Users")
+        }.navigationTitle("Contacts")
         CustomContactSegmentedControl(selectedTab: $selectedSegment)
     }
     

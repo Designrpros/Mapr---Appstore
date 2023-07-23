@@ -134,6 +134,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AD8F00F32A6D2A8F00536544 /* Checklist */ = {
+			isa = PBXGroup;
+			children = (
+				AD7AB5F32A5C6FD400D7F5E6 /* CustomChecklistItemDetailView.swift */,
+				AD7AB5F52A5C70F600D7F5E6 /* CostumChecklistview.swift */,
+			);
+			path = Checklist;
+			sourceTree = "<group>";
+		};
 		ADB555FC2A56A1E3004D089E /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -191,6 +200,7 @@
 				AD7AB5F12A5BB6F300D7F5E6 /* ProjectManager.swift */,
 				ADF428782A53A8030096D87D /* Map */,
 				ADF4288E2A53A8FE0096D87D /* Contact */,
+				AD8F00F32A6D2A8F00536544 /* Checklist */,
 				ADF428452A53A7490096D87D /* Assets.xcassets */,
 				ADF428472A53A7490096D87D /* Mapr.entitlements */,
 				ADD31F3B2A60513400B2F6E9 /* README.md */,
@@ -257,8 +267,6 @@
 				ADB556022A57F618004D089E /* Users.swift */,
 				ADB556042A57FE64004D089E /* UserDetailView.swift */,
 				ADF4288C2A53A8F70096D87D /* ContactView.swift */,
-				AD7AB5F32A5C6FD400D7F5E6 /* CustomChecklistItemDetailView.swift */,
-				AD7AB5F52A5C70F600D7F5E6 /* CostumChecklistview.swift */,
 			);
 			path = Contact;
 			sourceTree = "<group>";

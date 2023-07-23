@@ -84,8 +84,26 @@ class SignInWithAppleManager: NSObject, ObservableObject, ASAuthorizationControl
 
 
 #if os(iOS)
-class AppDelegate: NSObject, UIApplicationDelegate, ASAuthorizationControllerDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        CKContainer.default().accountStatus { (accountStatus, error) in
+            if let error = error {
+                print("Error checking account status: \(error)")
+            } else {
+                switch accountStatus {
+                case .available:
+                    print("iCloud Available")
+                case .noAccount:
+                    print("No iCloud account")
+                case .restricted:
+                    print("iCloud restricted")
+                case .couldNotDetermine:
+                    print("Unable to determine iCloud status")
+                @unknown default:
+                    print("Unknown iCloud status")
+                }
+            }
+        }
         // Override point for customization after application launch.
         return true
     }
@@ -107,7 +125,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last {
             print("Core Data file path: \(url)")
         }
+        
+        CKContainer.default().accountStatus { (accountStatus, error) in
+            if let error = error {
+                print("Error checking account status: \(error)")
+            } else {
+                switch accountStatus {
+                case .available:
+                    print("iCloud Available")
+                case .noAccount:
+                    print("No iCloud account")
+                case .restricted:
+                    print("iCloud restricted")
+                case .couldNotDetermine:
+                    print("Unable to determine iCloud status")
+                @unknown default:
+                    print("Unknown iCloud status")
+                }
+            }
+        }
     }
+
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application

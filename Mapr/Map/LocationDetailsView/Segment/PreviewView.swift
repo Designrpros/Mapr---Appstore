@@ -216,18 +216,9 @@ struct PreviewView: View {
     }
 #if os(macOS)
     private func saveAsPDF(pdfView: some View) {
-        // Estimate the height of your content
-        let itemHeight = CGFloat(50) // Estimate of the height of each item in your lists
-        let otherContentHeight = CGFloat(500) // Estimate of the height of the other content
-
-        let timeEntriesHeight = itemHeight * CGFloat(timeTrackerViewModel.timeEntries.count)
-        let materialsHeight = itemHeight * CGFloat(materialsViewModel.materials.count)
-        let checklistItemsHeight = itemHeight * CGFloat(checklistViewModel.checklistItems.count)
-
-        let contentHeight = timeEntriesHeight + materialsHeight + checklistItemsHeight + otherContentHeight
-
         let pdfWidth = CGFloat(595) // Width of a standard A4 page
-        let pdfHeight = contentHeight + 2 * 20 // Set the height to the content height plus top and bottom margins
+        let maxPdfHeight = CGFloat(842) // Height of a standard A4 page
+        let margin = CGFloat(20) // Adjust this to change the margin size
 
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
@@ -235,39 +226,50 @@ struct PreviewView: View {
         panel.canCreateDirectories = true
         panel.begin { response in
             if response == .OK, let directoryURL = panel.url {
-                let pdfURL = directoryURL.appendingPathComponent("preview.pdf")
+                // Split the content into sections
+                let sections = splitIntoSections(content: pdfView, maxHeight: maxPdfHeight - 2 * margin)
 
-                let renderer = ImageRenderer(content: pdfView)
-                renderer.render { size, context in
-                    var box = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
-                    guard let pdfContext = CGContext(pdfURL as CFURL, mediaBox: &box, nil) else {
-                        return
-                    }
+                for (index, section) in sections.enumerated() {
+                    let pdfURL = directoryURL.appendingPathComponent("preview_\(index).pdf")
 
-                    let margin = CGFloat(20) // Adjust this to change the margin size
-                    let contentRect = CGRect(x: margin, y: margin, width: box.width - 2 * margin, height: box.height - 2 * margin)
+                    let renderer = ImageRenderer(content: section)
+                    renderer.render { size, context in
+                        var box = CGRect(x: 0, y: 0, width: pdfWidth, height: size.height + 2 * margin)
+                        guard let pdfContext = CGContext(pdfURL as CFURL, mediaBox: &box, nil) else {
+                            return
+                        }
 
-                    // Create a new view for the page
-                    let pageView = pdfView
-                        .frame(width: contentRect.width, height: contentRect.height)
-                        .padding(.vertical, margin) // Add padding to top and bottom
+                        let contentRect = CGRect(x: margin, y: margin, width: box.width - 2 * margin, height: box.height - 2 * margin)
 
-                    let renderer = ImageRenderer(content: pageView)
-                    guard let cgImage = renderer.cgImage else { return }
+                        // Create a new view for the page
+                        let pageView = section
+                            .frame(width: contentRect.width, height: contentRect.height)
+                            .padding(.vertical, margin) // Add padding to top and bottom
 
-                    pdfContext.beginPDFPage(nil)
-                    pdfContext.draw(cgImage, in: contentRect)
-                    pdfContext.endPDFPage()
+                        let renderer = ImageRenderer(content: pageView)
+                        guard let cgImage = renderer.cgImage else { return }
 
-                    pdfContext.closePDF()
+                        pdfContext.beginPDFPage(nil)
+                        pdfContext.draw(cgImage, in: contentRect)
+                        pdfContext.endPDFPage()
 
-                    DispatchQueue.main.async {
-                        isPDFSaved = true
+                        pdfContext.closePDF()
+
+                        DispatchQueue.main.async {
+                            isPDFSaved = true
+                        }
                     }
                 }
             }
         }
     }
+
+    private func splitIntoSections(content: some View, maxHeight: CGFloat) -> [some View] {
+        // This is a placeholder function. You'll need to implement this function to split your content into sections.
+        // Each section should be a separate view that can be rendered to a PDF file.
+        return [content]
+    }
+
 #endif
 
 }
