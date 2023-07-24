@@ -73,14 +73,31 @@ struct AllProjectsMapView: UIViewRepresentable {
         }
     }
     class Coordinator: NSObject, MKMapViewDelegate {
-        var parent: AllProjectsMapView
+            var parent: AllProjectsMapView
 
-        init(_ parent: AllProjectsMapView) {
-            self.parent = parent
+            init(_ parent: AllProjectsMapView) {
+                self.parent = parent
+            }
+
+            func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+                guard let annotation = annotation as? ProjectAnnotation else { return nil }
+
+                let identifier = "project"
+                var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
+
+                if annotationView == nil {
+                    annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                } else {
+                    annotationView?.annotation = annotation
+                }
+
+                annotationView?.canShowCallout = true
+                annotationView?.markerTintColor = annotation.color
+                annotationView?.glyphTintColor = .black
+                
+                return annotationView
+            }
         }
-
-        // Implement MKMapViewDelegate methods here
-    }
 
 }
 
@@ -104,7 +121,7 @@ struct AllProjectsMapView: NSViewRepresentable {
     
     func updateNSView(_ nsView: MKMapView, context: Context) {
         nsView.removeAnnotations(nsView.annotations)
-        
+        f
         print("Updating map view with locations: \(locations)")
         
         var minLatitude = 90.0
