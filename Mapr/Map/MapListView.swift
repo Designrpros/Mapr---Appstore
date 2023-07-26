@@ -148,9 +148,11 @@ struct MapListView: View {
                                 }
                                 .contextMenu {
                                     Button(action: {
-                                        // Delete the project associated with the location
-                                        if let project = location.project {
-                                            viewContext.delete(project)
+                                        // Delete all projects associated with the location
+                                        if let projectSet = location.projects {
+                                            for project in projectSet.allObjects as! [Project] {
+                                                viewContext.delete(project)
+                                            }
                                         }
                                         // Delete the location from Core Data
                                         viewContext.delete(location)
@@ -207,8 +209,19 @@ struct MapListView: View {
             }
         }
         
-        private func createProject(from mapItem: MKMapItem) -> Project {
-            let project = Project(context: viewContext)
+    private func createProject(from mapItem: MKMapItem) -> Project {
+        let project = Project(context: viewContext)
+        
+        // Check if a Location already exists for the mapItem
+        let fetchRequest: NSFetchRequest<Location> = Location.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "name == %@", mapItem.name ?? "")
+        let existingLocations = try? viewContext.fetch(fetchRequest)
+        
+        if let existingLocation = existingLocations?.first {
+            // If a Location already exists, use it
+            project.location = existingLocation
+        } else {
+            // If no Location exists, create a new one
             let location = Location(context: viewContext)
             
             // Set the properties of the location based on the mapItem
@@ -221,33 +234,35 @@ struct MapListView: View {
             
             // Associate the location with the project
             project.location = location
-            
-            // Set the other properties of the project
-            project.projectName = mapItem.name
-            
-            // Create a new CKRecord for the project
-            let newRecord = CKRecord(recordType: "Project")
-            // Save the CKRecord's recordID to the project
-            project.recordID = newRecord.recordID.recordName
-            
-            print("Saving project...")
-            do {
-                try viewContext.save()
-                print("Project saved successfully.")
-            } catch {
-                print("Failed to save project: \(error)")
-            }
-            
-            // Update the search results to remove the newly saved location
-            if let index = searchResults.firstIndex(where: { $0.name == mapItem.name }) {
-                searchResults.remove(at: index)
-            }
-            
-            // Clear the search text
-            searchText = ""
-            
-            return project
         }
+        
+        // Set the other properties of the project
+        project.projectName = mapItem.name
+        
+        // Create a new CKRecord for the project
+        let newRecord = CKRecord(recordType: "Project")
+        // Save the CKRecord's recordID to the project
+        project.recordID = newRecord.recordID.recordName
+        
+        print("Saving project...")
+        do {
+            try viewContext.save()
+            print("Project saved successfully.")
+        } catch {
+            print("Failed to save project: \(error)")
+        }
+        
+        // Update the search results to remove the newly saved location
+        if let index = searchResults.firstIndex(where: { $0.name == mapItem.name }) {
+            searchResults.remove(at: index)
+        }
+        
+        // Clear the search text
+        searchText = ""
+        
+        return project
+    }
+
         
         
         
@@ -269,12 +284,7 @@ struct MapListView: View {
                 }
                 
                 DispatchQueue.main.async {
-                    let savedLocationNames = Set(self.projects.map { $0.location?.name ?? "" })
-                    self.searchResults = response.mapItems.filter { mapItem in
-                        guard let name = mapItem.name else { return false }
-                        return !savedLocationNames.contains(name)
-                    }
-                    
+                    self.searchResults = response.mapItems
                     if self.searchResults.isEmpty {
                         self.setDefaultLocation()
                     }
@@ -282,6 +292,7 @@ struct MapListView: View {
             }
         }
     }
+
 
     private func setDefaultLocation() {
         let defaultLocation = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060))) // New York City

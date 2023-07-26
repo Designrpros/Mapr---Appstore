@@ -43,17 +43,20 @@ struct AllProjectsMapView: UIViewRepresentable {
         var maxLongitude = -180.0
         
         for location in locations {
-            guard let project = location.project else { continue }
-            let annotation = ProjectAnnotation(project: project)
-            uiView.addAnnotation(annotation)
-            
-            let latitude = location.latitude
-            let longitude = location.longitude
-            
-            minLatitude = min(minLatitude, latitude)
-            maxLatitude = max(maxLatitude, latitude)
-            minLongitude = min(minLongitude, longitude)
-            maxLongitude = max(maxLongitude, longitude)
+            if let projectSet = location.projects {
+                for project in projectSet.allObjects as! [Project] {
+                    let annotation = ProjectAnnotation(project: project)
+                    uiView.addAnnotation(annotation)
+                    
+                    let latitude = location.latitude
+                    let longitude = location.longitude
+                    
+                    minLatitude = min(minLatitude, latitude)
+                    maxLatitude = max(maxLatitude, latitude)
+                    minLongitude = min(minLongitude, longitude)
+                    maxLongitude = max(maxLongitude, longitude)
+                }
+            }
         }
         
         let centerLatitude = (minLatitude + maxLatitude) / 2.0
@@ -121,7 +124,6 @@ struct AllProjectsMapView: NSViewRepresentable {
     
     func updateNSView(_ nsView: MKMapView, context: Context) {
         nsView.removeAnnotations(nsView.annotations)
-        f
         print("Updating map view with locations: \(locations)")
         
         var minLatitude = 90.0
@@ -130,18 +132,24 @@ struct AllProjectsMapView: NSViewRepresentable {
         var maxLongitude = -180.0
         
         for location in locations {
-            guard let project = location.project else { continue }
-            let annotation = ProjectAnnotation(project: project)
-            nsView.addAnnotation(annotation)
-            
-            let latitude = location.latitude
-            let longitude = location.longitude
-            
-            minLatitude = min(minLatitude, latitude)
-            maxLatitude = max(maxLatitude, latitude)
-            minLongitude = min(minLongitude, longitude)
-            maxLongitude = max(maxLongitude, longitude)
+            if let projectSet = location.projects {
+                for project in projectSet.allObjects as! [Project] {
+                    let annotation = ProjectAnnotation(project: project)
+                    nsView.addAnnotation(annotation)
+                    
+                    let latitude = location.latitude
+                    let longitude = location.longitude
+                    
+                    minLatitude = min(minLatitude, latitude)
+                    maxLatitude = max(maxLatitude, latitude)
+                    minLongitude = min(minLongitude, longitude)
+                    maxLongitude = max(maxLongitude, longitude)
+                }
+            }
         }
+
+
+
         
         let centerLatitude = (minLatitude + maxLatitude) / 2.0
         let centerLongitude = (minLongitude + maxLongitude) / 2.0
