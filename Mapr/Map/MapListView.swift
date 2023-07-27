@@ -131,22 +131,40 @@ struct MapListView: View {
                         Spacer()
                         
                         ForEach(projects.filter { !$0.isFinished }, id: \.self) { project in
-                            if let location = project.location {
-                                NavigationLink(destination: LocationDetailView(project: project, locations: $locations, userSelection: userSelection)) {
-                                    HStack {
-                                        Image(systemName: "house.fill")
-                                            .foregroundColor(.purple)
-                                            .frame(width: 30, height: 30)
-                                        VStack(alignment: .leading) {
-                                            Text(location.name ?? "Unknown") // Use the name from your Location entity
-                                                .font(.headline)
-                                            Text("\(location.postalCode ?? ""), \(location.city ?? ""), \(location.country ?? "")") // Display the postal code, city, and country
-                                                .font(.subheadline)
-                                                .foregroundColor(.gray)
-                                        }
-                                    }
-                                }
+                               if let location = project.location {
+                                   // Calculate the index of the project at its location
+                                   let projectIndex = projects.filter { $0.location == location && !$0.isFinished }.firstIndex(of: project)
+                                   
+                                   NavigationLink(destination: LocationDetailView(project: project, locations: $locations, userSelection: userSelection)) {
+                                       HStack {
+                                           Image(systemName: "house.fill")
+                                               .foregroundColor(.purple)
+                                               .frame(width: 30, height: 30)
+                                           VStack(alignment: .leading) {
+                                               Text("\(location.name ?? "Unknown")\(projectIndex.map { $0 > 0 ? " (\($0 + 1))" : "" } ?? "")") // Use the name from your Location entity
+                                                   .font(.headline)
+                                               Text("\(location.postalCode ?? ""), \(location.city ?? ""), \(location.country ?? "")") // Display the postal code, city, and country
+                                                   .font(.subheadline)
+                                                   .foregroundColor(.gray)
+                                           }
+                                       }
+                                   }
+                               
+
                                 .contextMenu {
+                                    Button(action: {
+                                        // Delete only the selected project
+                                        viewContext.delete(project)
+                                        do {
+                                            try viewContext.save()
+                                        } catch {
+                                            print("Failed to delete project: \(error)")
+                                        }
+                                    }) {
+                                        Text("Delete Project")
+                                        Image(systemName: "trash")
+                                    }
+                                    
                                     Button(action: {
                                         // Delete all projects associated with the location
                                         if let projectSet = location.projects {
@@ -162,23 +180,27 @@ struct MapListView: View {
                                             print("Failed to delete location: \(error)")
                                         }
                                     }) {
-                                        Text("Delete Location")
+                                        Text("Delete All Projects at Location")
                                         Image(systemName: "trash")
                                     }
                                 }
+
                             }
                         }
                     }
                     Section(header: Text("Finished Projects")) {
                         ForEach(projects.filter { $0.isFinished }, id: \.self) { project in
                             if let location = project.location {
+                                // Calculate the index of the project at its location
+                                let projectIndex = projects.filter { $0.location == location && $0.isFinished }.firstIndex(of: project)
+                                
                                 NavigationLink(destination: LocationDetailView(project: project, locations: $locations, userSelection: userSelection)) {
                                     HStack {
                                         Image(systemName: "house.fill")
-                                            .foregroundColor(.yellow)
+                                            .foregroundColor(.purple)
                                             .frame(width: 30, height: 30)
                                         VStack(alignment: .leading) {
-                                            Text(location.name ?? "Unknown") // Use the name from your Location entity
+                                            Text("\(location.name ?? "Unknown")\(projectIndex.map { $0 > 0 ? " (\($0 + 1))" : "" } ?? "")") // Use the name from your Location entity
                                                 .font(.headline)
                                             Text("\(location.postalCode ?? ""), \(location.city ?? ""), \(location.country ?? "")") // Display the postal code, city, and country
                                                 .font(.subheadline)
@@ -220,6 +242,8 @@ struct MapListView: View {
         if let existingLocation = existingLocations?.first {
             // If a Location already exists, use it
             project.location = existingLocation
+            // Increment the count of how many times the location has been selected
+            existingLocation.count += 1
         } else {
             // If no Location exists, create a new one
             let location = Location(context: viewContext)
@@ -231,6 +255,8 @@ struct MapListView: View {
             location.country = mapItem.placemark.country
             location.latitude = mapItem.placemark.coordinate.latitude
             location.longitude = mapItem.placemark.coordinate.longitude
+            // Set the count to 1 since this is the first time the location is being selected
+            location.count = 1
             
             // Associate the location with the project
             project.location = location
@@ -262,6 +288,7 @@ struct MapListView: View {
         
         return project
     }
+
 
         
         
