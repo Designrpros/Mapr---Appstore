@@ -27,27 +27,41 @@ class ProjectAnnotation: NSObject, Identifiable, MKAnnotation {
     }
 }
 
-
-
 struct AllProjectsMapView: View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Location.name, ascending: true)],
         animation: .default)
     private var locations: FetchedResults<Location>
+    
+    @State private var showFinishedProjects = true
+
+    @State private var initialRegion = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+        span: MKCoordinateSpan(latitudeDelta: 0, longitudeDelta: 0)
+    )
+    @State private var userRegion = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+        span: MKCoordinateSpan(latitudeDelta: 0, longitudeDelta: 0)
+    )
 
     var body: some View {
-        Map(coordinateRegion: $region, annotationItems: annotations) { annotation in
+        Map(coordinateRegion: $userRegion, annotationItems: filteredAnnotations) { annotation in
             MapMarker(coordinate: annotation.coordinate, tint: annotation.color)
         }
         .onAppear {
             updateRegion()
+            userRegion = initialRegion
+        }
+        .toolbar {
+            ToolbarItem {
+                Button(action: {
+                    showFinishedProjects.toggle()
+                }) {
+                    Text(showFinishedProjects ? "Hide Finished Projects" : "Show Finished Projects")
+                }
+            }
         }
     }
-
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-        span: MKCoordinateSpan(latitudeDelta: 0, longitudeDelta: 0)
-    )
 
     private var annotations: [ProjectAnnotation] {
         var annotations = [ProjectAnnotation]()
@@ -62,13 +76,17 @@ struct AllProjectsMapView: View {
         return annotations
     }
 
+    private var filteredAnnotations: [ProjectAnnotation] {
+        annotations.filter { showFinishedProjects || !$0.project.isFinished }
+    }
+
     private func updateRegion() {
         var minLatitude = 90.0
         var maxLatitude = -90.0
         var minLongitude = 180.0
         var maxLongitude = -180.0
 
-        for annotation in annotations {
+        for annotation in filteredAnnotations {
             let latitude = annotation.coordinate.latitude
             let longitude = annotation.coordinate.longitude
 
@@ -88,6 +106,6 @@ struct AllProjectsMapView: View {
         let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
         let region = MKCoordinateRegion(center: centerCoordinate, span: span)
 
-        self.region = region
+        self.initialRegion = region
     }
 }
