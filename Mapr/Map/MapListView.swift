@@ -151,40 +151,24 @@ struct MapListView: View {
                                    }
                                
 
-                                .contextMenu {
-                                    Button(action: {
-                                        // Delete only the selected project
-                                        viewContext.delete(project)
-                                        do {
-                                            try viewContext.save()
-                                        } catch {
-                                            print("Failed to delete project: \(error)")
-                                        }
-                                    }) {
-                                        Text("Delete Project")
-                                        Image(systemName: "trash")
-                                    }
-                                    
-                                    Button(action: {
-                                        // Delete all projects associated with the location
-                                        if let projectSet = location.projects {
-                                            for project in projectSet.allObjects as! [Project] {
-                                                viewContext.delete(project)
-                                            }
-                                        }
-                                        // Delete the location from Core Data
-                                        viewContext.delete(location)
-                                        do {
-                                            try viewContext.save()
-                                        } catch {
-                                            print("Failed to delete location: \(error)")
-                                        }
-                                    }) {
-                                        Text("Delete All Projects at Location")
-                                        Image(systemName: "trash")
-                                    }
-                                }
-
+                                   .contextMenu {
+                                       Button(action: {
+                                           // Remove the project from the projects relationship of its location
+                                           project.location?.removeFromProjects(project)
+                                           
+                                           // Delete the project
+                                           viewContext.delete(project)
+                                           
+                                           do {
+                                               try viewContext.save()
+                                           } catch {
+                                               print("Failed to delete project: \(error)")
+                                           }
+                                       }) {
+                                           Text("Delete Project")
+                                           Image(systemName: "trash")
+                                       }
+                                   }
                             }
                         }
                     }
