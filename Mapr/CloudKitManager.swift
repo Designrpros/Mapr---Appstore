@@ -6,6 +6,8 @@ class CloudKitManager: ObservableObject {
     @Published var currentUser: User?
 
 
+    var backOffTime = 1.0
+
     func addUser(username: String, email: String, role: String, completion: @escaping (CKRecord?, Error?) -> Void) {
         let record = CKRecord(recordType: "User")
         record["username"] = username
@@ -13,21 +15,47 @@ class CloudKitManager: ObservableObject {
         record["role"] = role
 
         publicDatabase.save(record) { (savedRecord, error) in
-            DispatchQueue.main.async {
-                completion(savedRecord, error)
+            if let ckerror = error as? CKError, ckerror.code == .requestRateLimited {
+                // If the error is a rate limit error, wait for the suggested time before trying again
+                let retryAfter = ckerror.userInfo[CKErrorRetryAfterKey] as? Double ?? 0
+                DispatchQueue.main.asyncAfter(deadline: .now() + retryAfter) {
+                    self.addUser(username: username, email: email, role: role, completion: completion)
+                }
+            } else {
+                // If the request was successful or failed for a different reason, call the completion handler
+                DispatchQueue.main.async {
+                    completion(savedRecord, error)
+                }
             }
         }
     }
 
+
+
+
     func fetchUsers(completion: @escaping ([CKRecord]?, Error?) -> Void) {
+        print("Fetching users")
         let query = CKQuery(recordType: "User", predicate: NSPredicate(value: true))
 
         publicDatabase.perform(query, inZoneWith: nil) { (records, error) in
-            DispatchQueue.main.async {
-                completion(records, error)
+            print("Rate limit error when fetching users, retrying after \(self.backOffTime) seconds")
+            if let ckerror = error as? CKError, ckerror.code == .limitExceeded {
+                // If the error is a rate limit error, wait for the back-off time before trying again
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.backOffTime) {
+                    self.backOffTime *= 2
+                    self.fetchUsers(completion: completion)
+                }
+            } else {
+                print("Finished fetching users, error: \(error)")
+                // If the request was successful or failed for a different reason, reset the back-off time and call the completion handler
+                self.backOffTime = 1.0
+                DispatchQueue.main.async {
+                    completion(records, error)
+                }
             }
         }
     }
+
     
     
     func deleteUser(user: User, completion: @escaping (Error?) -> Void) {
