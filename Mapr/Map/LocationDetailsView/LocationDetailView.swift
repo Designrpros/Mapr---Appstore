@@ -198,8 +198,7 @@ struct LocationDetailView: View {
                             }
                         }
 
-
-///* THIS IS RELEVANT CODE FOR DTS
+/* THIS IS RELEVANT CODE FOR DTS
                         Button(action: {
                             showingAddUserModal = true
                         }) {
@@ -211,7 +210,7 @@ struct LocationDetailView: View {
                         .sheet(isPresented: $showingAddUserModal) {
                             AddUserModal(project: project, managedObjectContext: managedObjectContext, userSelection: userSelection, selectedUsers: $selectedUsers, userEntities: userEntities)
                         }
-//*/
+*/
 
 #endif
                         //Button(action: {

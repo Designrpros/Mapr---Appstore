@@ -15,7 +15,7 @@ struct ContentView: View {
                     switch selectedTab {
                     case 0:
                         MapListView()
-                            .navigationTitle("Mapr")
+                           .navigationTitle("Mapr")
                     case 1:
                         ContactListView()
                             .navigationTitle("Contacts")
@@ -51,7 +51,7 @@ struct TabBar: View {
             TabButton(icon: "list.bullet", tabNumber: 2, selectedTab: $selectedTab)
         }
         .frame(height: 60)
-        .background(Color("AccentColor1"))
+        //.background(Color("AccentColor1"))
     }
 }
 
@@ -64,7 +64,7 @@ struct TabButton: View {
         Button(action: { selectedTab = tabNumber }) {
             Image(systemName: icon)
                 .font(.system(size: 24))
-                .foregroundColor(selectedTab == tabNumber ? Color("CostumGray") : Color.primary)
+                .foregroundColor(selectedTab == tabNumber ?  Color.primary : Color("CostumGray"))
                 .frame(maxWidth: .infinity, maxHeight: 60)
         }
         .buttonStyle(BorderlessButtonStyle())

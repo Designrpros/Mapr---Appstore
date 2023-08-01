@@ -360,6 +360,9 @@ struct ContactModalView: View {
                     }) {
                         Image(systemName: "person.crop.circle.badge.plus")
                             .foregroundColor(.white)
+#if os(iOS)
+                            .imageScale(.large)
+#endif
                     }
                     .padding(.leading, 8)
                     .buttonStyle(BorderlessButtonStyle())

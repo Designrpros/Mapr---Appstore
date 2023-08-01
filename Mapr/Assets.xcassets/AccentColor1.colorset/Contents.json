@@ -7,7 +7,25 @@
           "alpha" : "1.000",
           "blue" : "0.141",
           "green" : "0.141",
-          "red" : "0.129"
+          "red" : "0.133"
+        }
+      },
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "color" : {
+        "color-space" : "display-p3",
+        "components" : {
+          "alpha" : "1.000",
+          "blue" : "0.141",
+          "green" : "0.141",
+          "red" : "0.133"
         }
       },
       "idiom" : "universal"

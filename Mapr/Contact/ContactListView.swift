@@ -77,7 +77,7 @@ struct ContactListView: View {
                 Users()
             }
         }.navigationTitle("Contacts")
-        CustomContactSegmentedControl(selectedTab: $selectedSegment)
+        //CustomContactSegmentedControl(selectedTab: $selectedSegment)
     }
     
     var filteredContacts: [Contact] {
@@ -146,7 +146,10 @@ struct AddContactView: View {
                     Button("Cancel") {
                         presentationMode.wrappedValue.dismiss()
                     }
+                    .font(.system(size: 24))
+                    
                     Spacer()
+                    
                     Button("Add") {
                         let newContact = Contact(context: viewContext)
                         newContact.name = newName
@@ -161,6 +164,7 @@ struct AddContactView: View {
                             print("Failed to add contact: \(error)")
                         }
                     }
+                    .font(.system(size: 24))
                 }
                 .padding()
                 .frame(width: 250, height: 50)
